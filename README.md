@@ -6,7 +6,7 @@ Chimera and Chimera-SDK are developed as part of the PULP project, a joint effor
 
 ## License
 
-Unless specified otherwise in the respective file headers, all code checked into this repository is made available under a permissive license. All software sources are licensed under Apache 2.0 or compatible licenses.
+Unless specified otherwise in the respective file headers, all code checked into this repository is made available under a permissive license. All software sources are licensed under Apache 2.0 or compatible licenses, with the exception of `scripts/run_clang_format.py`, which is licensed under the MIT license.
 
 ## Getting started
 
