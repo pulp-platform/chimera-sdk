@@ -15,22 +15,7 @@ set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_gcc.cmake)
 
 project(chimera-sdk LANGUAGES C ASM)
 
-set(AVAILABLE_TARGETS
-  "Cheshire"
-  CACHE STRING "Available Targets"
-)
-
-get_property(OPT_STRINGS CACHE OPT PROPERTY STRINGS)
-
-if(NOT TARGET_PLATFORM IN_LIST AVAILABLE_TARGETS)
-  message(FATAL_ERROR "Wrong value for TARGET_PLATFORM: Got ${TARGET_PLATFORM}")
-endif()
-
-
-if (TARGET_PLATFORM STREQUAL "Cheshire")
-  add_subdirectory(targets/cheshire)
-endif()
-
+add_subdirectory(targets)
 add_subdirectory(hal)
 
 add_library(chimera-sdk INTERFACE)
