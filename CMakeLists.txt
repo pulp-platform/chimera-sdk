@@ -6,14 +6,17 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
-
 set(CMAKE_C_STANDARD 99)
 
+# SCHEREMO: Needed to skip compiler test, which doesn't support baremetal targets
 set(CMAKE_C_COMPILER_WORKS 1)
+
+# SCHEREMO: This toolchain file is only used for test compilation!
 set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_gcc.cmake)
 
 project(chimera-sdk LANGUAGES C ASM)
+
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
 add_subdirectory(targets)
 add_subdirectory(hal)
