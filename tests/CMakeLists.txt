@@ -5,3 +5,5 @@
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 
 add_subdirectory(generic)
+
+# TODO: Add target-specific test directories
