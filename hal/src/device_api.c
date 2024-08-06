@@ -4,5 +4,5 @@
 //
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
