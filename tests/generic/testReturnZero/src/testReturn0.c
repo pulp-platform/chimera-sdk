@@ -4,4 +4,6 @@
 //
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
 
-int main() { return 0; }
+int main() {
+    return 0;
+}

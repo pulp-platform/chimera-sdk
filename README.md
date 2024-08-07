@@ -29,13 +29,17 @@ cmake -DTARGET_PLATFORM=[YOURTARGETPLATFORM]  ../
 cmake --build .
 ```
 
+where you should replace `[YOURTARGETPLATFORM]` by one of the platforms defined in `targets/CMakeLists.txt` under `AVAILABLE_TARGETS`.
+
 The resulting binaries will be stored in `build/bin`, and can be used within the `chimera` repo as tests.
 
 ## CXX Formatting
 
 To format all source files, run
 ```
-python scripts/run_clang_format.py -ir sw/
+python scripts/run_clang_format.py -ir hal/
+python scripts/run_clang_format.py -ir targets/
+python scripts/run_clang_format.py -ir tests/
 ```
 
 Our CI uses llvm-12 for clang-format, so on IIS machines you may run
