@@ -45,10 +45,60 @@ ExternalProject_Add(
 
 message(STATUS "OpenTitan added as an external project.")
 
-add_library(opentitan_lib STATIC IMPORTED GLOBAL)
+set(OPENTITAN_SW_DIR ${OPENTITAN_DIR}/sw)
+set(OPENTITAN_HW_IP_DIR ${OPENTITAN_DIR}/hw/ip)
+set(OPENTITAN_UTIL_DIR ${OPENTITAN_DIR}/util)
 
-set_target_properties(opentitan_lib PROPERTIES
-  IMPORTED_LOCATION ${OPENTITAN_DIR}/sw/device/lib/libot.a
+set(REGTOOL_PY ${OPENTITAN_UTIL_DIR}/regtool.py)
+set(UART_HJSON ${OPENTITAN_HW_IP_DIR}/uart/data/uart.hjson)
+set(UART_REGS_H ${OPENTITAN_SW_DIR}/device/lib/dif/autogen/uart_regs.h)
+
+add_custom_command(
+  OUTPUT ${UART_REGS_H}
+  COMMAND ${Python3_EXECUTABLE} ${REGTOOL_PY} ${UART_HJSON} -D > ${UART_REGS_H}
+  DEPENDS ${REGTOOL_PY} ${UART_HJSON}
+  COMMENT "Generating uart_regs.h"
 )
 
-add_dependencies(opentitan_lib opentitan)
+add_custom_target(
+  generate_uart_regs ALL
+  DEPENDS ${UART_REGS_H}
+)
+
+add_dependencies(generate_uart_regs opentitan)
+
+ExternalProject_Get_Property(opentitan SOURCE_DIR)
+
+file(GLOB_RECURSE OPENTITAN_SOURCES
+    "${OPENTITAN_SW_DIR}/device/lib/base/*.c"
+    "${OPENTITAN_SW_DIR}/device/lib/dif/*.c"
+    "${OPENTITAN_SW_DIR}/device/lib/dif/autogen/*.c"
+    "${OPENTITAN_SW_DIR}/device/lib/runtime/*.c"
+)
+
+list(FILTER OPENTITAN_SOURCES EXCLUDE REGEX ".*crc32.*")
+list(FILTER OPENTITAN_SOURCES EXCLUDE REGEX ".*hardened.*")
+
+message(STATUS "OpenTitan sources collected.")
+
+add_library(opentitan_lib STATIC ${OPENTITAN_SOURCES})
+
+add_dependencies(opentitan_lib opentitan generate_uart_regs)
+
+target_include_directories(opentitan_lib
+    PUBLIC
+    ${OPENTITAN_SW_DIR}
+    ${OPENTITAN_SW_DIR}/device/lib
+    ${OPENTITAN_SW_DIR}/device/lib/base
+    ${OPENTITAN_SW_DIR}/device/lib/base/internal
+    ${OPENTITAN_SW_DIR}/device/lib/dif
+    ${OPENTITAN_SW_DIR}/device/lib/dif/autogen
+)
+
+target_link_libraries(opentitan_lib
+    PUBLIC
+    runtime
+)
+
+message(STATUS "OpenTitan library configured.")
+
