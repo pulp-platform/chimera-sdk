@@ -53,17 +53,28 @@ The resulting binaries will be stored in `build/bin`, and can be used within the
 
 To format all source files, run
 ```
-python scripts/run_clang_format.py -ir hal/
-python scripts/run_clang_format.py -ir targets/
-python scripts/run_clang_format.py -ir tests/
+python scripts/run_clang_format.py -ir hal/ targets/ tests/ driver/
 ```
 
 Our CI uses llvm-12 for clang-format, so on IIS machines you may run
 ```
-python scripts/run_clang_format.py -ir hal/ --clang-format-executable=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin/clang-format
-
-python scripts/run_clang_format.py -ir targets/ --clang-format-executable=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin/clang-format
-
-python scripts/run_clang_format.py -ir tests/ --clang-format-executable=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin/clang-format
+python scripts/run_clang_format.py -ir tests/ hal/ targets/ driver/ --clang-format-executable=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin/clang-format
 
 ```
+
+## Visual Studio Code Integration
+
+To enable automatic configuration of the C/C++ extension and support for the integrated cMake build flow on the IIS workstations, add the following content to `.vscode/settings.json`:
+```json
+{
+    "cmake.configureSettings": {
+        "TOOLCHAIN_DIR": "/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin",
+        "TARGET_PLATFORM": "chimera-convolve",
+    },
+    "cmake.environment": {
+        "PATH": "/usr/pack/riscv-1.0-kgf/default/bin:${env:PATH}",
+        "LD_LIBRARY_PATH": "/usr/pack/riscv-1.0-kgf/lib64:/usr/pack/riscv-1.0-kgf/lib64",
+    }
+}
+```
+

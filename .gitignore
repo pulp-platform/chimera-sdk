@@ -1,3 +1,5 @@
 *~
 .ninja*
 **/build/*
+
+.vscode/settings.json

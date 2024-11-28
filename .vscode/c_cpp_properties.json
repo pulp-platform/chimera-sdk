@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "cMake",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compileCommands": "${config:cmake.buildDirectory}/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
