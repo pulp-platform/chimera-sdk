@@ -4,17 +4,18 @@
 //
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
 
+#include "test_cluster.h"
+#include "test_host.h"
+
 #include "soc.h"
-#include "driver.h"
-
-#include <stddef.h>
-
-#define TESTVAL 0x050CCE55
-#define STACK_ADDRESS (CLUSTER_4_BASE + 0x20000 - 8)
 
 static uint32_t *clintPointer = (uint32_t *)CLINT_CTRL_BASE;
 
-// WIESEP: Stack, thread and global pointer might not yet be set up!
+/**
+ * @brief Interrupt handler for the cluster, which clears the interrupt flag for the current hart.
+ *
+ * @warning Stack, thread and global pointer might not yet be set up!
+ */
 __attribute__((naked)) void clusterInterruptHandler() {
     asm volatile(
         // Load global pointer
@@ -42,12 +43,11 @@ __attribute__((naked)) void clusterInterruptHandler() {
     );
 }
 
-typedef struct {
-    int value;
-} offloadArgs_t;
-
-static offloadArgs_t offloadArgs = {.value = 0xdeadbeef};
-
+/**
+ * @brief Main function of the cluster test.
+ *
+ * @return int Return 0 if the test was successful, -1 otherwise.
+ */
 int32_t testReturn(void *args) {
     // Cast to the correct struct
     offloadArgs_t *argsStruct = (offloadArgs_t *)args;
@@ -58,12 +58,4 @@ int32_t testReturn(void *args) {
     }
 
     return TESTVAL;
-}
-
-int main() {
-    setup_snitchCluster_interruptHandler(clusterInterruptHandler);
-    offload_snitchCluster_core(testReturn, &offloadArgs, (void *)(STACK_ADDRESS), 4, 0);
-    uint32_t retVal = wait_snitchCluster_return(4);
-
-    return (retVal != (TESTVAL | 0x000000001));
 }

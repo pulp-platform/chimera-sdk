@@ -5,19 +5,30 @@
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-file(GLOB_RECURSE TEST_SRCS
-  "src/test.c"
+set(TEST_NAME test_host_returnZero)
+
+######## HOST Code #############################################################
+file(GLOB_RECURSE TEST_HOST_SRCS
+  "src_host/*.c"
 )
 
-add_chimera_test(
-  test_host_returnZero
-  ${TEST_SRCS}
-)
+add_library(${TEST_NAME}_host OBJECT ${TEST_HOST_SRCS})
+# target_include_directories(${TEST_NAME}_host PUBLIC include)
 
-target_compile_options(test_host_returnZero
+# WIESEP: Set the correct ISA and ABI for the host
+target_compile_options(${TEST_NAME}_host
   PRIVATE
   -O2
+  -march=${ISA_HOST}
+  -mabi=${ABI_HOST}
+)
+target_link_libraries(${TEST_NAME}_host PUBLIC chimera-sdk)
+
+
+######## TEST Executable #######################################################
+add_chimera_test(
+  ${TEST_NAME}
 )
 
-
-target_link_libraries(test_host_returnZero PUBLIC chimera-sdk)
+# WIESEP: Link the host to the test executable (chimera-sdk is already linked)
+target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_host)

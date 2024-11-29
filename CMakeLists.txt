@@ -34,14 +34,12 @@ set(ABI_HOST ilp32)
 set(ISA_CLUSTER_SNITCH rv32im)
 set(ABI_CLUSTER_SNITCH ilp32)
 
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
+message(STATUS "[CHIMERA-SDK] ISA_HOST           : ${ISA_HOST}")
+message(STATUS "[CHIMERA-SDK] ABI_HOST           : ${ABI_HOST}")
+message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_SNITCH : ${ISA_CLUSTER_SNITCH}")
+message(STATUS "[CHIMERA-SDK] ABI_CLUSTER_SNITCH : ${ABI_CLUSTER_SNITCH}")
 
-# WIESEP: With the current flow the cluster ISA has to be part of the host ISA
-# use isa_includes to check this
-set(ISA_IS_SUBSET isa_includes(${ISA_HOST} ${ISA_CLUSTER_SNITCH}))
-if(NOT ISA_IS_SUBSET)
-  message(FATAL_ERROR "Cluster ISA ${ISA_CLUSTER_SNITCH} is not included in host ISA ${ISA_HOST}")
-endif()
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
 # WIESEP: Add a object library to collect all runtime sources
 add_library(runtime STATIC)
@@ -74,12 +72,6 @@ add_subdirectory(driver)
 add_library(chimera-sdk INTERFACE)
 target_link_libraries(chimera-sdk INTERFACE hal)
 target_link_libraries(chimera-sdk INTERFACE runtime)
-
-# WIESEP: Expose cluster ISA and ABI to avoid offloading issues
-target_compile_options(chimera-sdk INTERFACE
-  -march=${ISA_CLUSTER_SNITCH}
-  -mabi=${ABI_CLUSTER_SNITCH}
-)
 
 enable_testing()
 
