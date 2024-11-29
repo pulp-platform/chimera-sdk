@@ -5,8 +5,4 @@
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-# Add test for host core
-add_subdirectory(host)
-
-# Add test for snitchCluster
-add_subdirectory(snitchCluster)
+add_subdirectory(simpleOffload)

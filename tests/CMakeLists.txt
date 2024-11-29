@@ -5,6 +5,5 @@
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 
 add_subdirectory(generic)
-add_target_source(${TARGET_PLATFORM})
 
-# TODO: Add target-specific test directories
+# add_target_source(${TARGET_PLATFORM})

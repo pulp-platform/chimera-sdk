@@ -3,16 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
-
-project(chimera-sdk-testReturnZero LANGUAGES C ASM)
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 file(GLOB_RECURSE TEST_SRCS
-  "src/testReturn0.c"
+  "src/test.c"
 )
 
 add_chimera_test(
-  testReturnZero
+  test_host_returnZero
   ${TEST_SRCS}
 )
 
-target_link_libraries(testReturnZero PUBLIC chimera-sdk)
+target_link_libraries(test_host_returnZero PUBLIC chimera-sdk)

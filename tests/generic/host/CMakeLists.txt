@@ -3,5 +3,6 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-add_subdirectory(testClusterOffload)
+add_subdirectory(returnZero)

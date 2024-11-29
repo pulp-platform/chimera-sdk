@@ -3,16 +3,15 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
-
-project(chimera-sdk-testClusterOffload LANGUAGES C ASM)
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 file(GLOB_RECURSE TEST_SRCS
-  "src/testClusterOffload.c"
+  "src/test.c"
 )
 
 add_chimera_test(
-  testClusterOffload
+  test_snitchCluster_simpleOffload
   ${TEST_SRCS}
 )
 
-target_link_libraries(testClusterOffload PUBLIC chimera-sdk)
+target_link_libraries(test_snitchCluster_simpleOffload PUBLIC chimera-sdk)
