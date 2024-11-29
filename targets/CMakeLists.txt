@@ -8,6 +8,7 @@
 set(AVAILABLE_TARGETS
   "chimera-host"
   "chimera-open"
+  "chimera-convolve"
   CACHE STRING "Available Targets"
 )
 
@@ -23,4 +24,8 @@ endif()
 
 if (TARGET_PLATFORM STREQUAL "chimera-open")
   add_subdirectory(chimera-open)
+endif()
+
+if (TARGET_PLATFORM STREQUAL "chimera-convolve")
+  add_subdirectory(chimera-convolve)
 endif()
