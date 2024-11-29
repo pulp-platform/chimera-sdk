@@ -12,7 +12,6 @@ set(CMAKE_C_STANDARD 99)
 
 # SCHEREMO: Needed to skip compiler test, which doesn't support baremetal targets
 set(CMAKE_C_COMPILER_WORKS 1)
-set(CMAKE_CXX_STANDARD 11)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
