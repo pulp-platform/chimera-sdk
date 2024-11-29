@@ -78,3 +78,18 @@ To enable automatic configuration of the C/C++ extension and support for the int
 }
 ```
 
+## Technical Details
+
+### Mixed ISA Compilation
+The current approach compiles all code for both the host and cluster cores into a single library. This requires precise handling to ensure compatibility between the different instruction set architectures (ISAs) and application binary interfaces (ABIs).
+This requires careful handling to avoid invalid instructions caused by mismatched ISAs or ABIs between the host and cluster cores. Hence, we define four CMake variables,`ISA_HOST`, `ABI_HOST`, `ISA_CLUSTER_SNITCH`, and `ABI_CLUSTER_SNITCH` to specify the appropriate ISA and ABI for each core type. 
+Furthermore, the tests are split into `src_host` and `src_cluster` directories to clearly separate code executed on the host and cluster cores. 
+
+### cMake Build Flow
+All runtime functions executed by the host core are compiled into a dedicated `runtime` static library. The trampoline function, which is executed by the cluster core, is a notable exception. To support its compilation with a different ISA, the trampoline function is built separately as an object library. This object library is then linked into the `runtime` library, ensuring that it integrates seamlessly while maintaining the necessary ISA compatibility.
+
+### Warning
+Special attention is required for functions that execute before the cluster core is fully initialized, such as the trampoline function and interrupt handlers. At this stage, critical resources like the stack, global pointer, and thread pointer are not yet configured. Consequently, the compiler must not generate code that allocates stack frames. To address this, such functions are implemented as naked functions, which prevent the compiler from adding prologues or epilogues that rely on stack operations.
+
+**It is recommended to always check the generated assembly code to ensure that the correct instructions are generated for the target core!**
+
