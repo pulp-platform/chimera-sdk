@@ -127,7 +127,6 @@ _trap_handler_wrap:
     addi sp, sp, 128
     mret
 
-.global trap_vector
 .weak trap_vector
 trap_vector:
     j trap_vector

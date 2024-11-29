@@ -6,4 +6,7 @@
 
 add_subdirectory(generic)
 
-# add_target_source(${TARGET_PLATFORM})
+# Check if folder has a CMakeLists.txt file
+if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${TARGET_PLATFORM}/CMakeLists.txt)
+  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${TARGET_PLATFORM})
+endif()
