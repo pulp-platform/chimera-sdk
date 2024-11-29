@@ -16,12 +16,6 @@ set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
-
-# SCHEREMO: Help most IDE's LSPs find definitions
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-
 # SCHEREMO: This toolchain file is only used for test compilation!
 set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
 
