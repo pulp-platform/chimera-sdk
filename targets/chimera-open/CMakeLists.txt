@@ -14,28 +14,24 @@ file(GLOB_RECURSE C_SOURCES
 )
 
 set_property(SOURCE ${ASM_SOURCES} PROPERTY LANGUAGE ASM)
-add_library(runtime OBJECT ${ASM_SOURCES} ${C_SOURCES})
 
+target_sources(runtime
+  PRIVATE
+  ${ASM_SOURCES}
+  ${C_SOURCES}
+)
+
+# WIESEP: Export the target specific linkerscript
+target_link_options(runtime
+  PUBLIC
+  -L${CMAKE_CURRENT_LIST_DIR}
+  -Tlink.ld
+)
+
+# WIESEP: Export the target specific include directory
 target_include_directories(runtime
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
-set(ISA rv32imc)
-set(ABI ilp32)
 
-target_compile_options(runtime
-  PUBLIC
-  -march=${ISA}
-  -mabi=${ABI}
-)
-
-target_link_options(runtime
-  PUBLIC
-  -march=${ISA}
-  -mabi=${ABI}
-  -nostartfiles
-  -nostdlib
-  -L${CMAKE_CURRENT_LIST_DIR}
-  -Tlink.ld
-)

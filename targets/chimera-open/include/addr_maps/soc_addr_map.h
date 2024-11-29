@@ -25,6 +25,10 @@
 #define CLUSTER_3_NUMCORES 9
 #define CLUSTER_4_NUMCORES 9
 
+#define NUM_CLUSTER_CORES \
+    (CLUSTER_0_NUMCORES + CLUSTER_1_NUMCORES + CLUSTER_2_NUMCORES + CLUSTER_3_NUMCORES + \
+     CLUSTER_4_NUMCORES)
+
 static uint8_t _chimera_numCores[] = {CLUSTER_0_NUMCORES, CLUSTER_1_NUMCORES, CLUSTER_2_NUMCORES,
                                       CLUSTER_3_NUMCORES, CLUSTER_4_NUMCORES};
 #define _chimera_numClusters 5

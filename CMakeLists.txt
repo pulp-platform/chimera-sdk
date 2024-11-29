@@ -4,6 +4,7 @@
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 cmake_minimum_required(VERSION 3.13)
 
@@ -27,15 +28,58 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 project(chimera-sdk LANGUAGES C ASM)
 
+# WIESEP: It is important to set the ISA and ABI for the host and the cluster snitch
+set(ISA_HOST rv32imc)
+set(ABI_HOST ilp32)
+set(ISA_CLUSTER_SNITCH rv32im)
+set(ABI_CLUSTER_SNITCH ilp32)
+
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
-add_subdirectory(targets)
-add_subdirectory(hal)
+# WIESEP: With the current flow the cluster ISA has to be part of the host ISA
+# use isa_includes to check this
+set(ISA_IS_SUBSET isa_includes(${ISA_HOST} ${ISA_CLUSTER_SNITCH}))
+if(NOT ISA_IS_SUBSET)
+  message(FATAL_ERROR "Cluster ISA ${ISA_CLUSTER_SNITCH} is not included in host ISA ${ISA_HOST}")
+endif()
 
+# WIESEP: Add a object library to collect all runtime sources
+add_library(runtime STATIC)
+
+target_compile_options(runtime
+  PRIVATE
+  -O2
+  -march=${ISA_HOST}
+  -mabi=${ABI_HOST}
+)
+
+target_link_options(runtime
+  PRIVATE
+  -march=${ISA_HOST}
+  -mabi=${ABI_HOST}
+)
+
+# WIESEP: Expose common link option
+target_link_options(runtime
+  PUBLIC
+  -nostartfiles
+  -nostdlib
+)
+
+add_subdirectory(hal)
+add_subdirectory(targets)
+add_subdirectory(driver)
+
+# WIESEP: Interface library to link against all components of the SDK
 add_library(chimera-sdk INTERFACE)
 target_link_libraries(chimera-sdk INTERFACE hal)
 target_link_libraries(chimera-sdk INTERFACE runtime)
-target_sources(chimera-sdk INTERFACE $<TARGET_OBJECTS:runtime>)
+
+# WIESEP: Expose cluster ISA and ABI to avoid offloading issues
+target_compile_options(chimera-sdk INTERFACE
+  -march=${ISA_CLUSTER_SNITCH}
+  -mabi=${ABI_CLUSTER_SNITCH}
+)
 
 enable_testing()
 

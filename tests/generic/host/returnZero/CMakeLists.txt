@@ -14,4 +14,10 @@ add_chimera_test(
   ${TEST_SRCS}
 )
 
+target_compile_options(test_host_returnZero
+  PRIVATE
+  -O2
+)
+
+
 target_link_libraries(test_host_returnZero PUBLIC chimera-sdk)
