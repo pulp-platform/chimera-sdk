@@ -4,6 +4,7 @@
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 file(GLOB_RECURSE ASM_SOURCES
   "src/crt0.S"
