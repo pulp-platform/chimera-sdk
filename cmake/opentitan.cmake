@@ -125,13 +125,9 @@ add_custom_target(
 
 add_dependencies(generate_uart_regs opentitan_build)
 
-# Explicitly list OpenTitan source files
-set(OPENTITAN_SOURCES
-  ${OPENTITAN_SW_DIR}/device/lib/base/abs_mmio.c
-  ${OPENTITAN_SW_DIR}/device/lib/base/bitfield.c
-  ${OPENTITAN_SW_DIR}/device/lib/base/math.c
-  ${OPENTITAN_SW_DIR}/device/lib/base/math_builtins.c
-  ${OPENTITAN_SW_DIR}/device/lib/base/memory.c
+file(GLOB_RECURSE OPENTITAN_SOURCES
+  LIST_DIRECTORIES false
+  ${OPENTITAN_SW_DIR}/device/lib/base/*.c
 )
 
 message(STATUS "OpenTitan sources collected.")
