@@ -66,7 +66,7 @@ target_link_options(runtime
 
 add_subdirectory(hal)
 add_subdirectory(targets)
-add_subdirectory(driver)
+add_subdirectory(drivers)
 
 # WIESEP: Interface library to link against all components of the SDK
 add_library(chimera-sdk INTERFACE)
