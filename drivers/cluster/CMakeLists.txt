@@ -17,11 +17,11 @@ target_sources(runtime_host PRIVATE ${C_SOURCES})
 ################################################################################
 # Snitch Cluster Runtime Library                                               #
 ################################################################################
-file(GLOB_RECURSE C_SOURCES_SNTICH
+file(GLOB_RECURSE C_SOURCES_SNITCH
   "trampoline_snitchCluster.c"
 )
 
-target_sources(runtime_cluster_snitch PRIVATE ${C_SOURCES_SNTICH})
+target_sources(runtime_cluster_snitch PRIVATE ${C_SOURCES_SNITCH})
 
 
 
