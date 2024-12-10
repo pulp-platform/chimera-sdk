@@ -4,18 +4,16 @@
 //
 // Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-#include "soc.h"
-
 #include <stdint.h>
 
 // Persistent trampoline function pointer for each core
-extern void (*_trampoline_function[NUM_CLUSTER_CORES])(void *);
+extern void (*_trampoline_function)(void *);
 
 // Peristent argument storage for the trampoline function
-extern void *_trampoline_args[NUM_CLUSTER_CORES];
+extern void *_trampoline_args;
 
 // Persistant stack pointer storage for each core
-extern void *_trampoline_stack[NUM_CLUSTER_CORES];
+extern void *_trampoline_stack;
 
 /**
  * @brief Trampoline function for the cluster core.

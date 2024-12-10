@@ -3,10 +3,32 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-add_subdirectory(generic)
+# Define mappings directly using lists for each target
+set(CHIMERA_CONVOLVE_FOLDERS chimera-convolve chimera-open chimera-host)
+set(CHIMERA_OPEN_FOLDERS chimera-open chimera-host)
+set(CHIMERA_HOST_FOLDERS chimera-host)
 
-# Check if folder has a CMakeLists.txt file
-if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${TARGET_PLATFORM}/CMakeLists.txt)
-  add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${TARGET_PLATFORM})
+# Determine which folders to include based on TARGET_PLATFORM
+if(TARGET_PLATFORM STREQUAL "chimera-convolve")
+    set(INCLUDED_FOLDERS ${CHIMERA_CONVOLVE_FOLDERS})
+elseif(TARGET_PLATFORM STREQUAL "chimera-open")
+    set(INCLUDED_FOLDERS ${CHIMERA_OPEN_FOLDERS})
+elseif(TARGET_PLATFORM STREQUAL "chimera-host")
+    set(INCLUDED_FOLDERS ${CHIMERA_HOST_FOLDERS})
+else()
+    message(FATAL_ERROR "[CHIMERA-SDK] Unknown TARGET_PLATFORM: '${TARGET_PLATFORM}'. Valid options are chimera-convolve, chimera-open, or chimera-host.")
 endif()
+
+# WIESEP: Print the folders being included
+message(STATUS "[CHIMERA-SDK] Including test folders: ${INCLUDED_FOLDERS}")
+
+# Add subdirectories, checking for a valid CMakeLists.txt in each folder
+foreach(folder IN LISTS INCLUDED_FOLDERS)
+    if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${folder}/CMakeLists.txt)
+        add_subdirectory(${folder})
+    else()
+        message(WARNING "[CHIMERA-SDK] Folder '${folder}' does not contain a valid CMakeLists.txt. Skipping.")
+    endif()
+endforeach()

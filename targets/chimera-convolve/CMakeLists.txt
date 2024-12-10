@@ -16,23 +16,27 @@ file(GLOB_RECURSE C_SOURCES
 
 set_property(SOURCE ${ASM_SOURCES} PROPERTY LANGUAGE ASM)
 
-target_sources(runtime
+target_sources(runtime_host
   PRIVATE
   ${ASM_SOURCES}
   ${C_SOURCES}
 )
 
 # WIESEP: Export the target specific linkerscript
-target_link_options(runtime
+target_link_options(runtime_host
   PUBLIC
   -L${CMAKE_CURRENT_LIST_DIR}
   -Tlink.ld
 )
 
 # WIESEP: Export the target specific include directory
-target_include_directories(runtime
+target_include_directories(runtime_host
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
-
+# WIESEP: Export the headers also to the cluster runtime
+target_include_directories(runtime_cluster_snitch
+  PUBLIC
+  ${CMAKE_CURRENT_LIST_DIR}/include
+)

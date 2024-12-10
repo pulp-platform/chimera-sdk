@@ -29,50 +29,82 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 project(chimera-sdk LANGUAGES C ASM)
 
 # WIESEP: It is important to set the ISA and ABI for the host and the cluster snitch
-set(ISA_HOST rv32imc)
-set(ABI_HOST ilp32)
+set(ABI ilp32)
 set(ISA_CLUSTER_SNITCH rv32im)
-set(ABI_CLUSTER_SNITCH ilp32)
+set(ISA_HOST rv32imc)
 
-message(STATUS "[CHIMERA-SDK] ISA_HOST           : ${ISA_HOST}")
-message(STATUS "[CHIMERA-SDK] ABI_HOST           : ${ABI_HOST}")
-message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_SNITCH : ${ISA_CLUSTER_SNITCH}")
-message(STATUS "[CHIMERA-SDK] ABI_CLUSTER_SNITCH : ${ABI_CLUSTER_SNITCH}")
+message(STATUS "[CHIMERA-SDK] ABI                   : ${ABI}")
+message(STATUS "[CHIMERA-SDK] ISA_HOST              : ${ISA_HOST}")
+message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_SNITCH    : ${ISA_CLUSTER_SNITCH}")
+if (${DISASSEMBLE_LIBRARIES})
+  message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : ON")
+else()
+  message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : OFF")
+endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
-# WIESEP: Add a object library to collect all runtime sources
-add_library(runtime STATIC)
+################################################################################
+# Host Runtime Library                                                         #
+################################################################################
+add_library(runtime_host STATIC)
 
-target_compile_options(runtime
+target_compile_options(runtime_host
   PRIVATE
   -O2
-  -march=${ISA_HOST}
-  -mabi=${ABI_HOST}
 )
 
-target_link_options(runtime
-  PRIVATE
+target_compile_options(runtime_host
+  PUBLIC
   -march=${ISA_HOST}
-  -mabi=${ABI_HOST}
+  -mabi=${ABI}
 )
 
 # WIESEP: Expose common link option
-target_link_options(runtime
+target_link_options(runtime_host
   PUBLIC
+  -march=${ISA_HOST}
+  -mabi=${ABI}
   -nostartfiles
-  -nostdlib
+  -ffreestanding
 )
 
+################################################################################
+# Snitch Cluster Runtime Library                                               #
+################################################################################
+add_library(runtime_cluster_snitch STATIC)
+
+# WIESEP: Do not export optimization flags
+target_compile_options(runtime_cluster_snitch
+  PRIVATE
+  -O2
+)
+
+target_compile_options(runtime_cluster_snitch
+  PUBLIC
+  -march=${ISA_CLUSTER_SNITCH}
+  -mabi=${ABI}
+)
+
+# WIESEP: Expose common link option
+target_link_options(runtime_cluster_snitch
+  PUBLIC
+  -march=${ISA_CLUSTER_SNITCH}
+  -mabi=${ABI}
+  -nostartfiles
+  -ffreestanding
+)
+
+################################################################################
+# Add subdirectories                                                           #
+################################################################################
 add_subdirectory(hal)
 add_subdirectory(targets)
 add_subdirectory(drivers)
 
-# WIESEP: Interface library to link against all components of the SDK
-add_library(chimera-sdk INTERFACE)
-target_link_libraries(chimera-sdk INTERFACE hal)
-target_link_libraries(chimera-sdk INTERFACE runtime)
-
+################################################################################
+# Testing                                                                      #
+################################################################################
 enable_testing()
 
 add_subdirectory(tests)

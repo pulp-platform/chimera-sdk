@@ -2,11 +2,11 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 #
+# Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
+# Add test for host core
+# add_subdirectory(host)
 
-# WIESEP: Add all runtime drivers
-add_subdirectory(cluster)
-
-# WIESEP: Export this directory as root include directory for the drivers
-target_include_directories(runtime_host PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+# Add test for snitchCluster
+add_subdirectory(snitchCluster)

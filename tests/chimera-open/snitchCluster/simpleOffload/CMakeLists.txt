@@ -19,10 +19,8 @@ target_include_directories(${TEST_NAME}_host PUBLIC include)
 target_compile_options(${TEST_NAME}_host
   PRIVATE
   -O2
-  -march=${ISA_HOST}
-  -mabi=${ABI_HOST}
 )
-target_link_libraries(${TEST_NAME}_host PUBLIC chimera-sdk)
+target_link_libraries(${TEST_NAME}_host PUBLIC runtime_host hal_host)
 
 ######## CLUSTER Code ##########################################################
 file(GLOB_RECURSE TEST_SNITCH_SRCS
@@ -36,16 +34,15 @@ target_include_directories(${TEST_NAME}_cluster PUBLIC include)
 target_compile_options(${TEST_NAME}_cluster
   PRIVATE
   -O2
-  -march=${ISA_CLUSTER_SNITCH}
-  -mabi=${ABI_CLUSTER_SNITCH}
 )
-target_link_libraries(${TEST_NAME}_cluster PUBLIC chimera-sdk)
+target_link_libraries(${TEST_NAME}_cluster PUBLIC runtime_cluster_snitch)
 
 ######## TEST Executable #######################################################
 add_chimera_test(
   ${TEST_NAME}
 )
 
-# WIESEP: Link the host and cluster code to the test executable (chimera-sdk is already linked)
+# WIESEP: Link the host and cluster code to the test executable
 target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_host)
 target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_cluster)
+

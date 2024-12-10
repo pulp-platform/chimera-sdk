@@ -4,6 +4,7 @@
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 file(GLOB_RECURSE ASM_SOURCES
   "src/crt0.S"
@@ -14,28 +15,28 @@ file(GLOB_RECURSE C_SOURCES
 )
 
 set_property(SOURCE ${ASM_SOURCES} PROPERTY LANGUAGE ASM)
-add_library(runtime OBJECT ${ASM_SOURCES} ${C_SOURCES})
 
-target_include_directories(runtime
+target_sources(runtime_host
+  PRIVATE
+  ${ASM_SOURCES}
+  ${C_SOURCES}
+)
+
+# WIESEP: Export the target specific linkerscript
+target_link_options(runtime_host
+  PUBLIC
+  -L${CMAKE_CURRENT_LIST_DIR}
+  -Tlink.ld
+)
+
+# WIESEP: Export the target specific include directory
+target_include_directories(runtime_host
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
-set(ISA rv32imc)
-set(ABI ilp32)
-
-target_compile_options(runtime
+# WIESEP: Export the headers also to the cluster runtime
+target_include_directories(runtime_cluster_snitch
   PUBLIC
-  -march=${ISA}
-  -mabi=${ABI}
-)
-
-target_link_options(runtime
-  PUBLIC
-  -march=${ISA}
-  -mabi=${ABI}
-  -nostartfiles
-  -nostdlib
-  -L${CMAKE_CURRENT_LIST_DIR}
-  -Tlink.ld
+  ${CMAKE_CURRENT_LIST_DIR}/include
 )

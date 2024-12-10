@@ -53,12 +53,12 @@ The resulting binaries will be stored in `build/bin`, and can be used within the
 
 To format all source files, run
 ```
-python scripts/run_clang_format.py -ir hal/ targets/ tests/ driver/
+python scripts/run_clang_format.py -ir hal/ targets/ tests/ drivers/
 ```
 
 Our CI uses llvm-12 for clang-format, so on IIS machines you may run
 ```
-python scripts/run_clang_format.py -ir tests/ hal/ targets/ driver/ --clang-format-executable=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin/clang-format
+python scripts/run_clang_format.py -ir tests/ hal/ targets/ drivers/ --clang-format-executable=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin/clang-format
 
 ```
 
@@ -77,12 +77,13 @@ To enable automatic configuration of the C/C++ extension and support for the int
     }
 }
 ```
+If you are not on an IIS system, you need to adjust the paths according to your local installation.
 
 ## Technical Details
 
 ### Mixed ISA Compilation
 The current approach compiles all code for both the host and cluster cores into a single library. This requires precise handling to ensure compatibility between the different instruction set architectures (ISAs) and application binary interfaces (ABIs).
-This requires careful handling to avoid invalid instructions caused by mismatched ISAs or ABIs between the host and cluster cores. Hence, we define four CMake variables,`ISA_HOST`, `ABI_HOST`, `ISA_CLUSTER_SNITCH`, and `ABI_CLUSTER_SNITCH` to specify the appropriate ISA and ABI for each core type. 
+This requires careful handling to avoid invalid instructions caused by mismatched ISAs between the host and cluster cores. Hence, we define four CMake variables,`ABI`, `ISA_HOST`, and `ISA_CLUSTER_SNITCH`, to specify the appropriate ISA for each core type. The ABI has to be identical to ensure correct function calls.
 Furthermore, the tests are split into `src_host` and `src_cluster` directories to clearly separate code executed on the host and cluster cores. 
 
 ### cMake Build Flow

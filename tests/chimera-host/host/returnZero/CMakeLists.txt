@@ -19,16 +19,15 @@ add_library(${TEST_NAME}_host OBJECT ${TEST_HOST_SRCS})
 target_compile_options(${TEST_NAME}_host
   PRIVATE
   -O2
-  -march=${ISA_HOST}
-  -mabi=${ABI_HOST}
 )
-target_link_libraries(${TEST_NAME}_host PUBLIC chimera-sdk)
-
+target_link_libraries(${TEST_NAME}_host PUBLIC runtime_host hal_host)
 
 ######## TEST Executable #######################################################
 add_chimera_test(
   ${TEST_NAME}
 )
 
-# WIESEP: Link the host to the test executable (chimera-sdk is already linked)
+# WIESEP: Link the host to the test executable
 target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_host)
+
+
