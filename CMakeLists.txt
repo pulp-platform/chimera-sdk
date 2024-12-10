@@ -20,6 +20,8 @@ set(HOST_FAMILY "riscv32")
 set(HOST_ENDIAN "little")
 set(HOST_SYSTEM "unknown")
 
+set(DISASSEMBLE_LIBRARIES CACHE BOOL OFF)
+
 # SCHEREMO: This toolchain file is only used for test compilation!
 set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
 

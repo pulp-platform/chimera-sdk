@@ -40,6 +40,8 @@ target_include_directories(runtime_host
 target_compile_options(runtime_host
   PRIVATE
   -O2
+  -ffunction-sections
+  -fdata-sections
 )
 
 target_compile_options(runtime_host
@@ -105,6 +107,8 @@ target_include_directories(runtime_cluster_snitch
 target_compile_options(runtime_cluster_snitch
   PRIVATE
   -O2
+  -ffunction-sections
+  -fdata-sections
 )
 
 target_compile_definitions(runtime_cluster_snitch PUBLIC TARGET_PLATFORM_CHIMERA_OPEN)
