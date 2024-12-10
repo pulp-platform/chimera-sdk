@@ -6,6 +6,9 @@
 # Host Runtime Library                                                         #
 ################################################################################
 add_library(runtime_host STATIC)
+if (${DISASSEMBLE_LIBRARIES})
+  disassemble_target(runtime_host)
+endif()
 
 target_link_directories(runtime_host PUBLIC
   ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib/baremetal/${COMPILERRT_HOST}
@@ -42,6 +45,8 @@ target_include_directories(runtime_host
 target_compile_options(runtime_host
   PRIVATE
   -O2
+  -ffunction-sections
+  -fdata-sections
 )
 
 target_compile_options(runtime_host
@@ -68,6 +73,10 @@ target_link_options(runtime_host
 # Trampoline Functions
 ################################################################################
 add_library(trampoline_rv32im STATIC)
+if (${DISASSEMBLE_LIBRARIES})
+  disassemble_target(trampoline_rv32im)
+endif()
+
 target_compile_options(trampoline_rv32im
   PRIVATE
   -O2
@@ -88,6 +97,9 @@ target_include_directories(trampoline_rv32im
 # Snitch Cluster Runtime Library                                               #
 ################################################################################
 add_library(runtime_cluster_snitch STATIC)
+if (${DISASSEMBLE_LIBRARIES})
+  disassemble_target(runtime_cluster_snitch)
+endif()
 
 target_link_directories(runtime_cluster_snitch PUBLIC
   ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib/baremetal/${COMPILERRT_CLUSTER_SNITCH}
@@ -109,6 +121,8 @@ target_include_directories(runtime_cluster_snitch
 target_compile_options(runtime_cluster_snitch
   PRIVATE
   -O2
+  -ffunction-sections
+  -fdata-sections
 )
 
 target_compile_definitions(runtime_cluster_snitch PUBLIC TARGET_PLATFORM_CHIMERA_CONVOLVE)

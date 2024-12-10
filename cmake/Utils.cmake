@@ -200,6 +200,13 @@ macro(add_target_source name)
   endif()
 endmacro()
 
+# Generic command to dissassemble a target
+macro(disassemble_target target)
+  add_custom_command(
+    TARGET ${target}
+    POST_BUILD
+    COMMAND ${CMAKE_OBJDUMP} -dhS $<TARGET_FILE:${target}> > $<TARGET_FILE:${target}>.s)
+endmacro()
 
 #[=======================================================================[.rst:
 .. cmake:command:: add_chimera_subdirectories(target_platform, category, mappings)

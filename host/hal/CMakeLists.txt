@@ -17,3 +17,6 @@ target_link_libraries(hal_host
   picolibc_host
 )
 
+if (${DISASSEMBLE_LIBRARIES})
+  disassemble_target(hal_host)
+endif()
