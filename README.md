@@ -87,7 +87,8 @@ This requires careful handling to avoid invalid instructions caused by mismatche
 Furthermore, the tests are split into `src_host` and `src_cluster` directories to clearly separate code executed on the host and cluster cores. 
 
 ### cMake Build Flow
-All runtime functions executed by the host core are compiled into a dedicated `runtime` static library. The trampoline function, which is executed by the cluster core, is a notable exception. To support its compilation with a different ISA, the trampoline function is built separately as an object library. This object library is then linked into the `runtime` library, ensuring that it integrates seamlessly while maintaining the necessary ISA compatibility.
+All runtime functions executed by the host core are compiled into a dedicated `runtime_host` static library and the cluster code into `runtime_cluster_<type>` (e.g. `runtime_cluster_snitch`). Additionally, the HAL layer is compiled into the `hal_host` static libary.
+The final binary is seperated into two object libaries, one for the host and one for the cluster core. The host object library is linked with the `runtime_host` and `hal_host` libraries, while the cluster object library is linked with the `runtime_cluster_<type>` library. The final binary is then linked from the two object libraries.
 
 ### Warning
 Special attention is required for functions that execute before the cluster core is fully initialized, such as the trampoline function and interrupt handlers. At this stage, critical resources like the stack, global pointer, and thread pointer are not yet configured. Consequently, the compiler must not generate code that allocates stack frames. To address this, such functions are implemented as naked functions, which prevent the compiler from adding prologues or epilogues that rely on stack operations.
