@@ -6,10 +6,10 @@
 
 
 ################################################################################
-# Host Runtime Library                                                         #
+# Snitch Cluster Runtime Library                                               #
 ################################################################################
-file(GLOB_RECURSE C_SOURCES
-  "offload_snitchCluster.c"
+file(GLOB_RECURSE C_SOURCES_SNITCH
+  "trampoline_snitchCluster.c"
 )
 
-target_sources(runtime_host PRIVATE ${C_SOURCES})
+target_sources(runtime_cluster_snitch PRIVATE ${C_SOURCES_SNITCH})

@@ -45,61 +45,17 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
 ################################################################################
-# Host Runtime Library                                                         #
-################################################################################
-add_library(runtime_host STATIC)
-
-target_compile_options(runtime_host
-  PRIVATE
-  -O2
-)
-
-target_compile_options(runtime_host
-  PUBLIC
-  -march=${ISA_HOST}
-  -mabi=${ABI}
-)
-
-# WIESEP: Expose common link option
-target_link_options(runtime_host
-  PUBLIC
-  -march=${ISA_HOST}
-  -mabi=${ABI}
-  -nostartfiles
-  -ffreestanding
-)
-
-################################################################################
-# Snitch Cluster Runtime Library                                               #
-################################################################################
-add_library(runtime_cluster_snitch STATIC)
-
-# WIESEP: Do not export optimization flags
-target_compile_options(runtime_cluster_snitch
-  PRIVATE
-  -O2
-)
-
-target_compile_options(runtime_cluster_snitch
-  PUBLIC
-  -march=${ISA_CLUSTER_SNITCH}
-  -mabi=${ABI}
-)
-
-# WIESEP: Expose common link option
-target_link_options(runtime_cluster_snitch
-  PUBLIC
-  -march=${ISA_CLUSTER_SNITCH}
-  -mabi=${ABI}
-  -nostartfiles
-  -ffreestanding
-)
-
-################################################################################
 # Add subdirectories                                                           #
 ################################################################################
-add_subdirectory(hal)
+# WIESEP: Targets have to be included before the other folders to make them available
+# Depending on the target, the following static libraries have to added by the targets:
+# - runtime_host
+# - runtime_cluster_snitch
 add_subdirectory(targets)
+
+# Include other subdirectories
+add_subdirectory(hal)
+add_subdirectory(devices)
 add_subdirectory(drivers)
 
 ################################################################################

@@ -6,6 +6,11 @@
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
+################################################################################
+# Host Runtime Library                                                         #
+################################################################################
+add_library(runtime_host STATIC)
+
 file(GLOB_RECURSE ASM_SOURCES
   "src/crt0.S"
 )
@@ -22,21 +27,62 @@ target_sources(runtime_host
   ${C_SOURCES}
 )
 
-# WIESEP: Export the target specific linkerscript
-target_link_options(runtime_host
-  PUBLIC
-  -L${CMAKE_CURRENT_LIST_DIR}
-  -Tlink.ld
-)
-
 # WIESEP: Export the target specific include directory
 target_include_directories(runtime_host
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/include
 )
 
+target_compile_options(runtime_host
+  PRIVATE
+  -O2
+)
+
+target_compile_options(runtime_host
+  PUBLIC
+  -march=${ISA_HOST}
+  -mabi=${ABI}
+)
+
+# WIESEP: Export the target specific linkerscript
+target_link_options(runtime_host
+  PUBLIC
+  -L${CMAKE_CURRENT_LIST_DIR}
+  -Tlink.ld
+  -march=${ISA_HOST}
+  -mabi=${ABI}
+  -nostartfiles
+  -ffreestanding
+)
+
+################################################################################
+# Snitch Cluster Runtime Library                                               #
+################################################################################
+add_library(runtime_cluster_snitch STATIC)
+
 # WIESEP: Export the headers also to the cluster runtime
 target_include_directories(runtime_cluster_snitch
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/include
+)
+
+# WIESEP: Do not export optimization flags
+target_compile_options(runtime_cluster_snitch
+  PRIVATE
+  -O2
+)
+
+target_compile_options(runtime_cluster_snitch
+  PUBLIC
+  -march=${ISA_CLUSTER_SNITCH}
+  -mabi=${ABI}
+)
+
+# WIESEP: Expose common link option
+target_link_options(runtime_cluster_snitch
+  PUBLIC
+  -march=${ISA_CLUSTER_SNITCH}
+  -mabi=${ABI}
+  -nostartfiles
+  -ffreestanding
 )
