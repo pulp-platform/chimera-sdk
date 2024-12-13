@@ -30,19 +30,39 @@ macro(add_target_source name)
   endif()
 endmacro()
 
-# Define a reusable macro for handling folder mappings
-macro(add_chimera_subdirectories target_platform category mappings)
+
+#[=======================================================================[.rst:
+.. command:: add_chimera_subdirectories(target_platform, category, mappings)
+
+   Add subdirectories based on a mapping of target platforms to folders.
+   The mappings are expected to be in the format ``target_platform:folder1,folder2,...``.
+
+   :param target_platform: The target platform to build for.
+   :param category: The category of the subdirectories.
+   :param mappings: A list of mappings from target platforms to folders.
+   
+   .. code-block:: cmake
+      :caption Example Usage
+
+      set(MAPPINGS
+          chimera-convolve:snitch_cluster
+          chimera-open:snitch_cluster
+          chimera-host:
+      )
+      add_chimera_subdirectories(${TARGET_PLATFORM} "Device" ${MAPPINGS})
+
+#]=======================================================================]
+function(add_chimera_subdirectories target_platform category mappings)
   # Initialize included folders
   set(included_folders "")
 
   # Process mappings
-  foreach(mapping IN LISTS ${mappings})
+  foreach(mapping IN LISTS mappings)
     string(FIND "${mapping}" ":" delim_pos)
     if(delim_pos EQUAL -1)
       message(WARNING "[CHIMERA-SDK] Invalid mapping entry: '${mapping}'. Skipping.")
       continue()
     endif()
-
 
     # Extract key and value
     string(SUBSTRING "${mapping}" 0 ${delim_pos} key)
@@ -77,4 +97,4 @@ macro(add_chimera_subdirectories target_platform category mappings)
       message(WARNING "[CHIMERA-SDK] ${category} folder '${folder}' does not contain a valid CMakeLists.txt. Skipping.")
     endif()
   endforeach()
-endmacro()
+endfunction()
