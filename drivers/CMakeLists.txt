@@ -12,7 +12,7 @@ set(DRIVER_MAPPINGS
 )
 
 # Call the macro
-add_chimera_subdirectories(${TARGET_PLATFORM} "Driver" ${DRIVER_MAPPINGS})
+add_chimera_subdirectories(${TARGET_PLATFORM} "Driver" "${DRIVER_MAPPINGS}")
 
 
 # WIESEP: Export this directory as root include directory for the drivers

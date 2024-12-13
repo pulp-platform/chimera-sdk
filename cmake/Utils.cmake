@@ -39,7 +39,7 @@ endmacro()
 
    :param target_platform: The target platform to build for.
    :param category: The category of the subdirectories.
-   :param mappings: A list of mappings from target platforms to folders.
+   :param mappings: A list of mappings from target platforms to folders. Make sure to wrap the list in quotes!
    
    .. code-block:: cmake
       :caption Example Usage
@@ -49,7 +49,7 @@ endmacro()
           chimera-open:snitch_cluster
           chimera-host:
       )
-      add_chimera_subdirectories(${TARGET_PLATFORM} "Device" ${MAPPINGS})
+      add_chimera_subdirectories(${TARGET_PLATFORM} "Device" "${MAPPINGS}")
 
 #]=======================================================================]
 function(add_chimera_subdirectories target_platform category mappings)

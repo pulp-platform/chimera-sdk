@@ -13,4 +13,4 @@ set(TEST_MAPPINGS
 )
 
 # Call the macro
-add_chimera_subdirectories(${TARGET_PLATFORM} "Test" ${TEST_MAPPINGS})
+add_chimera_subdirectories(${TARGET_PLATFORM} "Test" "${TEST_MAPPINGS}")
