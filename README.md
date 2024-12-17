@@ -11,10 +11,10 @@ Unless specified otherwise in the respective file headers, all code checked into
 ## Documentation
 All revelevant documentation can be found in the `docs` folder and is hosted on GitHub Pages.
 Access the documentation on 
-- [Master Branch](https://xeratec.github.io/chimera-sdk/)
-- [Devel Branch](https://xeratec.github.io/chimera-sdk/branch/devel)
+- [Master Branch](https://pulp-platform.github.io/chimera-sdk/)
+- [Devel Branch](https://pulp-platform.github.io/chimera-sdk/branch/devel)
 
-The documentation for a specific branch can be accessed via `https://xeratec.github.io/chimera-sdk/branch/<branch>`
+The documentation for a specific branch can be accessed via `https://pulp-platform.github.io/chimera-sdk/branch/<branch>`
 
 ## Contributing
 ### CXX Formatting
