@@ -51,3 +51,15 @@ jobs:
           AllowShortIfStatementsOnASingleLine: true,
           AllowShortLoopsOnASingleLine: true
           }
+
+  ling-py:
+    runs-on: ubuntu-latest
+    steps:
+    -
+      name: Checkout
+      uses: actions/checkout@v3
+    -
+      name: Check Python
+      uses: diegovalenzuelaiturra/yapf-action@master
+      with:
+        args: . --verbose --recursive --diff --parallel
