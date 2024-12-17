@@ -11,6 +11,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/** \addtogroup cluster
+ *  @{
+ */
+
 // Persistent trampoline function pointer for each core
 void (*_trampoline_function[NUM_CLUSTER_CORES])(void *) = {NULL};
 
@@ -33,6 +37,7 @@ extern void _trampoline();
  * @brief Generate a trampoline function for the cluster core.
  * The trampoline function will set up the stack pointer and call the function.
  *
+ * @param core_id ID of the core to offload to
  * @param function Function pointer to offload
  * @param args Arguments to pass to the function
  * @param stack Stack pointer for core
@@ -98,6 +103,8 @@ void offload_snitchCluster_core(void *function, void *args, void *stack_ptr, uin
  * The function will be executed on all cores of the cluster.
  *
  * @param function Function pointer to offload
+ * @param args Arguments to pass to the function
+ * @param stack_ptr Stack pointer for the core
  * @param clusterId ID of the cluster to offload to
  */
 void offload_snitchCluster(void *function, void *args, void *stack_ptr, uint8_t clusterId) {
@@ -194,3 +201,5 @@ uint32_t wait_snitchCluster_return(uint8_t clusterId) {
 
     return retVal;
 }
+
+/** @}*/

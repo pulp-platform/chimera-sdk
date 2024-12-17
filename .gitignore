@@ -3,3 +3,12 @@
 **/build/*
 
 .vscode/settings.json
+
+# Python
+.venv
+venv
+__pycache__
+
+# Documentation
+docs/_build
+docs/_autosummery

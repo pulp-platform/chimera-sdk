@@ -4,6 +4,10 @@
 //
 // Philip Wiese <wiesep@iis.ee.ethz.ch>
 
+/** \addtogroup devices_snitchCluster
+ *  @{
+ */
+
 #include <stdint.h>
 
 // Persistent trampoline function pointer for each core
@@ -56,3 +60,5 @@ void __attribute__((naked)) _trampoline() {
         "jr a1\n" // Jump and link to the function pointer in a1
     );
 }
+
+/** @}*/

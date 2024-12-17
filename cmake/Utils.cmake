@@ -32,7 +32,7 @@ endmacro()
 
 
 #[=======================================================================[.rst:
-.. command:: add_chimera_subdirectories(target_platform, category, mappings)
+.. cmake:command:: add_chimera_subdirectories(target_platform, category, mappings)
 
    Add subdirectories based on a mapping of target platforms to folders.
    The mappings are expected to be in the format ``target_platform:folder1,folder2,...``.
@@ -42,8 +42,8 @@ endmacro()
    :param mappings: A list of mappings from target platforms to folders. Make sure to wrap the list in quotes!
    
    .. code-block:: cmake
-      :caption Example Usage
-
+      :caption: Example Usage
+   
       set(MAPPINGS
           chimera-convolve:snitch_cluster
           chimera-open:snitch_cluster
