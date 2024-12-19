@@ -58,3 +58,16 @@ breathe_default_project = "chimera_ll"
 # https://www.sphinx-doc.org/en/master/usage/extensions/todo.html
 
 todo_include_todos = True
+
+# -- Options for HTML templates ------------------------------------------------
+
+# Extract branch name from git
+branch = os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
+
+html_context = {
+    'current_version':
+    f"{branch}",
+    'versions':
+    [["master", "https://pulp-platform.github.io/chimera-sdk/"],
+     ["devel", "https://pulp-platform.github.io/chimera-sdk/branch/devel/"]],
+}
