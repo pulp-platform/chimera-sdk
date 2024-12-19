@@ -146,7 +146,7 @@ target_include_directories(opentitan_lib
 
 target_link_libraries(opentitan_lib
     PUBLIC
-    runtime
+    runtime_host
 )
 
 message(STATUS "OpenTitan library configured.")

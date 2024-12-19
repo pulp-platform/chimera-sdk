@@ -20,7 +20,7 @@ add_chimera_subdirectories(${TARGET_PLATFORM} "Driver" "${DRIVER_MAPPINGS}")
 target_include_directories(runtime_host PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 # VIVIANEP: Link to the opentitan library
-target_link_libraries(runtime
+target_link_libraries(runtime_host
     PUBLIC
     opentitan_lib
 )
