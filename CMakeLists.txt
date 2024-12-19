@@ -40,7 +40,6 @@ else()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
-# VIVIANEP: Add OpenTitan as an external project
 
 ################################################################################
 # Add subdirectories                                                           #
