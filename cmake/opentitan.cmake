@@ -6,8 +6,14 @@
 
 include(ExternalProject)
 
-set(OPENTITAN_DIR ${CMAKE_CURRENT_BINARY_DIR}/../drivers/opentitan)
+set(OPENTITAN_DIR ${CMAKE_SOURCE_DIR}/drivers/opentitan)
 set(SPARSE_CHECKOUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/sparse-checkout)
+
+if(NOT DEFINED OPENTITAN_COMMIT_HASH)
+  message(FATAL_ERROR "Please set a commit hash in your target.")
+endif()
+
+message(STATUS "[OT Drivers] Using OpenTitan commit hash: ${OPENTITAN_COMMIT_HASH}")
 
 set(SPARSE_PATTERNS
   "util/design/*"
@@ -34,7 +40,6 @@ endforeach()
 
 # Clone and set up the OpenTitan repository during configuration
 if(NOT EXISTS ${OPENTITAN_DIR}/.git)
-  message(STATUS "Cloning OpenTitan repository...")
   execute_process(
     COMMAND git clone --no-checkout https://github.com/lowRISC/opentitan.git ${OPENTITAN_DIR}
     RESULT_VARIABLE GIT_CLONE_RESULT
@@ -45,11 +50,10 @@ if(NOT EXISTS ${OPENTITAN_DIR}/.git)
     message(FATAL_ERROR "Failed to clone OpenTitan repository: ${GIT_CLONE_ERROR}")
   endif()
 else()
-  message(STATUS "OpenTitan repository already exists.")
+  message(STATUS "[OT Drivers] OpenTitan repository already exists.")
 endif()
 
 # Configure sparse checkout
-message(STATUS "Configuring sparse checkout for OpenTitan...")
 execute_process(
   COMMAND git -C ${OPENTITAN_DIR} config core.sparseCheckout true
   RESULT_VARIABLE GIT_CONFIG_RESULT
@@ -75,16 +79,14 @@ endif()
 
 # Checkout the desired branch (e.g., master)
 execute_process(
-  COMMAND git -C ${OPENTITAN_DIR} checkout master
+  COMMAND git -C ${OPENTITAN_DIR} checkout ${OPENTITAN_COMMIT_HASH}
   RESULT_VARIABLE GIT_CHECKOUT_RESULT
   OUTPUT_VARIABLE GIT_CHECKOUT_OUTPUT
   ERROR_VARIABLE GIT_CHECKOUT_ERROR
 )
 if(NOT GIT_CHECKOUT_RESULT EQUAL 0)
-  message(FATAL_ERROR "Failed to checkout branch 'master': ${GIT_CHECKOUT_ERROR}")
+  message(FATAL_ERROR "Failed to checkout commit ${OPENTITAN_COMMIT_HASH}: ${GIT_CHECKOUT_ERROR}")
 endif()
-
-message(STATUS "OpenTitan repository prepared.")
 
 # Now proceed with adding the external project to manage build steps
 ExternalProject_Add(
@@ -130,8 +132,6 @@ file(GLOB_RECURSE OPENTITAN_SOURCES
   ${OPENTITAN_SW_DIR}/device/lib/base/*.c
 )
 
-message(STATUS "OpenTitan sources collected.")
-
 # Create OpenTitan library
 add_library(opentitan_lib STATIC ${OPENTITAN_SOURCES})
 
@@ -143,6 +143,4 @@ target_include_directories(opentitan_lib
     PUBLIC
     ${OPENTITAN_DIR}
 )
-
-message(STATUS "OpenTitan library configured.")
 
