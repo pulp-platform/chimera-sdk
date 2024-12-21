@@ -1,6 +1,7 @@
 *~
 .ninja*
 **/build/*
+drivers/*/thirdparty/
 
 .vscode/settings.json
 
