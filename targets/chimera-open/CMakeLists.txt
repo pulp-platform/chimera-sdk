@@ -12,11 +12,10 @@
 
 # VIVIANEP: Select target-specific commit hash of the OT lib
 set(TARGET_OPENTITAN_COMMIT_HASH 22168a3d42febfca725b36dd0d1554b68cf5783e)
+set(OPENTITAN_COMMIT_HASH ${TARGET_OPENTITAN_COMMIT_HASH} CACHE STRING "OpenTitan commit hash")
 
-set(OPENTITAN_COMMIT_HASH ${TARGET_OPENTITAN_COMMIT_HASH})
-
-# VIVIANEP: Add OpenTitan as an external project
-include(${CMAKE_SOURCE_DIR}/cmake/opentitan.cmake)
+# VIVIANEP: Choose driver versions (if applicable)
+set(UART_DRIVER_VERSION "opentitan" CACHE STRING "UART driver version")
 
 add_library(runtime_host STATIC)
 
