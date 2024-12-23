@@ -14,8 +14,6 @@
 set(TARGET_OPENTITAN_COMMIT_HASH 22168a3d42febfca725b36dd0d1554b68cf5783e)
 set(OPENTITAN_COMMIT_HASH ${TARGET_OPENTITAN_COMMIT_HASH} CACHE STRING "OpenTitan commit hash")
 
-# VIVIANEP: Choose driver versions (if applicable)
-set(UART_DRIVER_VERSION "opentitan" CACHE STRING "UART driver version")
 
 add_library(runtime_host STATIC)
 
