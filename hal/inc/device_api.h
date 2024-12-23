@@ -6,11 +6,31 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 /**
  * \addtogroup device
  * @{
  */
+
+/**
+ * @brief Device structure.
+ *
+ */
+typedef struct chi_device {
+    /**
+     * @brief Device API.
+     */
+    struct chi_device_api *api; // function pointers
+    /**
+     * @brief Device address.
+     */
+    uint32_t *device_addr;
+    /**
+     * @brief Device configuration.
+     */
+    void *cfg;
+} chi_device_t;
 
 /**
  * @brief Callback function for asynchronous device operations.
@@ -58,24 +78,5 @@ typedef struct chi_device_api {
     ssize_t (*write_async)(struct chi_device *device, const void *buffer, uint32_t size,
                            chi_device_callback cb);
 } chi_device_api_t;
-
-/**
- * @brief Device structure.
- *
- */
-typedef struct chi_device {
-    /**
-     * @brief Device API.
-     */
-    struct chi_device_api *api; // function pointers
-    /**
-     * @brief Device address.
-     */
-    uint32_t *device_addr;
-    /**
-     * @brief Device configuration.
-     */
-    void *cfg;
-} chi_device_t;
 
 /** @} */

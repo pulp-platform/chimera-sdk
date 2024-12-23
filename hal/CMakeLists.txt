@@ -14,3 +14,9 @@ target_include_directories(hal_host
   PUBLIC
   "inc/"
 )
+
+target_link_libraries(hal_host
+  PUBLIC
+    uart_lib
+    picolibc
+)

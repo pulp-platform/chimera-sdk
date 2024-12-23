@@ -4,5 +4,7 @@
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
+# Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 add_subdirectory(returnZero)
+add_subdirectory(uartSimple)

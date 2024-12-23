@@ -24,6 +24,18 @@ set(OPENTITAN_SPARSE_PATTERNS
   "sw/device/lib/base/math_builtins.c"
   "sw/device/lib/base/memory.c"
   "sw/device/lib/base/memory.h"
+  "sw/device/lib/base/mmio.c"
+  "sw/device/lib/base/mmio.h"
+  "sw/device/lib/base/multibits.c"
+  "sw/device/lib/base/multibits.h"
+  "sw/device/lib/base/internal/status.h"
+  "sw/device/lib/base/internal/absl_status.h"
+  "sw/device/lib/dif/dif_base.c"
+  "sw/device/lib/dif/dif_base.h"
+  "sw/device/lib/dif/dif_uart.c"
+  "sw/device/lib/dif/dif_uart.h"
+  "sw/device/lib/dif/autogen/dif_uart_autogen.c"
+  "sw/device/lib/dif/autogen/dif_uart_autogen.h"
 )
 
 # ------------------------------------------------------------------------------
@@ -55,8 +67,6 @@ add_custom_command(
   COMMENT "Generating ${UART_REGS_H} with COMMAND ${Python3_EXECUTABLE} ${REGTOOL_PY} ${UART_HJSON} -D > ${UART_REGS_H}"
 )
 
-message(STATUS "[REMOVE ME] COMMAND: ${Python3_EXECUTABLE} ${REGTOOL_PY} ${UART_HJSON} -D > ${UART_REGS_H}")
-
 # Generate the uart_regs.h header using the OT regtool
 add_custom_target(
   generate_uart_regs
@@ -65,3 +75,27 @@ add_custom_target(
 )
 
 add_dependencies(generate_uart_regs opentitan_interface_${OPENTITAN_COMMIT_HASH})
+
+# ------------------------------------------------------------------------------
+# Add the UART driver library
+# ------------------------------------------------------------------------------
+add_library(uart_lib STATIC)
+
+file(GLOB_RECURSE UART_SOURCES
+  "${OPENTITAN_SW_DIR}/device/lib/base/*.c"
+  "${OPENTITAN_SW_DIR}/device/lib/dif/*.c"
+)
+
+target_sources(
+  uart_lib
+  PRIVATE
+    ${UART_SOURCES}
+    ${UART_REGS_H}
+)
+
+target_include_directories(
+  uart_lib
+  PUBLIC
+  ${OPENTITAN_DIR}
+  ${OPENTITAN_SW_DIR}/device/lib/dif/autogen
+)
