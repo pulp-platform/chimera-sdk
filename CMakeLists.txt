@@ -8,7 +8,8 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-set(CMAKE_C_STANDARD 99)
+# set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 
 # SCHEREMO: Needed to skip compiler test, which doesn't support baremetal targets
 set(CMAKE_C_COMPILER_WORKS 1)
