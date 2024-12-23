@@ -97,6 +97,7 @@ ExternalProject_Add(
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
   BUILD_BYPRODUCTS "${OPENTITAN_DIR}/.git/config"
+  BUILD_ALWAYS 1
 )
 
 add_custom_target(opentitan_target_${OPENTITAN_COMMIT_HASH} ALL
