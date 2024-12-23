@@ -8,8 +8,8 @@
 # Define mappings for drivers
 set(DRIVER_MAPPINGS
     chimera-convolve:cluster
-    chimera-open:cluster,uart_${UART_DRIVER_VERSION}
-    chimera-host:
+    chimera-open:cluster
+    chimera-host:uart_opentitan
 )
 
 # Call the macro
