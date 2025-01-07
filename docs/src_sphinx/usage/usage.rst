@@ -4,31 +4,45 @@ Usage
 Building the SDK
 ----------------
 
+The applications are built with RISC-V LLVM 12.0.1 or later to ensure compatibility. 
+However, the SDK uses the GNU linker (``riscv32-unknown-elf-ld``) instead of the LLVM linker (``lld``) due to compatibility issues.
+
+.. warning::
+    Ensure that ``riscv32-unknown-elf-ld`` locatable in your ``PATH``.
+
+
+Generic Environment
+^^^^^^^^^^^^^^^^^^^
+
 To build the SDK and all tests contained in the SDK, run:
 
 .. code-block:: bash
 
-    mkdir build && cd build
-    cmake -DTARGET_PLATFORM=[YOURTARGETPLATFORM] ../
-    cmake --build .
+    cmake -DTARGET_PLATFORM=<target> -B build
+    cmake --build build -j
 
 where you should replace ``[YOURTARGETPLATFORM]`` by one of the platforms defined in ``targets/CMakeLists.txt`` under ``AVAILABLE_TARGETS``.
 The resulting binaries will be stored in ``build/bin``, and can be used within the ``chimera`` repo as tests.
 
-The applications are built using the RISC-V LLVM toolchain. On IIS systems, users can use the pre-installed LLVM version 12.0.1.
-Outside of IIS systems, you need to install LLVM version 12.0.1 or later to ensure compatibility. Thus you need to specify the ``TOOLCHAIN_DIR`` parameter when running cmake. 
+If you did not globally install the toolchain, you need to specify the ``TOOLCHAIN_DIR`` parameter when running cmake.
 
 .. code-block:: bash
 
-    mkdir build && cd build
-    cmake -DTARGET_PLATFORM=[YOURTARGETPLATFORM] -DTOOLCHAIN_DIR=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin ../
-    cmake --build .
+    cmake -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=<path-to-toolchain> ../
+    cmake --build build -j
 
-The correct version of the toolchain can be verified by running
+IIS Workstations
+^^^^^^^^^^^^^^^^
+
+On IIS systems, users can use the pre-installed LLVM compiler by activating the riscv environment with the ``riscv`` command.
+This command sets the necessary environment variables for the toolchain. 
+To build the SDK, run:
 
 .. code-block:: bash
 
-    llvm-config --version
+    riscv zsh # Setup the default riscv environment (modifies PATH and LD_LIBRARY_PATH)
+    cmake -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0 -B build
+    cmake --build build -j
 
 
 Targets
@@ -48,12 +62,11 @@ To enable automatic configuration of the C/C++ extension and support for the int
 
     {
         "cmake.configureSettings": {
-            "TOOLCHAIN_DIR": "/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0/bin",
+            "TOOLCHAIN_DIR": "/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0",
             "TARGET_PLATFORM": "chimera-convolve",
         },
         "cmake.environment": {
             "PATH": "/usr/pack/riscv-1.0-kgf/default/bin:${env:PATH}",
-            "LD_LIBRARY_PATH": "/usr/pack/riscv-1.0-kgf/lib64:/usr/pack/riscv-1.0-kgf/lib64",
         }
     }
 

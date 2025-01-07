@@ -22,6 +22,15 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 # SCHEREMO: This toolchain file is only used for test compilation!
 set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
 
+# WIESEP: We currently use the GCC riscv32-unknown-elf-ld linker instead of LLVM lld linker
+find_program(RISCV32_UNKNOWN_ELF_LD riscv32-unknown-elf-ld)
+if(NOT RISCV32_UNKNOWN_ELF_LD)
+    message(FATAL_ERROR "riscv32-unknown-elf-ld not found. Make sure it can be found in your PATH.")
+else()
+    set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=${RISCV32_UNKNOWN_ELF_LD}")
+    message(STATUS "Found linker: ${RISCV32_UNKNOWN_ELF_LD}")
+endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
