@@ -91,7 +91,7 @@ if (TEST_MODE STREQUAL "simulation")
   enable_testing()
 
   if(NOT EXISTS ${SOC_MODEL_BINARY})
-    message(FATAL_ERROR "Simulation binary ${SOC_MODEL_BINARY} does not exist.")
+    message(FATAL_ERROR "SoC model binary ${SOC_MODEL_BINARY} does not exist.")
   endif()
 
   # Convert PRELOAD_MODE to integer
@@ -101,7 +101,7 @@ if (TEST_MODE STREQUAL "simulation")
     message(FATAL_ERROR "PRELOAD_MODE must be an integer.")
   endif()
 
-  message(STATUS "[CHIMERA-SDK] Simulation Binary     : ${SOC_MODEL_BINARY}")
+  message(STATUS "[CHIMERA-SDK] SoC Model Binary     : ${SOC_MODEL_BINARY}")
   message(STATUS "[CHIMERA-SDK] Preload Mode          : ${PRELOAD_MODE}")
 endif()
 
