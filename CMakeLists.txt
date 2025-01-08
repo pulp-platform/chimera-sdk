@@ -62,14 +62,14 @@ add_subdirectory(drivers)
 # Testing                                                                      #
 ################################################################################
 option(TEST_MODE "Set what validation target the tests should be run on" "OFF")
-set(SIMULATION_BINARY "chim.bin" CACHE STRING "Path to the simulation binary")
+set(SOC_MODEL_BINARY "chim.bin" CACHE STRING "Path to the simulation binary")
 set(PRELOAD_MODE "0" CACHE STRING "Preload mode for simulation")
 
 if (TEST_MODE STREQUAL "simulation")
   enable_testing()
 
-  if(NOT EXISTS ${SIMULATION_BINARY})
-    message(FATAL_ERROR "Simulation binary ${SIMULATION_BINARY} does not exist.")
+  if(NOT EXISTS ${SOC_MODEL_BINARY})
+    message(FATAL_ERROR "Simulation binary ${SOC_MODEL_BINARY} does not exist.")
   endif()
 
   # Convert PRELOAD_MODE to integer
@@ -79,7 +79,7 @@ if (TEST_MODE STREQUAL "simulation")
     message(FATAL_ERROR "PRELOAD_MODE must be an integer.")
   endif()
 
-  message(STATUS "[CHIMERA-SDK] Simulation Binary     : ${SIMULATION_BINARY}")
+  message(STATUS "[CHIMERA-SDK] Simulation Binary     : ${SOC_MODEL_BINARY}")
   message(STATUS "[CHIMERA-SDK] Preload Mode          : ${PRELOAD_MODE}")
 
   add_subdirectory(tests)
