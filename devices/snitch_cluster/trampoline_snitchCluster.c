@@ -30,7 +30,7 @@ extern void *_trampoline_stack;
  */
 // WIESEP: Make sure the compiler does not allocate a stack frame
 void __attribute__((naked)) _trampoline() {
-    SNITCH_SETUP_CORE();
+    _SETUP_GP_TP();
 
     asm volatile(
         // Get hart ID (hardware thread ID)

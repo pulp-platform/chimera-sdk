@@ -17,7 +17,7 @@
  * @warning Stack, thread and global pointer might not yet be set up!
  */
 __attribute__((naked)) void clusterInterruptHandler() {
-    SNITCH_SETUP_CORE();
+    _SETUP_GP_TP();
 
     asm volatile(
         // Load mhartid CSR into t0

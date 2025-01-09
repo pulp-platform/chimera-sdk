@@ -18,7 +18,7 @@
  *
  * This function will set up the global pointer and thread pointer for the core.
  */
-#define SNITCH_SETUP_CORE() \
+#define _SETUP_GP_TP() \
     asm volatile(".option push\n" \
                  ".option norelax\n" \
                  "la gp, __global_pointer$\n" \
