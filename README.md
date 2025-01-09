@@ -19,10 +19,18 @@ The documentation for a specific branch can be accessed via `https://pulp-platfo
 ## Contributing
 ### Formatting
 To simplify formatting of the code, we provide a Makefiles target that runs clang-format on all source files.
-To install all required dependencies and run the formatter run:
+We recomment that you setup a virtual environment and install the required dependencies using the following commands:
 
 ```bash
-make setup
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+Alternatively you can also use any mamba/conda environment.
+
+Then, to format the code, run the following command:
+
+```bash
 make format
 ```
 

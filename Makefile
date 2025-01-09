@@ -11,11 +11,6 @@ help:
 	@echo ""
 	@echo "Available Targets:"
 	@echo " - format: Format all code"
-	@echo " - setup: Install dependencies"
-
-setup:
-	@echo "Installing dependencies..."
-	@pip install -r requirements.txt
 
 format:
 	@echo "Formatting code..."

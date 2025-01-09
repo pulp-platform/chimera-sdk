@@ -11,8 +11,6 @@
 
 #include "trampoline_snitchCluster.h"
 
-uint32_t *clintPointer = (uint32_t *)CLINT_CTRL_BASE;
-
 /**
  * @brief Interrupt handler for the cluster, which clears the interrupt flag for the current hart.
  *
@@ -26,8 +24,9 @@ __attribute__((naked)) void clusterInterruptHandler() {
         "csrr t0, mhartid\n"
         // Load the base address of clintPointer into t1
         // "lw t1, %0\n"
-        "lui t1, %%hi(clintPointer)\n"
-        "addi t1, t1, %%lo(clintPointer)\n"
+
+        // Load clint base address into t1
+        "la t1, __base_clint\n"
 
         // Calculate the interrupt target address: t1 = t1 + (t0 * 4)
         "slli t0, t0, 2\n"
@@ -35,9 +34,9 @@ __attribute__((naked)) void clusterInterruptHandler() {
         // Store 0 to the interrupt target address
         "sw zero, 0(t1)\n"
         "ret"
-        :                   // No outputs
-        : "m"(clintPointer) // Pass clintPointer as input
-        : "t0", "t1"        // Declare clobbered registers
+        :            // No outputs
+        :            // No inputs
+        : "t0", "t1" // Declare clobbered registers
     );
 }
 
