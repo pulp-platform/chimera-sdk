@@ -10,6 +10,8 @@
 
 #include <stdint.h>
 
+#include "trampoline_snitchCluster.h"
+
 // Persistent trampoline function pointer for each core
 extern void (*_trampoline_function)(void *);
 
@@ -28,18 +30,11 @@ extern void *_trampoline_stack;
  */
 // WIESEP: Make sure the compiler does not allocate a stack frame
 void __attribute__((naked)) _trampoline() {
+    SNITCH_SETUP_CORE();
+
     asm volatile(
         // Get hart ID (hardware thread ID)
         "csrr t1, mhartid\n" // Load mhartid into a0
-
-        // Load global pointer
-        ".option push\n"
-        ".option norelax\n"          // Disable relaxation to ensure `la` behaves as expected
-        "la gp, __global_pointer$\n" // Load address of global pointer
-        ".option pop\n"
-
-        // Set thread pointer (tp) to zero
-        "mv tp, zero\n"
 
         // Set up stack pointer
         "la a0, _trampoline_stack\n" // Load address of _trampoline_stack

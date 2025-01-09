@@ -13,3 +13,4 @@ file(GLOB_RECURSE C_SOURCES_SNITCH
 )
 
 target_sources(runtime_cluster_snitch PRIVATE ${C_SOURCES_SNITCH})
+target_include_directories(runtime_cluster_snitch PUBLIC ${CMAKE_CURRENT_LIST_DIR})
