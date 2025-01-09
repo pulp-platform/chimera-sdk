@@ -24,3 +24,29 @@ set(CMAKE_C_ABI_COMPILED "False")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --target=riscv32-unknown-elf")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --target=riscv32-unknown-elf")
+
+# Use LLVM LLD linker
+set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
+
+# Check LLVM version
+execute_process(
+    COMMAND ${CMAKE_C_COMPILER} --version
+    OUTPUT_VARIABLE LLVM_VERSION
+)
+string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" LLVM_VERSION ${LLVM_VERSION})
+
+# Get Major version
+string(REGEX MATCH "^[0-9]+" LLVM_VERSION_MAJOR ${LLVM_VERSION})
+string(REGEX MATCH "[0-9]+$" LLVM_VERSION_MINOR ${LLVM_VERSION})
+string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
+
+if (LLVM_VERSION_MAJOR LESS 15)
+    message(STATUS "Disable linker relaxation for LLVM < 15")
+    # WIESEP: Disable linker relaxation for LLVM 12
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mno-relax")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-relax")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--no-relax")
+
+    # Also for ASM files
+    set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -mno-relax")
+endif()
