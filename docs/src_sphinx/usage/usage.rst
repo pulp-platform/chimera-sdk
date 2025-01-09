@@ -4,11 +4,10 @@ Usage
 Building the SDK
 ----------------
 
-The applications are built with RISC-V LLVM 12.0.1 or later to ensure compatibility. 
-However, the SDK uses the GNU linker (``riscv32-unknown-elf-ld``) instead of the LLVM linker (``lld``) due to compatibility issues.
+The applications are built with RISC-V LLVM 12.0.1 or later to ensure compatibility.
 
-.. warning::
-    Ensure that ``riscv32-unknown-elf-ld`` locatable in your ``PATH``.
+.. important::
+    For LLVM versions less than 15, linker relaxation is not supported and thus disabled.
 
 
 Generic Environment
@@ -35,7 +34,7 @@ IIS Workstations
 ^^^^^^^^^^^^^^^^
 
 On IIS systems, users can use the pre-installed LLVM compiler by activating the riscv environment with the ``riscv`` command.
-This command sets the necessary environment variables for the toolchain. 
+This command sets the necessary environment variables for the toolchain.
 To build the SDK, run:
 
 .. code-block:: bash
@@ -65,9 +64,6 @@ To enable automatic configuration of the C/C++ extension and support for the int
             "TOOLCHAIN_DIR": "/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0",
             "TARGET_PLATFORM": "chimera-convolve",
         },
-        "cmake.environment": {
-            "PATH": "/usr/pack/riscv-1.0-kgf/default/bin:${env:PATH}",
-        }
     }
 
 If you are not on an IIS system, you need to adjust the paths according to your local installation.
