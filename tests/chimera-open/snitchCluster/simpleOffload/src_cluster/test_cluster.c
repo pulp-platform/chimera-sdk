@@ -22,8 +22,6 @@ __attribute__((naked)) void clusterInterruptHandler() {
     asm volatile(
         // Load mhartid CSR into t0
         "csrr t0, mhartid\n"
-        // Load the base address of clintPointer into t1
-        // "lw t1, %0\n"
 
         // Load clint base address into t1
         "la t1, __base_clint\n"
