@@ -65,7 +65,7 @@ add_subdirectory(drivers)
 set(VALID_TEST_MODES "simulation" "none")
 
 # Option for TEST_MODE with default value
-option(TEST_MODE "Set what validation target the tests should be run on" "none")
+set(TEST_MODE "none" CACHE STRING "Set what validation target the tests should be run on")
 
 # Check if TEST_MODE is set to a valid option
 if(NOT TEST_MODE IN_LIST VALID_TEST_MODES)
