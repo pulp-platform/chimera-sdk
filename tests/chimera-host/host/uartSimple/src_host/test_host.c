@@ -14,10 +14,10 @@ int main()
     device.cfg = &default_cfg;
 
     int open_result = device.api->open(&device);
-    // int close_result = device.api->close(&device);
+    int close_result = device.api->close(&device);
 
     // int open_result = 0;
-    int close_result = 0;
+    // int close_result = 0;
 
     return open_result + close_result;
 }
