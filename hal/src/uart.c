@@ -45,20 +45,42 @@ int uart_open(struct chi_device *device) {
         return -1; // Invalid argument
     }
 
-    // Initialize the UART context
-    uart_context_t *ctx = malloc(sizeof(uart_context_t));
-    if (ctx == NULL) {
-        return -2; // Out of memory error
+
+    // Allocate memory for UART context
+    uart_context_t *context = (uart_context_t *)malloc(sizeof(uart_context_t));
+    
+    if (context == NULL) {
+        return -2; // Memory allocation failed
     }
-    memset(ctx, 0, sizeof(uart_context_t));
 
-    // // If no cfg is provided, use the default configuration
-    // uart_config_t *cfg = device->cfg;
-    // if (cfg == NULL) {
-    //     cfg = &default_cfg;
-    // }
+    // Zero-initialize the UART context
+    memset(context, 0, sizeof(uart_context_t));
+    
+    // Copy user config
+    uart_config_t *cfg = (uart_config_t *)device->cfg;
 
-    // free(ctx); // Free the UART context
+    // Convert base address to MMIO region for DIF
+    mmio_region_t base_addr = mmio_region_from_addr((uintptr_t)device->device_addr);
+
+    // Initialize UART DIF
+    dif_uart_config_t uart_cfg = {
+        .baudrate = cfg->baud_rate,
+        .clk_freq_hz = cfg->clk_freq_hz,
+        .parity_enable = kDifToggleDisabled,
+        .parity = kDifUartParityOdd,
+        .rx_enable = kDifToggleEnabled,
+        .tx_enable = kDifToggleEnabled,
+        .rx_break_level = kDifUartRxBreakLevel2
+    };
+
+    // Check if the UART DIF was initialized successfully
+    if (dif_uart_configure(&context->uart, uart_cfg) != kDifOk) {
+        free(context);
+        return -3; // UART configuration failed
+    }
+
+    // Save the UART context
+    device->cfg = context;
 
     return 0; // Success
 }
