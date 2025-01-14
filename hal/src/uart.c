@@ -45,7 +45,6 @@ int uart_open(struct chi_device *device) {
         return -1; // Invalid argument
     }
 
-
     // Allocate memory for UART context
     uart_context_t *context = (uart_context_t *)malloc(sizeof(uart_context_t));
     
@@ -90,6 +89,23 @@ int uart_close(struct chi_device *device) {
     if (device == NULL || device->cfg == NULL) {
         return -1; // Invalid argument
     }
+
+    // Retrieve the UART context
+    uart_context_t *context = (uart_context_t *)device->cfg;
+
+    // Reset UART to safe state
+    dif_result_t reset_rx = dif_uart_fifo_reset(&context->uart, kDifUartDatapathRx);
+    dif_result_t reset_tx = dif_uart_fifo_reset(&context->uart, kDifUartDatapathTx);
+
+    if (reset_rx != kDifOk || reset_tx != kDifOk) {
+        return -4; // UART reset failed
+    }
+
+    // Free the UART context
+    free(context);
+
+    // Nullify the device configuration
+    device->cfg = NULL;
 
     return 0; // Success
 }
