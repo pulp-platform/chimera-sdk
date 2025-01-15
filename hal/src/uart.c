@@ -116,7 +116,63 @@ ssize_t uart_read_async(struct chi_device *device, void *buffer, uint32_t size, 
         return -1; // Invalid argument
     }
 
+    // Retrieve the UART context
+    uart_context_t *context = (uart_context_t *)device->cfg;
+
+    // Check if an asynch read is already in progress
+    if (context->rx_buffer != NULL) {
+        return -5; // Read operation already in progress
+    }
+
+    // Save bffer and callback details
+    context->rx_buffer = (uint8_t *)buffer;
+    context->rx_size = size;
+    context->rx_pos = 0;
+    context->rx_callback = cb;
+
+    // Enable RX watermark interrupt
+    if (dif_uart_irq_set_enabled(&context->uart, kDifUartIrqRxWatermark, kDifToggleEnabled) != kDifOk) {
+        context->rx_buffer = NULL;
+        context->rx_size = 0;
+        context->rx_callback = NULL;
+        return -6;
+    }
+
     return size; // Return the number of bytes to be read
+}
+
+/* UART RX interrupt service routine */
+void uart_rx_isr(struct chi_device *device) {
+    
+    // Retrieve the UART context
+    uart_context_t *context = (uart_context_t *)device->cfg;
+    size_t bytes_read = 0;
+
+    // Read bytes from the RX FIFO
+    bytes_read = dif_uart_bytes_receive(
+        &context->uart,
+        context->rx_size - context->rx_pos,
+        context->rx_buffer + context->rx_pos,
+        &bytes_read
+    );
+
+    // Update the read position
+    context->rx_pos += bytes_read;
+
+    // Check if the read operation is complete
+    if (context->rx_pos == context->rx_size) {
+        // Disable RX watermark interrupt
+        dif_uart_irq_set_enabled(&context->uart, kDifUartIrqRxWatermark, kDifToggleDisabled);
+        // Call the callback function
+        if (context->rx_callback != NULL) {
+            context->rx_callback(device);
+        }
+        // Reset the read operation
+        context->rx_buffer = NULL;
+        context->rx_size = 0;
+        context->rx_pos = 0;
+        context->rx_callback = NULL;
+    }
 }
 
 ssize_t uart_write_async(struct chi_device *device, const void *buffer, uint32_t size, chi_device_callback cb) {
