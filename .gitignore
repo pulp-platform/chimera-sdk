@@ -12,3 +12,6 @@ __pycache__
 # Documentation
 docs/_build
 docs/_autosummary
+
+# Dept Install Dir
+simulator_install
