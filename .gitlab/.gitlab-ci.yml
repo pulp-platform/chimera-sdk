@@ -11,8 +11,8 @@ stages: # List of stages for jobs with their order of execution
 .setup:
   script:
     - bash 
-    - /scratch/jungvi/Chimera-sdk-ci/mamba_setup.sh
-    - mamba activate chimera-sdk-ci
+    - eval "$(micromamba shell hook --shell bash)"
+    - micromamba activate chimera-sdk-ci
     - export CMAKE='/usr/sepp/bin/cmake-3.18.1'
     - export LLVM_INSTALL_PATH='/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
 
