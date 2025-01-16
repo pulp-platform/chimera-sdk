@@ -6,7 +6,7 @@
 
 stages: # List of stages for jobs with their order of execution
   - build
-  # - test
+  - test
 
 .setup:
   script:
@@ -15,6 +15,7 @@ stages: # List of stages for jobs with their order of execution
     - micromamba activate chimera-sdk-ci
     - export CMAKE='/usr/sepp/bin/cmake-3.18.1'
     - export LLVM_INSTALL_PATH='/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
+    - export GVSOC_HOME='/scratch/jungvi/chimera-sdk/simulator_install/gvsoc'
 
 build_sdk:
   stage: build
@@ -25,3 +26,16 @@ build_sdk:
     - !reference [.setup, script]
     - $CMAKE -DTARGET_PLATFORM=$TARGET -DTOOLCHAIN_DIR=$LLVM_INSTALL_PATH -B build
     - $CMAKE --build build -j
+
+test:
+  stage: test
+  parallel:
+    matrix:
+      - TARGET: [chimera-open, chimera-host, chimera-convolve]
+        TEST: [test_host_returnZero, test_snitchCluster_simpleOffload]
+  script:
+    - !reference [.setup, script]
+    - $CMAKE -DTARGET_PLATFORM=$TARGET -DTOOLCHAIN_DIR=$LLVM_INSTALL_PATH -B build
+    - $CMAKE --build build -j
+    - cd ${GVSOC_HOME}
+    - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/$TEST hello image run
