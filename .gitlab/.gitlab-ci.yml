@@ -7,8 +7,8 @@ stages: # List of stages for jobs with their order of execution
 .setup:
   script:
     - bash 
-    - export $CMAKE='/usr/sepp/bin/cmake-3.18.1'
-    - export $LLVM_INSTALL_PATH='/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
+    - export CMAKE='/usr/sepp/bin/cmake-3.18.1'
+    - export LLVM_INSTALL_PATH='/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
 
 build_sdk:
   stage: build
