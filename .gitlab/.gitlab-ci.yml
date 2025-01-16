@@ -35,7 +35,6 @@ test:
         TEST: [test_host_returnZero, test_snitchCluster_simpleOffload]
       - TARGET: [chimera-host, chimera-convolve]
         TEST: [test_host_returnZero]
-  # resource_group: gvsoc_test_jobs_group
   script:
     - !reference [.setup, script]
     - $CMAKE -DTARGET_PLATFORM=$TARGET -DTOOLCHAIN_DIR=$LLVM_INSTALL_PATH -B build
