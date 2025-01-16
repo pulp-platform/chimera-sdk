@@ -40,4 +40,4 @@ test:
     - cd ${GVSOC_HOME}
     - echo $CI_PROJECT_DIR
     - echo $CI_PROJECT_PATH
-    - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/$TEST image run
+    - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/bin/$TEST image run
