@@ -38,4 +38,6 @@ test:
     - $CMAKE -DTARGET_PLATFORM=$TARGET -DTOOLCHAIN_DIR=$LLVM_INSTALL_PATH -B build
     - $CMAKE --build build -j
     - cd ${GVSOC_HOME}
-    - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/$TEST hello image run
+    - echo $CI_PROJECT_DIR
+    - echo $CI_PROJECT_PATH
+    - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/$TEST image run
