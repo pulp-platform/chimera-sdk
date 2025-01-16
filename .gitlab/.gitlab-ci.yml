@@ -35,11 +35,10 @@ test:
         TEST: [test_host_returnZero, test_snitchCluster_simpleOffload]
       - TARGET: [chimera-host]
         TEST: [test_host_returnZero]
+  resource_group: gvsoc_test_jobs_group
   script:
     - !reference [.setup, script]
     - $CMAKE -DTARGET_PLATFORM=$TARGET -DTOOLCHAIN_DIR=$LLVM_INSTALL_PATH -B build
     - $CMAKE --build build -j
     - cd ${GVSOC_HOME}
-    - echo $CI_PROJECT_DIR
-    - echo $CI_PROJECT_PATH
     - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/bin/$TEST run
