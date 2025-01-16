@@ -31,8 +31,10 @@ test:
   stage: test
   parallel:
     matrix:
-      - TARGET: [chimera-open, chimera-host, chimera-convolve]
+      - TARGET: [chimera-open, chimera-convolve]
         TEST: [test_host_returnZero, test_snitchCluster_simpleOffload]
+      - TARGET: [chimera-host]
+        TEST: [test_host_returnZero]
   script:
     - !reference [.setup, script]
     - $CMAKE -DTARGET_PLATFORM=$TARGET -DTOOLCHAIN_DIR=$LLVM_INSTALL_PATH -B build
@@ -40,4 +42,4 @@ test:
     - cd ${GVSOC_HOME}
     - echo $CI_PROJECT_DIR
     - echo $CI_PROJECT_PATH
-    - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/bin/$TEST image run
+    - ./install/bin/gvsoc --target=chimera --binary $CI_PROJECT_DIR/build/bin/$TEST run
