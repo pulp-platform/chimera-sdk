@@ -18,6 +18,7 @@ stages: # List of stages for jobs with their order of execution
     - bash 
     - eval "$(micromamba shell hook --shell bash)"
     - micromamba activate chimera-sdk-ci
+    - rm -rf build
 
 build_sdk:
   stage: build
