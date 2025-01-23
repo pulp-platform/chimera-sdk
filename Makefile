@@ -8,7 +8,7 @@
 
 ROOT_DIR := $(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
-INSTALL_PREFIX ?= simulator_install
+INSTALL_PREFIX ?= install
 
 GVSOC_INSTALL_DIR ?= ${ROOT_DIR}/${INSTALL_PREFIX}
 GVSOC_COMMIT_HASH ?= ffba6ded9abf0a2c86d0b4096ec20a4392af96ad

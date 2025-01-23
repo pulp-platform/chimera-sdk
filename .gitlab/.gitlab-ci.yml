@@ -4,6 +4,11 @@
 
 # Author: Victor Jung <jungvi@iis.ee.ethz.ch>
 
+variables:
+  CMAKE: '/usr/sepp/bin/cmake-3.18.1'
+  LLVM_INSTALL_PATH: '/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
+  GVSOC_HOME: '/scratch/jungvi/chimera-sdk/install/gvsoc'
+
 stages: # List of stages for jobs with their order of execution
   - build
   - test
@@ -13,9 +18,6 @@ stages: # List of stages for jobs with their order of execution
     - bash 
     - eval "$(micromamba shell hook --shell bash)"
     - micromamba activate chimera-sdk-ci
-    - export CMAKE='/usr/sepp/bin/cmake-3.18.1'
-    - export LLVM_INSTALL_PATH='/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
-    - export GVSOC_HOME='/scratch/jungvi/chimera-sdk/simulator_install/gvsoc'
 
 build_sdk:
   stage: build
@@ -33,7 +35,7 @@ test:
     matrix:
       - TARGET: [chimera-open]
         TEST: [test_host_returnZero, test_snitchCluster_simpleOffload]
-      - TARGET: [chimera-host, chimera-convolve]
+      - TARGET: [chimera-host]
         TEST: [test_host_returnZero]
   script:
     - !reference [.setup, script]
