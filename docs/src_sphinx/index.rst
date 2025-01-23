@@ -15,6 +15,7 @@ Chimera SDK Documentation
    /usage/usage
    /usage/structure
    /usage/build
+   /usage/ci
 
 .. toctree::
    :maxdepth: 2
