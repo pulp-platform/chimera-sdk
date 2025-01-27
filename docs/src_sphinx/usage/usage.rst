@@ -54,7 +54,7 @@ The SDK supports multiple targets, each with a different configuration. The avai
 
 Tests
 -----
-You can test the functional correctness of your code with the event-based simulator [GVSoC](https://github.com/gvsoc/gvsoc/). To install GVSoC, run:
+You can test the functional correctness of your code with the event-based simulator `GVSoC <https://github.com/gvsoc/gvsoc>`_. To install GVSoC, run:
 
 .. code-block:: bash
 
@@ -63,7 +63,9 @@ You can test the functional correctness of your code with the event-based simula
 By default, this Makefile will install GVSoC in the ``install/gvsoc`` folder. If you want to change the install location, you can define the ``GVSOC_INSTALL_DIR`` symbol pointing at the desired install location.
 
 Finally, you can execute the tests by running the following command from GVSoC's root:
+
 .. code-block:: bash
+
     ./install/bin/gvsoc --target=chimera --binary <path-to-binary> run
 
 Visual Studio Code Integration
