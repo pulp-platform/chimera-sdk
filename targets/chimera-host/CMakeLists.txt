@@ -74,7 +74,7 @@ target_compile_options(runtime_host
   -mabi=${ABI}
 )
 
-# VIVIANEP: Must set s
+# VIVIANEP: Must set this flag to support RV32 functions from OpenTitan
 target_compile_definitions(runtime_host
   PUBLIC
   -DOT_PLATFORM_RV32=1
