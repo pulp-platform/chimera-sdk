@@ -24,7 +24,7 @@ endif()
 # ------------------------------------------------------------------------------
 # Write sparse checkout file
 # ------------------------------------------------------------------------------
-set(SPARSE_CHECKOUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/sparse-checkout")
+set(SPARSE_CHECKOUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/thirdparty/sparse-checkout")
 file(WRITE "${SPARSE_CHECKOUT_FILE}" "")
 foreach(PATTERN ${OPENTITAN_SPARSE_PATTERNS})
   file(APPEND "${SPARSE_CHECKOUT_FILE}" "${PATTERN}\n")

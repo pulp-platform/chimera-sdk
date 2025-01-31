@@ -82,6 +82,7 @@ add_dependencies(generate_uart_regs opentitan_interface_${OPENTITAN_COMMIT_HASH}
 add_library(uart_lib STATIC)
 
 file(GLOB_RECURSE UART_SOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
   "${OPENTITAN_SW_DIR}/device/lib/base/*.c"
   "${OPENTITAN_SW_DIR}/device/lib/dif/*.c"
 )
@@ -96,6 +97,8 @@ target_sources(
 target_include_directories(
   uart_lib
   PUBLIC
+  ${CMAKE_SOURCE_DIR}/hal/inc
+  ${CMAKE_SOURCE_DIR}/drivers/uart_opentitan/inc
   ${OPENTITAN_DIR}
   ${OPENTITAN_SW_DIR}/device/lib/dif/autogen
 )
