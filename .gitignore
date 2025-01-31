@@ -1,6 +1,7 @@
 *~
 .ninja*
 **/build/*
+**/cmake_install.cmake
 drivers/*/thirdparty/
 
 .vscode/settings.json
