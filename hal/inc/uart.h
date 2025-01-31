@@ -8,17 +8,15 @@
 #define UART_H
 
 #include <stdint.h>
-#include "device_api.h"
-#include "sw/device/lib/base/mmio.h"
-#include "sw/device/lib/dif/dif_uart.h"
-#include "uart_regs.h"
-#include <stddef.h>
 #include <stdlib.h>
+#include "device_api.h"
+
+#define DUMP(val) ({ asm volatile("csrw 0x7FF, %0" ::"rK"(val)); })
 
 // Parity options
 #define UART_PARITY_NONE 0
 #define UART_PARITY_EVEN 1
-#define UART_PARITY_ODD  2
+#define UART_PARITY_ODD 2
 
 // Default UART configurations (can be overridden via compiler defines)
 #ifndef UART_DEFAULT_BAUD_RATE
@@ -54,11 +52,18 @@ typedef struct {
     uint8_t stop_bits;
 } uart_config_t;
 
+typedef struct uart_context {
+    void *driver_context;
+    void *driver_api;
+} uart_context_t;
+
 // Function declarations
-int uart_open(struct chi_device *device);
-int uart_close(struct chi_device *device);
-ssize_t uart_read_async(struct chi_device *device, void *buffer, uint32_t size, chi_device_callback cb);
-ssize_t uart_write_async(struct chi_device *device, const void *buffer, uint32_t size, chi_device_callback cb);
+extern int uart_open(struct chi_device *device);
+extern int uart_close(struct chi_device *device);
+extern ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size,
+                         chi_device_callback cb);
+extern ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
+                          chi_device_callback cb);
 
 // Extern the UART API structure
 extern struct chi_device_api uart_api;
