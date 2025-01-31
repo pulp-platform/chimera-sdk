@@ -9,7 +9,7 @@
 set(DRIVER_MAPPINGS
     chimera-convolve:cluster
     chimera-open:cluster
-    chimera-host:uart_opentitan
+    chimera-host:uart_apb
 )
 
 # Call the macro
