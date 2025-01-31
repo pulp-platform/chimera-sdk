@@ -10,25 +10,24 @@
 # Set up picolibc
 ################################################################################
 
-set(TARGET "chimera-host")
+set(TARGET "chimera-host" CACHE STRING "Target platform")
 
-set(CROSS_C_COMPILER "clang")
-set(CROSS_AR "llvm-ar")
-set(CROSS_STRIP "llvm-strip")
-set(TARGET_FLAG "riscv32-unknown-elf")
+set(CROSS_C_COMPILER "clang" CACHE STRING "Cross compiler")
+set(CROSS_AR "llvm-ar" CACHE STRING "Archiver")
+set(CROSS_STRIP "llvm-strip" CACHE STRING "Strip tool")
+set(TARGET_FLAG "riscv32-unknown-elf" CACHE STRING "Target flag")
 
-set(CROSS_CPU "riscv32")
-set(CROSS_CPU_FAMILY "riscv32")
-set(CROSS_ENDIAN "little")
-set(CROSS_SYSTEM "none")
+set(CROSS_CPU "riscv32" CACHE STRING "CPU Architecture")
+set(CROSS_CPU_FAMILY "riscv32" CACHE STRING "CPU Family")
+set(CROSS_ENDIAN "little" CACHE STRING "Endianness")
+set(CROSS_SYSTEM "none" CACHE STRING "System type")
 
-set(CROSS_C_COMPILER_ARGS "-target ${TARGET_FLAG} -march=${ISA_HOST} -nostdlib")
-set(CROSS_C_ARGS "-Werror=double-promotion -Wno-unsupported-floating-point-opt -fshort-enums -mno-relax -march=${ISA_HOST} -mabi=${ABI}")
-set(CROSS_C_LINK_ARGS "-Wl,-z,noexecstack -march=${ISA_HOST} -mabi=${ABI}")
+set(CROSS_C_COMPILER_ARGS "-target ${TARGET_FLAG} -march=${ISA_HOST} -nostdlib" CACHE STRING "Compiler arguments")
+set(CROSS_C_ARGS "-Werror=double-promotion -Wno-unsupported-floating-point-opt -fshort-enums -mno-relax -march=${ISA_HOST} -mabi=${ABI}" CACHE STRING "C arguments")
+set(CROSS_C_LINK_ARGS "-Wl,-z,noexecstack -march=${ISA_HOST} -mabi=${ABI}" CACHE STRING "Linker arguments")
 
-set(CROSS_SKIP_SANITY_CHECK "true")
+set(CROSS_SKIP_SANITY_CHECK "true" CACHE STRING "Skip sanity check")
 
-include(${CMAKE_CURRENT_LIST_DIR}/../../cmake/picolibc.cmake)
 
 ################################################################################
 # Host Runtime Library                                                         #

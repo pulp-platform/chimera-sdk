@@ -51,6 +51,10 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 # - runtime_cluster_snitch
 add_subdirectory(targets)
 
+
+# VIVIANEP: Include the picolibc library
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/picolibc.cmake)
+
 # Include other subdirectories
 add_subdirectory(hal)
 add_subdirectory(devices)

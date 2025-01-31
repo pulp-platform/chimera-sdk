@@ -13,7 +13,9 @@ cpu_family = '@CROSS_CPU_FAMILY@'
 cpu = '@CROSS_CPU@'
 endian = '@CROSS_ENDIAN@'
 
-[properties]
+[built-in options]
 c_args = [ @CROSS_C_ARGS_LIST@ ]
 c_link_args = [ @CROSS_C_LINK_ARGS_LIST@ ]
+
+[properties]
 skip_sanity_check = @CROSS_SKIP_SANITY_CHECK@
