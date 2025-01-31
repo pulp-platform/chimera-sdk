@@ -4,43 +4,77 @@
 //
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
+#include "params.h"
+#include "clint.h"
 #include "uart.h"
+#include "util.h"
+#include "regs/cheshire.h"
+#include "regs/soc_ctrl.h"
+
 #include <stdio.h>
 #include <string.h>
 
-// Simulated received data
-const char simulated_data[] = "Hello, UART!";
+int main(void) {
+    // 1. Configure the UART from defaults
+    uart_config_t uart_cfg = default_cfg;
 
-bool read_callback(struct chi_device *device)
-{
-    uart_config_t *context = (uart_config_t *)device->device_addr;
+    // 2. Read the RTC frequency from a hardware register
+    uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
 
-    // Print received data
-    // printf("Received data: %s\n", context->rx_buffer);
+    // 3. Calculate the desired core frequency from the RTC frequency
+    uint32_t reset_freq = clint_get_core_freq(rtc_freq, 2500);
 
-    return true;
-}
+    // 4. Update the UART config with the calculated frequency
+    uart_cfg.clk_freq_hz = reset_freq;
 
-int main()
-{
-    struct chi_device device;
-    device.api = &uart_api;
-    device.device_addr = (uint32_t *)0x40000000;
-    device.cfg = &default_cfg;
+    // 5. Initialize the UART device
+    struct chi_device uart_device = {
+        .device_addr = (uint32_t *)&__base_uart,
+        .cfg = &uart_cfg,
+        .api = &uart_api,
+    };
 
-    // Open the UART device
-    int open_result = device.api->open(&device);
-    // Check if UART was opened successfully
-    if (open_result < 0)
-    {
-        return open_result;
+    // 6. Open the UART device
+    int open_result = uart_open(&uart_device);
+
+    if (open_result != 0) {
+        return -1;
     }
 
-    // Allocate read buffer
-    uint8_t rx_buffer[32] = {0};
+    // 7. Prepare data to send
+    const char uart_cmd[] = "UartWB";
+    size_t cmd_len = sizeof(uart_cmd) - 1;
 
+    // 8. Prepare expected response and a buffer to read into
+    const char expected_response[] = "WB OK";
+    size_t expected_len = sizeof(expected_response) - 1;
+    char response_buffer[sizeof(expected_response)] = {0};
 
-    int close_result = device.api->close(&device);
+    // 9. Write the command to UART
+    ssize_t bytes_written = uart_write(&uart_device, uart_cmd, (uint32_t)cmd_len, NULL);
 
-    return open_result + close_result;
+    if (bytes_written < 0) {
+        uart_close(&uart_device);
+        return -1;
+    }
+
+    // 10. Read the response from UART
+    ssize_t bytes_read = uart_read(&uart_device, response_buffer, (uint32_t)expected_len, NULL);
+
+    if (bytes_read < 0) {
+        uart_close(&uart_device);
+        return -1;
+    }
+
+    // 11. Validate the response
+    if ((size_t)bytes_read == expected_len &&
+        strncmp(response_buffer, expected_response, expected_len) == 0) {
+        uart_close(&uart_device);
+        return 0;
+    } else {
+        uart_close(&uart_device);
+        return -1;
+    }
+
+    return 0;
 }
