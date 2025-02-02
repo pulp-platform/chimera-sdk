@@ -4,49 +4,89 @@
 //
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
+/**
+ * \addtogroup drivers_uart_apb
+ * @ingroup drivers
+ * @{
+ *
+ * @file uart_apb.c
+ * @brief APB UART driver implementation for Chimera-SDK.
+ *
+ * This file provides the implementation of UART initialization, read, and write
+ * functions for an APB-based UART peripheral. It includes blocking read and write
+ * operations along with basic configuration.
+ *
+ * @author Viviane Potocnik
+ * @email vivianep@iis.ee.ethz.ch
+ * @date 2025-01-31
+ * @license Apache-2.0
+ */
+
 #include "uart_apb.h"
 #include <stdlib.h>
 #include <string.h>
 
+/**
+ * @brief Checks if data is available to read from the UART receiver.
+ * @internal
+ *
+ * @param base Base address of the UART peripheral.
+ * @return 1 if data is ready, 0 otherwise.
+ */
 static inline int rx_ready(uint32_t base) {
     uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
     return (status & (1 << UART_LINE_STATUS_DATA_READY_BIT)) != 0;
 }
 
+/**
+ * @brief Checks if the transmitter is ready to accept new data.
+ * @internal
+ *
+ * @param base Base address of the UART peripheral.
+ * @return 1 if the transmitter is ready, 0 otherwise.
+ */
 static inline int tx_ready(uint32_t base) {
     uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
     return (status & (1 << UART_LINE_STATUS_THR_EMPTY_BIT)) != 0;
 }
 
+/**
+ * @brief Checks if the UART transmitter is idle (empty).
+ * @internal
+ *
+ * @param base Base address of the UART peripheral.
+ * @return 1 if the transmitter is idle, 0 otherwise.
+ */
 static inline int tx_idle(uint32_t base) {
     uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
     return (status & (1 << UART_LINE_STATUS_THR_EMPTY_BIT)) &&
            (status & (1 << UART_LINE_STATUS_TMIT_EMPTY_BIT));
 }
 
+/**
+ * @brief Opens and initializes the UART device.
+ *
+ * This function configures the UART peripheral with the given settings or
+ * uses default values if no configuration is provided.
+ *
+ * @param device Pointer to the UART device.
+ * @return 0 on success, -1 if invalid arguments are provided.
+ */
 int uart_open(struct chi_device *device) {
     if (!device || !device->device_addr) {
         return -1;
     }
-    // If no config was provided, use the default
+
+    // Use default config if none is provided
     if (!device->cfg) {
         device->cfg = &default_cfg;
     }
 
     uart_config_t *cfg = (uart_config_t *)device->cfg;
-
-    /* Perform the same initialization you used to do in "uart_init()". */
     uint32_t base = (uint32_t)device->device_addr;
     uint32_t divisor = cfg->clk_freq_hz / (cfg->baud_rate << 4);
     uint8_t dlo = (uint8_t)(divisor);
     uint8_t dhi = (uint8_t)(divisor >> 8);
-
-    // DUMP(base); // 0x03002000
-    // DUMP(cfg->clk_freq_hz); // 0x0be6589d
-    // DUMP(cfg->baud_rate); // 115200 = 0x0001C200
-    // DUMP(divisor); // 108 = 0x0000006C
-    // DUMP(dlo); // 108 = 0x6C
-    // DUMP(dhi); // 0 = 0x00
 
     // 1. Disable all interrupts
     reg8_write(base, UART_INTR_ENABLE_REG_OFFSET, 0x00);
@@ -56,18 +96,26 @@ int uart_open(struct chi_device *device) {
     reg8_write(base, UART_DLAB_LSB_REG_OFFSET, dlo);
     reg8_write(base, UART_DLAB_MSB_REG_OFFSET, dhi);
 
-    // 3. 8 bits, no parity, one stop bit
+    // 3. Configure line control: 8 data bits, no parity, 1 stop bit
     reg8_write(base, UART_LINE_CONTROL_REG_OFFSET, 0x03);
 
-    // 4. Enable & clear FIFO, 14B threshold
+    // 4. Enable & clear FIFO, 14-byte threshold
     reg8_write(base, UART_FIFO_CONTROL_REG_OFFSET, 0xC7);
 
-    // 5. Autoflow mode
+    // 5. Enable auto-flow control
     reg8_write(base, UART_MODEM_CONTROL_REG_OFFSET, 0x20);
 
     return 0;
 }
 
+/**
+ * @brief Closes the UART device.
+ *
+ * This function disables the UART peripheral by resetting control registers.
+ *
+ * @param device Pointer to the UART device.
+ * @return 0 on success, -1 if invalid arguments are provided.
+ */
 int uart_close(struct chi_device *device) {
     if (!device || !device->device_addr) {
         return -1;
@@ -81,58 +129,13 @@ int uart_close(struct chi_device *device) {
     // 2. Disable DLAB
     reg8_write(base, UART_LINE_CONTROL_REG_OFFSET, 0x00);
 
-    // 3. Reset FIFO CTRL
+    // 3. Reset FIFO control
     reg8_write(base, UART_FIFO_CONTROL_REG_OFFSET, 0x00);
 
-    // 4. Reset modem CTRL
+    // 4. Reset modem control
     reg8_write(base, UART_MODEM_CONTROL_REG_OFFSET, 0x00);
 
     return 0;
 }
 
-ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_device_callback cb) {
-    if (!device || !device->device_addr || !buffer || size == 0) {
-        return -1;
-    }
-
-    uint8_t *dst = (uint8_t *)buffer;
-    uint32_t base = (uint32_t)device->device_addr;
-
-    // Blocking Read
-    for (uint32_t i = 0; i < size; i++) {
-        while (!rx_ready(base)) {
-            // spin
-        }
-        dst[i] = reg8_read(base, UART_RBR_REG_OFFSET);
-    }
-
-    if (cb) {
-        (void)cb(device);
-    }
-
-    return (ssize_t)size;
-}
-
-ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
-                   chi_device_callback cb) {
-    if (!device || !device->device_addr || !buffer || size == 0) {
-        return -1;
-    }
-
-    const uint8_t *src = (const uint8_t *)buffer;
-    uint32_t base = (uint32_t)device->device_addr;
-
-    // Blocking Write
-    for (uint32_t i = 0; i < size; i++) {
-        while (!tx_ready(base)) {
-            // spin
-        }
-        reg8_write(base, UART_THR_REG_OFFSET, src[i]);
-    }
-
-    if (cb) {
-        (void)cb(device);
-    }
-
-    return (ssize_t)size;
-}
+/** @} */ // End of drivers_uart_apb group

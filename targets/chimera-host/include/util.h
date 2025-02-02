@@ -1,46 +1,114 @@
 // Copyright 2022 ETH Zurich and University of Bologna.
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
-//
-// Nicole Narr <narrn@student.ethz.ch>
-// Christopher Reinwardt <creinwar@student.ethz.ch>
-// Paul Scheffler <paulsc@iis.ee.ethz.ch>
+
+/**
+ * \addtogroup targets_chimera_host_util
+ * @ingroup targets_chimera_host
+ * @brief Utility functions and macros for Chimera-Host.
+ *
+ * This file provides helper functions for register access, memory fencing,
+ * interrupts, cycle counters, and general-purpose macros.
+ *
+ * @{
+ *
+ * @file util.h
+ * @author Nicole Narr
+ * @author Christopher Reinwardt
+ * @author Paul Scheffler
+ * @author Viviane Potocnik
+ * @date 2025-01-31
+ * @license Apache-2.0
+ */
 
 #pragma once
 
 #include <stdint.h>
 
-/* Helpers for reading/writing 8-bit registers. */
+/** @name Register Access Helpers
+ *  @brief Functions for reading/writing memory-mapped registers.
+ *  @{
+ */
+
+/**
+ * @brief Gets a pointer to an 8-bit register.
+ * @param base Base address of the register.
+ * @param offset Register offset.
+ * @return Pointer to the 8-bit register.
+ */
 static inline volatile uint8_t *reg8(uint32_t base, int offset) {
     return (volatile uint8_t *)(uintptr_t)(base + offset);
 }
 
+/**
+ * @brief Writes a value to an 8-bit register.
+ * @param base Base address of the register.
+ * @param offset Register offset.
+ * @param val Value to write.
+ */
 static inline void reg8_write(uint32_t base, int offset, uint8_t val) {
     *reg8(base, offset) = val;
 }
 
+/**
+ * @brief Reads a value from an 8-bit register.
+ * @param base Base address of the register.
+ * @param offset Register offset.
+ * @return Value read from the register.
+ */
 static inline uint8_t reg8_read(uint32_t base, int offset) {
     return *reg8(base, offset);
 }
 
-/* Helpers for reading/writing 32-bit registers*/
+/**
+ * @brief Gets a pointer to a 32-bit register.
+ * @param base Base address of the register.
+ * @param offs Register offset.
+ * @return Pointer to the 32-bit register.
+ */
 static inline volatile uint32_t *reg32(void *base, int offs) {
     return (volatile uint32_t *)(base + offs);
 }
 
+/** @} */
+
+/** @name Memory and Execution Fencing
+ *  @brief Functions to enforce memory ordering and instruction synchronization.
+ *  @{
+ */
+
+/**
+ * @brief Issues a memory fence to enforce ordering of memory accesses.
+ */
 static inline void fence() {
     asm volatile("fence" ::: "memory");
 }
 
+/**
+ * @brief Issues an instruction fence to synchronize instruction fetches.
+ */
 static inline void fencei() {
     asm volatile("fence.i" ::: "memory");
 }
 
+/**
+ * @brief Issues a wait-for-interrupt (WFI) instruction to enter low-power mode.
+ */
 static inline void wfi() {
     asm volatile("wfi" ::: "memory");
 }
 
-// Enables or disables M-mode timer interrupts.
+/** @} */
+
+/** @name Interrupt Control
+ *  @brief Functions to enable or disable interrupts.
+ *  @{
+ */
+
+/**
+ * @brief Enables or disables M-mode timer interrupts.
+ * @param enable Set to 1 to enable, 0 to disable.
+ */
 static inline void set_mtie(int enable) {
     if (enable)
         asm volatile("csrs mie, %0" ::"r"(128) : "memory");
@@ -48,7 +116,10 @@ static inline void set_mtie(int enable) {
         asm volatile("csrc mie, %0" ::"r"(128) : "memory");
 }
 
-// Enables or disables M-mode global interrupts.
+/**
+ * @brief Enables or disables M-mode global interrupts.
+ * @param enable Set to 1 to enable, 0 to disable.
+ */
 static inline void set_mie(int enable) {
     if (enable)
         asm volatile("csrsi mstatus, 8" ::: "memory");
@@ -56,21 +127,53 @@ static inline void set_mie(int enable) {
         asm volatile("csrci mstatus, 8" ::: "memory");
 }
 
-// Get cycle count since reset
+/** @} */
+
+/** @name Cycle Counter
+ *  @brief Functions to retrieve system cycle count.
+ *  @{
+ */
+
+/**
+ * @brief Gets the number of cycles since system reset.
+ * @return 64-bit cycle count.
+ */
 static inline uint64_t get_mcycle() {
     uint64_t mcycle;
     asm volatile("csrr %0, mcycle" : "=r"(mcycle)::"memory");
     return mcycle;
 }
 
-// This may also be used to invoke code that does not return.
+/** @} */
+
+/** @name Function Invocation Helpers
+ *  @brief Functions for invoking dynamic function pointers.
+ *  @{
+ */
+
+/**
+ * @brief Invokes a function stored in memory.
+ *
+ * This function may also be used to invoke code that does not return.
+ *
+ * @param code Pointer to the function to invoke.
+ * @return Return value of the invoked function.
+ */
 static inline uint64_t invoke(void *code) {
     uint64_t (*code_fun_ptr)(void) = code;
     fencei();
     return code_fun_ptr();
 }
 
-// Set global pointer and return prior value. Use with caution.
+/**
+ * @brief Sets the global pointer register and returns its previous value.
+ *
+ * @note Use with caution, as modifying the global pointer register (gp)
+ *       can affect program execution.
+ *
+ * @param gp New global pointer value.
+ * @return Previous global pointer value.
+ */
 static inline void *gprw(void *gp) {
     void *ret;
     asm volatile("mv %0, gp" : "=r"(ret)::"memory");
@@ -78,15 +181,53 @@ static inline void *gprw(void *gp) {
     return ret;
 }
 
-// If a call yields a nonzero return, return that immediately as an int.
+/** @} */
+
+/** @name Error Handling Macros
+ *  @brief Macros for function return handling.
+ *  @{
+ */
+
+/**
+ * @brief Checks if a function call returns a nonzero value and returns early.
+ *
+ * This macro evaluates the given function call. If the return value is
+ * nonzero, the calling function will return immediately with the same value.
+ *
+ * @param call Function call to check.
+ */
 #define CHECK_CALL(call) \
     { \
         int __ccret = (volatile int)(call); \
         if (__ccret) return __ccret; \
     }
 
-// If a condition; if it is untrue, ummediately return an error code.
+/**
+ * @brief Asserts a condition and returns an error code if it fails.
+ *
+ * If the condition evaluates to false, the function returns the provided error code.
+ *
+ * @param ret Error code to return.
+ * @param cond Condition to check.
+ */
 #define CHECK_ASSERT(ret, cond) \
     if (!(cond)) return (ret);
 
+/** @} */
+
+/** @name Utility Macros
+ *  @brief General-purpose helper macros.
+ *  @{
+ */
+
+/**
+ * @brief Returns the minimum of two values.
+ * @param a First value.
+ * @param b Second value.
+ * @return The smaller of the two values.
+ */
 #define MIN(a, b) (((a) <= (b)) ? (a) : (b))
+
+/** @} */
+
+/** @} */ // End of targets_chimera_host_util group

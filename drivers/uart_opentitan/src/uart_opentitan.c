@@ -4,11 +4,43 @@
 //
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
+/**
+ * \addtogroup drivers_uart_opentitan
+ * @ingroup drivers
+ * @{
+ *
+ * @file uart_opentitan.c
+ * @brief OpenTitan UART driver implementation for Chimera-SDK.
+ *
+ * @warning This driver has not been tested yet. Chimera currently supports
+ *          the `uart_apb` driver, and this implementation is still a work in
+ *          progress (WIP). Use with caution.
+ *
+ * This file provides the implementation of UART initialization, read, and write
+ * functions using OpenTitan's Device Interface Functions (DIF).
+ *
+ * @author Viviane Potocnik
+ * @email vivianep@iis.ee.ethz.ch
+ * @date 2025-01-31
+ * @license Apache-2.0
+ */
+
 #include "uart_opentitan.h"
 #include <stdlib.h>
 #include <string.h>
 
-// OpenTitan UART open function
+/**
+ * @brief Opens and initializes the OpenTitan UART device.
+ *
+ * @warning This function has not been tested. Use at your own risk.
+ *
+ * This function configures the UART with the provided settings and initializes
+ * it using OpenTitan's DIF API.
+ *
+ * @param device Pointer to the UART device.
+ * @return 0 on success, -1 on invalid argument, -2 on memory allocation failure, -3 on
+ * configuration failure.
+ */
 int uart_open(struct chi_device *device) {
     if (!device || !device->device_addr || !device->cfg) {
         return -1; // Invalid argument
@@ -46,7 +78,16 @@ int uart_open(struct chi_device *device) {
     return 0; // Success
 }
 
-// OpenTitan UART close function
+/**
+ * @brief Closes the OpenTitan UART device.
+ *
+ * @warning This function has not been tested. Use at your own risk.
+ *
+ * This function releases any allocated memory and resets the UART context.
+ *
+ * @param device Pointer to the UART device.
+ * @return 0 on success, -1 on invalid argument.
+ */
 int uart_close(struct chi_device *device) {
     if (!device || !device->cfg) {
         return -1; // Invalid argument
@@ -58,7 +99,20 @@ int uart_close(struct chi_device *device) {
     return 0; // Success
 }
 
-// OpenTitan UART asynchronous read
+/**
+ * @brief Reads data from the OpenTitan UART receiver (asynchronous).
+ *
+ * @warning This function has not been tested. Use at your own risk.
+ *
+ * This function attempts to read the specified number of bytes from the UART
+ * and stores them in the provided buffer.
+ *
+ * @param device Pointer to the UART device.
+ * @param buffer Buffer to store received data.
+ * @param size Number of bytes to read.
+ * @param cb Optional callback function (set to NULL if not needed).
+ * @return Number of bytes read on success, -1 on invalid argument, -2 on read failure.
+ */
 ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_device_callback cb) {
     if (!device || !device->cfg || !buffer || size == 0) {
         return -1; // Invalid argument
@@ -79,7 +133,19 @@ ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_de
     return bytes_read;
 }
 
-// OpenTitan UART asynchronous write
+/**
+ * @brief Writes data to the OpenTitan UART transmitter (asynchronous).
+ *
+ * @warning This function has not been tested. Use at your own risk.
+ *
+ * This function attempts to send the specified number of bytes over UART.
+ *
+ * @param device Pointer to the UART device.
+ * @param buffer Data to send.
+ * @param size Number of bytes to write.
+ * @param cb Optional callback function (set to NULL if not needed).
+ * @return Number of bytes written on success, -1 on invalid argument, -2 on write failure.
+ */
 ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
                    chi_device_callback cb) {
     if (!device || !device->cfg || !buffer || size == 0) {
@@ -100,3 +166,5 @@ ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
 
     return bytes_written;
 }
+
+/** @} */ // End of drivers_uart_opentitan group

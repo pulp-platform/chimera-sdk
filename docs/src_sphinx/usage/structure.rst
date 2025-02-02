@@ -14,6 +14,7 @@ The SDK is organized into the following main folders:
     │ └─ <more devices>
     ├─ drivers                              # Host drivers for peripherals and clusters
     │ ├─ cluster
+    │ ├─ uart_<version>                     # UART driver for a specific version of the UART
     │ └─ <more drivers>
     ├─ hal                                  # Hardware Abstraction Layer (HAL)
     ├─ scripts                              # Utility scripts
@@ -24,6 +25,11 @@ The SDK is organized into the following main folders:
     | ├─ chimera-open    
     | └─ <more targets>
     └─ CMakelists.txt                       # Top level CMakeLists.txt
+
+.. note::
+    The UART driver version is determined by the ``DRIVER_MAPPINGS`` variable 
+    in the build system. This allows switching between different UART driver 
+    implementations at compile time.
 
 
 Tests
