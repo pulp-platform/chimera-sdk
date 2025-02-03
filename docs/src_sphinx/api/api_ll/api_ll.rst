@@ -6,7 +6,7 @@ The Low Level (LL) API provides a direct interface to the hardware of the SoC an
 It consists of drivers, devices and targets.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    api_ll_drivers
    api_ll_devices

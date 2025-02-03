@@ -65,8 +65,7 @@ typedef struct chi_device_api {
      * @param size Size of the buffer.
      * @return ssize_t Number of bytes read, negative on failure.
      */
-    ssize_t (*read_async)(struct chi_device *device, void *buffer, uint32_t size,
-                          chi_device_callback cb);
+    ssize_t (*read)(struct chi_device *device, void *buffer, uint32_t size, chi_device_callback cb);
 
     /** Write to the device.
      *
@@ -75,8 +74,8 @@ typedef struct chi_device_api {
      * @param size Size of the buffer.
      * @return ssize_t Number of bytes written, negative on failure.
      */
-    ssize_t (*write_async)(struct chi_device *device, const void *buffer, uint32_t size,
-                           chi_device_callback cb);
+    ssize_t (*write)(struct chi_device *device, const void *buffer, uint32_t size,
+                     chi_device_callback cb);
 } chi_device_api_t;
 
 /** @} */

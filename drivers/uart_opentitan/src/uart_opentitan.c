@@ -5,8 +5,9 @@
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers_uart_opentitan
- * @ingroup drivers
+ * \addtogroup drivers
+ * @{
+ * \defgroup drivers_uart_opentitan UART OpenTitan Driver
  * @{
  *
  * @file uart_opentitan.c
@@ -19,10 +20,8 @@
  * This file provides the implementation of UART initialization, read, and write
  * functions using OpenTitan's Device Interface Functions (DIF).
  *
- * @author Viviane Potocnik
- * @email vivianep@iis.ee.ethz.ch
+ * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #include "uart_opentitan.h"
@@ -30,8 +29,9 @@
 #include <string.h>
 
 /**
+ * \ingroup drivers_uart_opentitan
+ * \fn int uart_open_ot(struct chi_device *device)
  * @brief Opens and initializes the OpenTitan UART device.
- *
  * @warning This function has not been tested. Use at your own risk.
  *
  * This function configures the UART with the provided settings and initializes
@@ -79,8 +79,9 @@ int uart_open(struct chi_device *device) {
 }
 
 /**
+ * \ingroup drivers_uart_opentitan
+ * \fn int uart_close_ot(struct chi_device *device)
  * @brief Closes the OpenTitan UART device.
- *
  * @warning This function has not been tested. Use at your own risk.
  *
  * This function releases any allocated memory and resets the UART context.
@@ -100,8 +101,10 @@ int uart_close(struct chi_device *device) {
 }
 
 /**
+ * \ingroup drivers_uart_opentitan
+ * \fn ssize_t uart_read_ot(struct chi_device *device, void *buffer, uint32_t size,
+ * chi_device_callback cb)
  * @brief Reads data from the OpenTitan UART receiver (asynchronous).
- *
  * @warning This function has not been tested. Use at your own risk.
  *
  * This function attempts to read the specified number of bytes from the UART
@@ -134,8 +137,10 @@ ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_de
 }
 
 /**
+ * \ingroup drivers_uart_opentitan
+ * \fn ssize_t uart_write_ot(struct chi_device *device, const void *buffer, uint32_t size,
+ * chi_device_callback cb)
  * @brief Writes data to the OpenTitan UART transmitter (asynchronous).
- *
  * @warning This function has not been tested. Use at your own risk.
  *
  * This function attempts to send the specified number of bytes over UART.
@@ -168,3 +173,4 @@ ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
 }
 
 /** @} */ // End of drivers_uart_opentitan group
+/** @} */ // End of drivers group

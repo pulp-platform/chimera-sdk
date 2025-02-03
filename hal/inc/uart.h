@@ -15,10 +15,8 @@
  * @{
  *
  * @file uart.h
- * @author Viviane Potocnik
- * @email vivianep@iis.ee.ethz.ch
+ * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #ifndef UART_H

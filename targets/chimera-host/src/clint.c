@@ -17,10 +17,8 @@
  * This file provides implementations for CLINT timer functionality, including
  * timekeeping, timer comparisons, and sleep mechanisms.
  *
- * @author Viviene Potocnik
- * @email vivianep@iis.ee.ethz.ch
+ * @author Viviene Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #include "clint.h"

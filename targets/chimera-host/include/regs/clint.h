@@ -21,7 +21,6 @@
  *
  * @file clint.h
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #ifndef _CLINT_REG_DEFS_

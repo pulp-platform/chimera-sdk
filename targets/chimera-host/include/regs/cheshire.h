@@ -23,7 +23,6 @@
  *
  * @file cheshire_reg_defs.h
  * @date 2025-01-31
- * @license SHL-0.51
  */
 
 #ifndef _CHESHIRE_REG_DEFS_

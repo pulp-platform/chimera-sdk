@@ -5,10 +5,10 @@
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers_uart_apb
- * @ingroup drivers
+ * \addtogroup drivers
  * @{
- *
+ * \defgroup drivers_uart_apb UART APB Driver
+ * @{
  * @file uart_apb.c
  * @brief APB UART driver implementation for Chimera-SDK.
  *
@@ -16,10 +16,8 @@
  * functions for an APB-based UART peripheral. It includes blocking read and write
  * operations along with basic configuration.
  *
- * @author Viviane Potocnik
- * @email vivianep@iis.ee.ethz.ch
+ * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #include "uart_apb.h"
@@ -27,8 +25,8 @@
 #include <string.h>
 
 /**
+ * \ingroup drivers_uart_apb
  * @brief Checks if data is available to read from the UART receiver.
- * @internal
  *
  * @param base Base address of the UART peripheral.
  * @return 1 if data is ready, 0 otherwise.
@@ -39,8 +37,8 @@ static inline int rx_ready(uint32_t base) {
 }
 
 /**
+ * \ingroup drivers_uart_apb
  * @brief Checks if the transmitter is ready to accept new data.
- * @internal
  *
  * @param base Base address of the UART peripheral.
  * @return 1 if the transmitter is ready, 0 otherwise.
@@ -51,8 +49,8 @@ static inline int tx_ready(uint32_t base) {
 }
 
 /**
+ * \ingroup drivers_uart_apb
  * @brief Checks if the UART transmitter is idle (empty).
- * @internal
  *
  * @param base Base address of the UART peripheral.
  * @return 1 if the transmitter is idle, 0 otherwise.
@@ -64,13 +62,14 @@ static inline int tx_idle(uint32_t base) {
 }
 
 /**
+ * \ingroup drivers_uart_apb
  * @brief Opens and initializes the UART device.
  *
  * This function configures the UART peripheral with the given settings or
  * uses default values if no configuration is provided.
  *
  * @param device Pointer to the UART device.
- * @return 0 on success, -1 if invalid arguments are provided.
+ * @return 0 on success, -1 on failure.
  */
 int uart_open(struct chi_device *device) {
     if (!device || !device->device_addr) {
@@ -109,12 +108,13 @@ int uart_open(struct chi_device *device) {
 }
 
 /**
+ * \ingroup drivers_uart_apb
  * @brief Closes the UART device.
  *
  * This function disables the UART peripheral by resetting control registers.
  *
  * @param device Pointer to the UART device.
- * @return 0 on success, -1 if invalid arguments are provided.
+ * @return 0 on success, -1 on failure.
  */
 int uart_close(struct chi_device *device) {
     if (!device || !device->device_addr) {
@@ -138,4 +138,76 @@ int uart_close(struct chi_device *device) {
     return 0;
 }
 
+/**
+ * \ingroup drivers_uart_apb
+ * @brief Reads data from the UART receiver (blocking mode).
+ *
+ * This function waits until data is available and reads it into the provided buffer.
+ *
+ * @param device Pointer to the UART device.
+ * @param buffer Buffer to store received data.
+ * @param size Number of bytes to read.
+ * @param cb Optional callback function (set to NULL if not needed).
+ * @return Number of bytes read on success, -1 on failure.
+ */
+ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_device_callback cb) {
+    if (!device || !device->device_addr || !buffer || size == 0) {
+        return -1;
+    }
+
+    uint8_t *dst = (uint8_t *)buffer;
+    uint32_t base = (uint32_t)device->device_addr;
+
+    // Blocking read
+    for (uint32_t i = 0; i < size; i++) {
+        while (!rx_ready(base)) {
+            // Wait until data is available
+        }
+        dst[i] = reg8_read(base, UART_RBR_REG_OFFSET);
+    }
+
+    if (cb) {
+        (void)cb(device);
+    }
+
+    return (ssize_t)size;
+}
+
+/**
+ * \ingroup drivers_uart_apb
+ * @brief Writes data to the UART transmitter (blocking mode).
+ *
+ * This function waits until the transmitter is ready and sends the provided data.
+ *
+ * @param device Pointer to the UART device.
+ * @param buffer Data to send.
+ * @param size Number of bytes to write.
+ * @param cb Optional callback function (set to NULL if not needed).
+ * @return Number of bytes written on success, -1 on failure.
+ */
+ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
+                   chi_device_callback cb) {
+    if (!device || !device->device_addr || !buffer || size == 0) {
+        return -1;
+    }
+
+    const uint8_t *src = (const uint8_t *)buffer;
+    uint32_t base = (uint32_t)device->device_addr;
+
+    // Blocking write
+    for (uint32_t i = 0; i < size; i++) {
+        while (!tx_ready(base)) {
+            // Wait until the transmitter is ready
+        }
+        reg8_write(base, UART_THR_REG_OFFSET, src[i]);
+    }
+
+    if (cb) {
+        (void)cb(device);
+    }
+
+    return (ssize_t)size;
+}
+
 /** @} */ // End of drivers_uart_apb group
+/** @} */ // End of drivers group

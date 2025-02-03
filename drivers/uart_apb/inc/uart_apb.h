@@ -5,7 +5,9 @@
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers_uart_apb
+ * \addtogroup drivers
+ * @{
+ * \defgroup drivers_uart_apb UART APB Driver
  * @{
  * @file uart_apb.h
  * @brief APB UART register definitions for Chimera-SDK.
@@ -14,10 +16,8 @@
  * It is used in conjunction with the UART driver to configure and interact with
  * the hardware.
  *
- * @author Viviane Potocnik
- * @email vivianep@iis.ee.ethz.ch
+ * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #ifndef UART_APB_H
@@ -27,6 +27,7 @@
 #include "util.h"
 
 /**
+ * \ingroup drivers_uart_apb
  * @name UART Register Offsets
  * @brief Defines the register offsets for the APB UART peripheral.
  * @{
@@ -45,6 +46,7 @@
 /** @} */                                // End of UART Register Offsets
 
 /**
+ * \ingroup drivers_uart_apb
  * @name UART Line Status Register (LSR) Bit Definitions
  * @brief Defines the bit positions for the Line Status Register (LSR).
  * @{
@@ -59,3 +61,4 @@
 #endif // UART_APB_H
 
 /** @} */ // End of drivers_uart_apb group
+/** @} */ // End of drivers group

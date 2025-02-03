@@ -15,10 +15,8 @@
  * This file defines the default UART configuration and exposes the `uart_api`
  * structure, which provides function pointers for the UART HAL interface.
  *
- * @author Viviane Potocnik
- * @email vivianep@iis.ee.ethz.ch
+ * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #include "uart.h"
@@ -29,10 +27,10 @@
  * This structure provides function pointers for common UART operations.
  */
 struct chi_device_api uart_api = {
-    .open = uart_open,        /**< Pointer to the UART open function. */
-    .close = uart_close,      /**< Pointer to the UART close function. */
-    .read_async = uart_read,  /**< Pointer to the asynchronous UART read function. */
-    .write_async = uart_write /**< Pointer to the asynchronous UART write function. */
+    .open = uart_open,   /**< Pointer to the UART open function. */
+    .close = uart_close, /**< Pointer to the UART close function. */
+    .read = uart_read,   /**< Pointer to the asynchronous UART read function. */
+    .write = uart_write  /**< Pointer to the asynchronous UART write function. */
 };
 
 /**

@@ -16,9 +16,8 @@
  * @author Nicole Narr
  * @author Christopher Reinwardt
  * @author Paul Scheffler
- * @author Viviane Potocnik
+ * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #pragma once

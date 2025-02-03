@@ -5,10 +5,10 @@
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers_uart_opentitan
- * @ingroup drivers
+ * \addtogroup drivers
  * @{
- *
+ * \defgroup drivers_uart_opentitan UART OpenTitan Driver
+ * @{
  * @file uart_opentitan.h
  * @brief OpenTitan-specific UART driver interface for Chimera-SDK.
  *
@@ -20,10 +20,8 @@
  *          the `uart_apb` driver, and this implementation is still a work in
  *          progress (WIP). Use with caution.
  *
- * @author Viviane Potocnik
- * @email vivianep@iis.ee.ethz.ch
+ * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
  * @date 2025-01-31
- * @license Apache-2.0
  */
 
 #ifndef UART_OPENTITAN_H
@@ -38,6 +36,7 @@ extern "C" {
 #endif
 
 /**
+ * \ingroup drivers_uart_opentitan
  * @brief OpenTitan-specific UART context.
  *
  * This structure holds the device interface function (DIF) handle
@@ -54,3 +53,4 @@ typedef struct {
 #endif // UART_OPENTITAN_H
 
 /** @} */ // End of drivers_uart_opentitan group
+/** @} */ // End of drivers group
