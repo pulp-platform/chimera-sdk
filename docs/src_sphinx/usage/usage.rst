@@ -43,6 +43,7 @@ To build the SDK, run:
     cmake -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0 -B build
     cmake --build build -j
 
+.. _usage_tests:
 
 Targets
 -------
@@ -52,8 +53,8 @@ The SDK supports multiple targets, each with a different configuration. The avai
 - ``chimera-host``: Target with a single host core without clusters.
 - ``chimera-open``: Default target with multiple clusters.
 
-Tests
------
+Testing
+-------
 You can test the functional correctness of your code with the event-based simulator `GVSoC <https://github.com/gvsoc/gvsoc>`_. To install GVSoC, run:
 
 .. code-block:: bash
