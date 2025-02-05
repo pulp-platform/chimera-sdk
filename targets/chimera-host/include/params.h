@@ -3,7 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * \addtogroup targets_chimera_host_memory
+ * @defgroup targets_chimera_host Chimera-Host Target
+ * @brief Target-specific definitions and interfaces for Chimera-Host.
+ * @{
+ */
+
+/**
+ * @defgroup targets_chimera_host_memory Chimera-Host Memory Definitions
  * @ingroup targets_chimera_host
  * @brief Chimera-Host memory and address definitions.
  *
@@ -13,12 +19,11 @@
  *
  * @{
  *
- * @file chimera_host_memory.h
  * @author Nicole Narr
  * @author Christopher Reinwardt
  * @author Paul Scheffler
  * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-01-31
+ * @date 2025-02-05
  */
 
 #pragma once
@@ -80,3 +85,4 @@ static const uint64_t __BOOT_FW_TYPE_GUID[2] = {0x4B0D3F5B99EC86DAUL, 0x59F8A5CF
 /** @} */
 
 /** @} */ // End of targets_chimera_host_memory group
+/** @} */ // End of targets_chimera_host group

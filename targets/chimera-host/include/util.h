@@ -3,7 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * \addtogroup targets_chimera_host_util
+ * @defgroup targets_chimera_host Chimera-Host Target
+ * @brief Target-specific definitions and interfaces for Chimera-Host.
+ * @{
+ */
+
+/**
+ * @defgroup targets_chimera_host_util Utility Functions and Macros
  * @ingroup targets_chimera_host
  * @brief Utility functions and macros for Chimera-Host.
  *
@@ -17,7 +23,7 @@
  * @author Christopher Reinwardt
  * @author Paul Scheffler
  * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-01-31
+ * @date 2025-02-05
  */
 
 #pragma once
@@ -230,3 +236,4 @@ static inline void *gprw(void *gp) {
 /** @} */
 
 /** @} */ // End of targets_chimera_host_util group
+/** @} */ // End of targets_chimera_host group
