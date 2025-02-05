@@ -4,13 +4,7 @@
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
+# Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-# Define mappings for tests
-set(TEST_MAPPINGS
-    chimera-convolve:chimera-convolve
-    chimera-open:chimera-open
-    chimera-host:chimera-host
-)
-
-# Call the macro
-add_chimera_subdirectories(${TARGET_PLATFORM} "Test" "${TEST_MAPPINGS}")
+add_subdirectory(returnZero)
+add_subdirectory(uartSimple)
