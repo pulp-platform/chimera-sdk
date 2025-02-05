@@ -2,10 +2,16 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
-// Viviane Potcnik <vivianep@iis.ee.ethz.ch>
+// Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup hal_uart
+ * @defgroup hal Hardware Abstraction Layer (HAL)
+ * @brief The HAL module provides a unified API for hardware peripherals.
+ * @{
+ */
+
+/**
+ * @defgroup hal_uart UART HAL Interface
  * @ingroup hal
  * @brief UART HAL interface for Chimera-SDK.
  *
@@ -15,15 +21,15 @@
  * @{
  *
  * @file uart.h
- * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-01-31
+ * @author Viviane Potocnik <vivianep@iis.ee.ethz.ch>
+ * @date 2025-02-05
  */
 
 #ifndef UART_H
 #define UART_H
 
 #include <stdint.h>
-#include <stdlib.h>
+#include <sys/types.h> // Needed for ssize_t
 #include "device_api.h"
 
 /** @name UART Parity Modes
@@ -44,7 +50,7 @@
 #endif
 
 #ifndef UART_DEFAULT_DATA_BITS
-#define UART_DEFAULT_DATA_BITS 8 /**< Default data bits. */
+#define UART_DEFAULT_DATA_BITS 8 /**< Default number of data bits. */
 #endif
 
 #ifndef UART_DEFAULT_PARITY
@@ -52,7 +58,7 @@
 #endif
 
 #ifndef UART_DEFAULT_STOP_BITS
-#define UART_DEFAULT_STOP_BITS 1 /**< Default stop bits. */
+#define UART_DEFAULT_STOP_BITS 1 /**< Default number of stop bits. */
 #endif
 
 #ifndef UART_CLK_FREQ_HZ
@@ -78,61 +84,84 @@ typedef struct {
 } uart_config_t;
 
 /**
- * @brief UART context structure.
- *
- * This structure holds pointers to the driver-specific context and API functions.
- */
-typedef struct uart_context {
-    void *driver_context; /**< Pointer to driver-specific context. */
-    void *driver_api;     /**< Pointer to driver-specific API functions. */
-} uart_context_t;
-
-/**
  * @brief Opens and initializes the UART device.
  *
- * @param device Pointer to the UART device.
+ * @param device Pointer to the UART device structure.
  * @return 0 on success, negative value on failure.
  */
-extern int uart_open(struct chi_device *device);
+extern int uart_open(chi_device_t *device);
 
 /**
  * @brief Closes the UART device.
  *
- * @param device Pointer to the UART device.
+ * @param device Pointer to the UART device structure.
  * @return 0 on success, negative value on failure.
  */
-extern int uart_close(struct chi_device *device);
+extern int uart_close(chi_device_t *device);
 
 /**
- * @brief Reads data from the UART receiver (asynchronous).
+ * @brief Reads data from the UART receiver.
  *
- * @param device Pointer to the UART device.
- * @param buffer Buffer to store received data.
+ * @param device Pointer to the UART device structure.
+ * @param buffer Pointer to the buffer where received data will be stored.
  * @param size Number of bytes to read.
- * @param cb Optional callback function.
+ * @param cb Optional callback function to signal completion.
  * @return Number of bytes read on success, negative value on failure.
  */
-extern ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size,
-                         chi_device_callback cb);
+extern ssize_t uart_read(chi_device_t *device, void *buffer, uint32_t size,
+                         chi_device_callback_t cb);
 
 /**
- * @brief Writes data to the UART transmitter (asynchronous).
+ * @brief Writes data to the UART transmitter.
  *
- * @param device Pointer to the UART device.
- * @param buffer Data to send.
+ * @param device Pointer to the UART device structure.
+ * @param buffer Pointer to the data to send.
  * @param size Number of bytes to write.
- * @param cb Optional callback function.
+ * @param cb Optional callback function to signal completion.
  * @return Number of bytes written on success, negative value on failure.
  */
-extern ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
-                          chi_device_callback cb);
+extern ssize_t uart_write(chi_device_t *device, const void *buffer, uint32_t size,
+                          chi_device_callback_t cb);
 
-/** @brief UART API structure, defining function pointers for driver operations. */
-extern struct chi_device_api uart_api;
-
-/** @brief Default UART configuration settings. */
+/**
+ * @brief Default UART configuration settings.
+ *
+ * This global configuration structure defines default parameters for UART communication,
+ * which can be overridden by the user.
+ *
+ * **Default Configuration:**
+ * @code
+ * uart_config_t default_cfg = {
+ *     .baud_rate   = UART_DEFAULT_BAUD_RATE,  // Default baud rate
+ *     .clk_freq_hz = UART_CLK_FREQ_HZ,        // Default clock frequency
+ *     .data_bits   = UART_DEFAULT_DATA_BITS,  // Default number of data bits
+ *     .parity      = UART_DEFAULT_PARITY,     // Default parity setting
+ *     .stop_bits   = UART_DEFAULT_STOP_BITS   // Default number of stop bits
+ * };
+ * @endcode
+ */
 extern uart_config_t default_cfg;
+
+/**
+ * @brief UART HAL API structure.
+ *
+ * This structure defines function pointers for UART operations, allowing for
+ * modular driver implementations.
+ *
+ * The default implementation uses weak symbols that can be overridden by specific drivers.
+ *
+ * @code
+ * __attribute__((weak)) chi_device_api_t uart_api = {
+ *     .open  = uart_open,
+ *     .close = uart_close,
+ *     .read  = uart_read,
+ *     .write = uart_write
+ * };
+ * @endcode
+ */
+extern chi_device_api_t uart_api;
 
 #endif // UART_H
 
 /** @} */ // End of hal_uart group
+/** @} */ // End of hal group

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
+# Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 file(GLOB_RECURSE SOURCES
   "src/*"
@@ -17,6 +18,7 @@ target_include_directories(hal_host
 
 target_link_libraries(hal_host
   PUBLIC
+    -Wl,--whole-archive uart_lib -Wl,--no-whole-archive
     uart_lib
     picolibc
 )
