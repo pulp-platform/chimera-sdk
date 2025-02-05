@@ -3,9 +3,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * \addtogroup targets_chimera_host_clint
+ * @defgroup targets_chimera_host Chimera-Host Target
+ * @brief Target-specific definitions and interfaces for Chimera-Host.
+ * @{
+ */
+
+/**
+ * @defgroup targets_chimera_host_clint CLINT (Core-Local Interruptor) Interface
  * @ingroup targets_chimera_host
- * @brief CLINT (Core-Local Interruptor) interface for Chimera-Host.
+ * @brief CLINT interface for Chimera-Host.
  *
  * This module provides functions for interacting with the CLINT timer,
  * including reading `mtime`, comparing timestamps, and implementing sleep functions.
@@ -17,7 +23,7 @@
  * @author Christopher Reinwardt
  * @author Paul Scheffler
  * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-01-31
+ * @date 2025-02-05
  */
 
 #pragma once
@@ -105,3 +111,4 @@ void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime);
 void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks);
 
 /** @} */ // End of targets_chimera_host_clint group
+/** @} */ // End of targets_chimera_host group

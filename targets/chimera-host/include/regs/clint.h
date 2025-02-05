@@ -8,7 +8,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * \addtogroup targets_chimera_host_clint_registers
+ * @defgroup targets_chimera_host Chimera-Host Target
+ * @brief Target-specific definitions and interfaces for Chimera-Host.
+ * @{
+ */
+
+/**
+ * @defgroup targets_chimera_host_clint_registers CLINT Registers
  * @ingroup targets_chimera_host
  * @brief Register definitions for the CLINT (Core-Local Interruptor) in Chimera-Host.
  *
@@ -76,3 +82,4 @@ extern "C" {
 #endif // _CLINT_REG_DEFS_
 
 /** @} */ // End of targets_chimera_host_clint_registers group
+/** @} */ // End of targets_chimera_host group
