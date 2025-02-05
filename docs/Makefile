@@ -21,8 +21,7 @@ help:
 doxygen: 
 	@echo "Building Doxygen documentation"
 	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_HAL.in 
-	# @$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_LL_chimera-open.in
-	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_LL_chimera-host.in
+	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_LL_chimera-open.in
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
