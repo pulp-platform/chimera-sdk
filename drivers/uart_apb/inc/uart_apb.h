@@ -16,15 +16,14 @@
  * It is used in conjunction with the UART driver to configure and interact with
  * the hardware.
  *
- * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-01-31
+ * @author Viviane Potocnik
+ * @date 2025-02-04
  */
 
 #ifndef UART_APB_H
 #define UART_APB_H
 
 #include "uart.h"
-#include "util.h"
 
 /**
  * \ingroup drivers_uart_apb

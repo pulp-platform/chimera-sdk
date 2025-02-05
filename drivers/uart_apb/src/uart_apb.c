@@ -17,15 +17,15 @@
  * operations along with basic configuration.
  *
  * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-01-31
+ * @date 2025-02-04
  */
 
 #include "uart_apb.h"
+#include "util.h"
 #include <stdlib.h>
 #include <string.h>
 
 /**
- * \ingroup drivers_uart_apb
  * @brief Checks if data is available to read from the UART receiver.
  *
  * @param base Base address of the UART peripheral.
@@ -37,7 +37,6 @@ static inline int rx_ready(uint32_t base) {
 }
 
 /**
- * \ingroup drivers_uart_apb
  * @brief Checks if the transmitter is ready to accept new data.
  *
  * @param base Base address of the UART peripheral.
@@ -49,29 +48,12 @@ static inline int tx_ready(uint32_t base) {
 }
 
 /**
- * \ingroup drivers_uart_apb
- * @brief Checks if the UART transmitter is idle (empty).
- *
- * @param base Base address of the UART peripheral.
- * @return 1 if the transmitter is idle, 0 otherwise.
- */
-static inline int tx_idle(uint32_t base) {
-    uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
-    return (status & (1 << UART_LINE_STATUS_THR_EMPTY_BIT)) &&
-           (status & (1 << UART_LINE_STATUS_TMIT_EMPTY_BIT));
-}
-
-/**
- * \ingroup drivers_uart_apb
  * @brief Opens and initializes the UART device.
- *
- * This function configures the UART peripheral with the given settings or
- * uses default values if no configuration is provided.
  *
  * @param device Pointer to the UART device.
  * @return 0 on success, -1 on failure.
  */
-int uart_open(struct chi_device *device) {
+int uart_apb_open(chi_device_t *device) {
     if (!device || !device->device_addr) {
         return -1;
     }
@@ -108,41 +90,29 @@ int uart_open(struct chi_device *device) {
 }
 
 /**
- * \ingroup drivers_uart_apb
  * @brief Closes the UART device.
- *
- * This function disables the UART peripheral by resetting control registers.
  *
  * @param device Pointer to the UART device.
  * @return 0 on success, -1 on failure.
  */
-int uart_close(struct chi_device *device) {
+int uart_apb_close(chi_device_t *device) {
     if (!device || !device->device_addr) {
         return -1;
     }
 
     uint32_t base = (uint32_t)device->device_addr;
 
-    // 1. Disable all interrupts
+    // Reset control registers
     reg8_write(base, UART_INTR_ENABLE_REG_OFFSET, 0x00);
-
-    // 2. Disable DLAB
     reg8_write(base, UART_LINE_CONTROL_REG_OFFSET, 0x00);
-
-    // 3. Reset FIFO control
     reg8_write(base, UART_FIFO_CONTROL_REG_OFFSET, 0x00);
-
-    // 4. Reset modem control
     reg8_write(base, UART_MODEM_CONTROL_REG_OFFSET, 0x00);
 
     return 0;
 }
 
 /**
- * \ingroup drivers_uart_apb
  * @brief Reads data from the UART receiver (blocking mode).
- *
- * This function waits until data is available and reads it into the provided buffer.
  *
  * @param device Pointer to the UART device.
  * @param buffer Buffer to store received data.
@@ -150,7 +120,7 @@ int uart_close(struct chi_device *device) {
  * @param cb Optional callback function (set to NULL if not needed).
  * @return Number of bytes read on success, -1 on failure.
  */
-ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_device_callback cb) {
+ssize_t uart_apb_read(chi_device_t *device, void *buffer, uint32_t size, chi_device_callback_t cb) {
     if (!device || !device->device_addr || !buffer || size == 0) {
         return -1;
     }
@@ -158,11 +128,9 @@ ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_de
     uint8_t *dst = (uint8_t *)buffer;
     uint32_t base = (uint32_t)device->device_addr;
 
-    // Blocking read
     for (uint32_t i = 0; i < size; i++) {
         while (!rx_ready(base)) {
-            // Wait until data is available
-        }
+        } // Wait until data is available
         dst[i] = reg8_read(base, UART_RBR_REG_OFFSET);
     }
 
@@ -174,10 +142,7 @@ ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_de
 }
 
 /**
- * \ingroup drivers_uart_apb
  * @brief Writes data to the UART transmitter (blocking mode).
- *
- * This function waits until the transmitter is ready and sends the provided data.
  *
  * @param device Pointer to the UART device.
  * @param buffer Data to send.
@@ -185,8 +150,8 @@ ssize_t uart_read(struct chi_device *device, void *buffer, uint32_t size, chi_de
  * @param cb Optional callback function (set to NULL if not needed).
  * @return Number of bytes written on success, -1 on failure.
  */
-ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
-                   chi_device_callback cb) {
+ssize_t uart_apb_write(chi_device_t *device, const void *buffer, uint32_t size,
+                       chi_device_callback_t cb) {
     if (!device || !device->device_addr || !buffer || size == 0) {
         return -1;
     }
@@ -194,11 +159,9 @@ ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
     const uint8_t *src = (const uint8_t *)buffer;
     uint32_t base = (uint32_t)device->device_addr;
 
-    // Blocking write
     for (uint32_t i = 0; i < size; i++) {
         while (!tx_ready(base)) {
-            // Wait until the transmitter is ready
-        }
+        } // Wait until the transmitter is ready
         reg8_write(base, UART_THR_REG_OFFSET, src[i]);
     }
 
@@ -208,6 +171,24 @@ ssize_t uart_write(struct chi_device *device, const void *buffer, uint32_t size,
 
     return (ssize_t)size;
 }
+
+/// @cond DOXYGEN_SHOULD_SKIP_THIS
+extern int uart_open(chi_device_t *device)
+    __attribute__((alias("uart_apb_open"), used, visibility("default")));
+extern int uart_close(chi_device_t *device)
+    __attribute__((alias("uart_apb_close"), used, visibility("default")));
+extern ssize_t uart_read(chi_device_t *device, void *buffer, uint32_t size,
+                         chi_device_callback_t cb)
+    __attribute__((alias("uart_apb_read"), used, visibility("default")));
+extern ssize_t uart_write(chi_device_t *device, const void *buffer, uint32_t size,
+                          chi_device_callback_t cb)
+    __attribute__((alias("uart_apb_write"), used, visibility("default")));
+// @endcond
+
+/// @cond DOXYGEN_SHOULD_SKIP_THIS
+chi_device_api_t uart_api = {
+    .open = uart_apb_open, .close = uart_apb_close, .read = uart_apb_read, .write = uart_apb_write};
+// @endcond
 
 /** @} */ // End of drivers_uart_apb group
 /** @} */ // End of drivers group
