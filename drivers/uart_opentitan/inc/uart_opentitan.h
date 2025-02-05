@@ -21,7 +21,7 @@
  *          progress (WIP). Use with caution.
  *
  * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-01-31
+ * @date 2025-02-04
  */
 
 #ifndef UART_OPENTITAN_H
@@ -30,10 +30,6 @@
 #include <stdint.h>
 #include "uart.h"
 #include "sw/device/lib/dif/dif_uart.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /**
  * \ingroup drivers_uart_opentitan
@@ -45,10 +41,6 @@ extern "C" {
 typedef struct {
     dif_uart_t uart; /**< OpenTitan DIF UART handle. */
 } opentitan_uart_context_t;
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // UART_OPENTITAN_H
 
