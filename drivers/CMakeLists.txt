@@ -7,8 +7,8 @@
 
 # Define mappings for drivers
 set(DRIVER_MAPPINGS
-    chimera-convolve:cluster
-    chimera-open:cluster
+    chimera-convolve:cluster,uart_apb
+    chimera-open:cluster,uart_apb
     chimera-host:uart_apb
 )
 
