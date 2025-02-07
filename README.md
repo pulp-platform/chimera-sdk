@@ -25,6 +25,7 @@ We recomment that you setup a virtual environment and install the required depen
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-docs.txt
 ```
 Alternatively you can also use any mamba/conda environment.
 
