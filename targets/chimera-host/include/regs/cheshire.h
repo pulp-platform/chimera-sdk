@@ -152,3 +152,4 @@ extern "C" {
 #endif // _CHESHIRE_REG_DEFS_
 
 /** @} */ // End of targets_chimera_host_registers group
+/** @} */ // End of targets_chimera_host group
