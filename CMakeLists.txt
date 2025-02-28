@@ -31,11 +31,15 @@ project(chimera-sdk LANGUAGES C ASM)
 # WIESEP: It is important to set the ISA and ABI for the host and the cluster snitch
 set(ABI ilp32)
 set(ISA_CLUSTER_SNITCH rv32im)
+#TODO(smazzola): XpulpNN currently not supported in the toolchain
+# set(ISA_CLUSTER_PULP rv32imcxpulpnn)
+set(ISA_CLUSTER_PULP rv32imc)
 set(ISA_HOST rv32imc)
 
 message(STATUS "[CHIMERA-SDK] ABI                   : ${ABI}")
 message(STATUS "[CHIMERA-SDK] ISA_HOST              : ${ISA_HOST}")
 message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_SNITCH    : ${ISA_CLUSTER_SNITCH}")
+message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_PULP      : ${ISA_CLUSTER_PULP}")
 if (${DISASSEMBLE_LIBRARIES})
   message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : ON")
 else()

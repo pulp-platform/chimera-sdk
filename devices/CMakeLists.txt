@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
+# Sergio Mazzola <smazzola@iis.ee.ethz.ch>
 
 # Define mappings for devices
 set(DEVICE_MAPPINGS
     chimera-convolve:snitch_cluster
     chimera-open:snitch_cluster
+    chimera-pulp:pulp_cluster
     chimera-host:
 )
 

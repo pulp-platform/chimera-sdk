@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
+# Sergio Mazzola <smazzola@iis.ee.ethz.ch>
 
 # Define mappings for drivers
 set(DRIVER_MAPPINGS
-    chimera-convolve:cluster
-    chimera-open:cluster
+    chimera-convolve:snitch_cluster
+    chimera-open:snitch_cluster
+    chimera-pulp:pulp_cluster
     chimera-host:
 )
 

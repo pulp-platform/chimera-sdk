@@ -4,11 +4,13 @@
 #
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
+# Sergio Mazzola <smazzola@iis.ee.ethz.ch>
 
 set(AVAILABLE_TARGETS
   "chimera-host"
   "chimera-open"
   "chimera-convolve"
+  "chimera-pulp"
   CACHE STRING "Available Targets"
 )
 
@@ -30,4 +32,8 @@ endif()
 
 if (TARGET_PLATFORM STREQUAL "chimera-convolve")
   add_subdirectory(chimera-convolve)
+endif()
+
+if (TARGET_PLATFORM STREQUAL "chimera-pulp")
+  add_subdirectory(chimera-pulp)
 endif()

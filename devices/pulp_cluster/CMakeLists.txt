@@ -2,15 +2,14 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 #
-# Philip Wiese <wiesep@iis.ee.ethz.ch>
-
+# Sergio Mazzola <smazzola@iis.ee.ethz.ch>
 
 ################################################################################
-# Host Runtime Library                                                         #
+# Pulp Cluster Runtime Library                                               #
 ################################################################################
-file(GLOB_RECURSE C_SOURCES
-  "offload_snitchCluster.c"
+file(GLOB_RECURSE C_SOURCES_PULP
+  "trampoline_pulpCluster.c"
 )
 
-target_sources(runtime_host PRIVATE ${C_SOURCES})
-target_compile_definitions(runtime_host INTERFACE CHIMERA_DRIVER_CLUSTER)
+target_sources(runtime_cluster_pulp PRIVATE ${C_SOURCES_PULP})
+target_include_directories(runtime_cluster_pulp PUBLIC ${CMAKE_CURRENT_LIST_DIR})
