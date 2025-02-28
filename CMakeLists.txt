@@ -20,7 +20,11 @@ set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # SCHEREMO: This toolchain file is only used for test compilation!
-set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
+if (COMPILER STREQUAL "GCC")
+  set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_gcc.cmake)
+else ()
+  set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
+endif ()
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
