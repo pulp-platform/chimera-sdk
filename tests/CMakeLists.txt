@@ -10,6 +10,7 @@ set(TEST_MAPPINGS
     chimera-convolve:chimera-convolve,chimera-open,chimera-host
     chimera-open:chimera-open,chimera-host
     chimera-host:chimera-host
+    chimera-pulp:chimera-pulp,chimera-host
 )
 
 # Call the macro
