@@ -15,6 +15,7 @@
 
 #ifdef CHIMERA_DRIVER_PULP_CLUSTER
 #include "pulp_cluster/offload_pulpCluster.h"
+#include "pulp_cluster/config_pulpCluster.h"
 #endif
 
 #endif //_DRIVER_INCLUDE_GUARD_
