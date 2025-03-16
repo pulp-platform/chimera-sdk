@@ -11,6 +11,8 @@
 ################################################################################
 
 set(TARGET "chimera-host" CACHE STRING "Target platform")
+set(OPENTITAN_COMMIT_HASH f995b5639fe7eefee047e03ccf262c0179f79ec8 CACHE STRING "OT")
+message(STATUS "OPENTITAN_COMMIT_HASH: ${OPENTITAN_COMMIT_HASH}")
 
 set(CROSS_C_COMPILER "clang" CACHE STRING "Cross compiler")
 set(CROSS_AR "llvm-ar" CACHE STRING "Archiver")
