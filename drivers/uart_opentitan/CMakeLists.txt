@@ -7,206 +7,186 @@
 # ------------------------------------------------------------------------------
 # Set the variables for the OpenTitan UART driver
 # ------------------------------------------------------------------------------
+set(TOP_TARGET "earlgrey" CACHE STRING "Top-level target for OpenTitan IP generation")
 set(OPENTITAN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/opentitan")
 set(OPENTITAN_SW_DIR "${OPENTITAN_DIR}/sw")
+set(OPENTITAN_TOP_DIR "${OPENTITAN_DIR}/hw/top_${TOP_TARGET}")
+set(GENERATE_OT_IPS_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/../../scripts/opentitan/generate_ot_ips.py")
+set(GENERATED_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/opentitan/hw/top_${TOP_TARGET}")
+
+# VIVIANEP: The following commit hash has been verified to 
+#           successfully build the OpenTitan IPs for the UART driver.
+set(OPENTITAN_COMMIT_HASH f995b5639fe7eefee047e03ccf262c0179f79ec8 CACHE STRING "OpenTitan commit hash")
+message(STATUS "[CHIMERA-SDK] Using OpenTitan commit: ${OPENTITAN_COMMIT_HASH}")
 
 set(OPENTITAN_SPARSE_PATTERNS
   "util/"
-  "hw/ip_templates/"
-  "hw/ip/aes/model/aes_modes.c"
-  "hw/ip/aes/model/aes_modes.h"
-  "hw/ip/*/data/*.hjson"
-  "hw/top_earlgrey/ip_autogen/*/data/*.hjson"
-  "hw/top_earlgrey/data/*.hjson"
-  "hw/top_earlgrey/data/otp/*.hjson"
-  "hw/top_earlgrey/ip"
-  "hw/top_earlgrey/templates/*.tpl"
-  "sw/device/lib/arch/boot_stage.h"
-  "sw/device/lib/arch/device.h"
-  "sw/device/lib/arch/device_silicon.c"
-  "sw/device/lib/base/abs_mmio.c"
-  "sw/device/lib/base/abs_mmio.h"
-  "sw/device/lib/base/adv_macros.h"
-  "sw/device/lib/base/bitfield.c"
-  "sw/device/lib/base/bitfield.h"
-  "sw/device/lib/base/csr.h"
-  "sw/device/lib/base/csr_registers.h"
-  "sw/device/lib/base/hardened.c"
-  "sw/device/lib/base/hardened.h"
-  "sw/device/lib/base/hardened_asm.h"
-  "sw/device/lib/base/macros.h"
-  "sw/device/lib/base/math.c"
-  "sw/device/lib/base/math.h"
-  "sw/device/lib/base/math_builtins.c"
-  "sw/device/lib/base/memory.c"
-  "sw/device/lib/base/memory.h"
-  "sw/device/lib/base/mmio.c"
-  "sw/device/lib/base/mmio.h"
-  "sw/device/lib/base/multibits.c"
-  "sw/device/lib/base/multibits.h"
-  "sw/device/lib/base/status.c"
-  "sw/device/lib/base/status.h"
-  "sw/device/lib/base/stdasm.c"
-  "sw/device/lib/base/stdasm.h"
-  "sw/device/lib/base/internal/status.h"
-  "sw/device/lib/base/internal/absl_status.h"
-  "sw/device/lib/dif/dif_aes.c"
-  "sw/device/lib/dif/dif_aes.h"
-  "sw/device/lib/dif/dif_adc_ctrl.c"
-  "sw/device/lib/dif/dif_adc_ctrl.h"
-  "sw/device/lib/dif/dif_alert_handler.c"
-  "sw/device/lib/dif/dif_alert_handler.h"
-  "sw/device/lib/dif/dif_aon_timer.c"
-  "sw/device/lib/dif/dif_aon_timer.h"
-  "sw/device/lib/dif/dif_base.c"
-  "sw/device/lib/dif/dif_base.h"
-  "sw/device/lib/dif/dif_clkmgr.c"
-  "sw/device/lib/dif/dif_clkmgr.h"
-  "sw/device/lib/dif/dif_csrng.c"
-  "sw/device/lib/dif/dif_csrng.h"
-  "sw/device/lib/dif/dif_csrng_shared.c"
-  "sw/device/lib/dif/dif_csrng_shared.h"
-  # "sw/device/lib/dif/dif_dma.c"
-  # "sw/device/lib/dif/dif_dma.h"
-  "sw/device/lib/dif/dif_edn.c"
-  "sw/device/lib/dif/dif_edn.h"
-  "sw/device/lib/dif/dif_entropy_src.c"
-  "sw/device/lib/dif/dif_entropy_src.h"
-  "sw/device/lib/dif/dif_flash_ctrl.c"
-  "sw/device/lib/dif/dif_flash_ctrl.h"
-  "sw/device/lib/dif/dif_gpio.c"
-  "sw/device/lib/dif/dif_gpio.h"
-  "sw/device/lib/dif/dif_hmac.c"
-  "sw/device/lib/dif/dif_hmac.h"
-  "sw/device/lib/dif/dif_i2c.c"
-  "sw/device/lib/dif/dif_i2c.h"
-  "sw/device/lib/dif/dif_keymgr.c"
-  "sw/device/lib/dif/dif_keymgr.h"
-  # "sw/device/lib/dif/dif_keymgr_dpe.c"
-  # "sw/device/lib/dif/dif_keymgr_dpe.h"
-  "sw/device/lib/dif/dif_kmac.c"
-  "sw/device/lib/dif/dif_kmac.h"
-  "sw/device/lib/dif/dif_lc_ctrl.c"
-  "sw/device/lib/dif/dif_lc_ctrl.h"
-  "sw/device/lib/dif/dif_otbn.c"
-  "sw/device/lib/dif/dif_otbn.h"
-  "sw/device/lib/dif/dif_otp_ctrl.c"
-  "sw/device/lib/dif/dif_otp_ctrl.h"
-  "sw/device/lib/dif/dif_pinmux.c"
-  "sw/device/lib/dif/dif_pinmux.h"
-  "sw/device/lib/dif/dif_pwrmgr.c"
-  "sw/device/lib/dif/dif_pwrmgr.h"
-  "sw/device/lib/dif/dif_rstmgr.c"
-  "sw/device/lib/dif/dif_rstmgr.h"
-  "sw/device/lib/dif/dif_rv_core_ibex.c"
-  "sw/device/lib/dif/dif_rv_core_ibex.h"
-  "sw/device/lib/dif/dif_rv_plic.c"
-  "sw/device/lib/dif/dif_rv_plic.h"
-  "sw/device/lib/dif/dif_sensor_ctrl.c"
-  "sw/device/lib/dif/dif_sensor_ctrl.h"
-  "sw/device/lib/dif/dif_spi_host.c"
-  "sw/device/lib/dif/dif_spi_host.h"
-  "sw/device/lib/dif/dif_spi_device.c"
-  "sw/device/lib/dif/dif_spi_device.h"
-  "sw/device/lib/dif/dif_sram_ctrl.c"
-  "sw/device/lib/dif/dif_sram_ctrl.h"
-  "sw/device/lib/dif/dif_sysrst_ctrl.c"
-  "sw/device/lib/dif/dif_sysrst_ctrl.h"
-  "sw/device/lib/dif/dif_uart.c"
-  "sw/device/lib/dif/dif_uart.h"
-  "sw/device/lib/dif/dif_usbdev.c"
-  "sw/device/lib/dif/dif_usbdev.h"
-  "sw/device/lib/runtime/hart.c"
-  "sw/device/lib/runtime/hart.h"
-  "sw/device/lib/runtime/ibex.c"
-  "sw/device/lib/runtime/ibex.h"
-  "sw/device/lib/runtime/irq.c"
-  "sw/device/lib/runtime/irq.h"
-  # "sw/device/lib/runtime/log.c"
-  # "sw/device/lib/runtime/log.h"
-  # "sw/device/lib/runtime/print.h"
-  "sw/device/lib/testing/*.c"
-  "sw/device/lib/testing/*.h"
-  # "sw/device/lib/testing/json/spi_passthru.c"
-  # "sw/device/lib/testing/json/spi_passthru.h"
-  "sw/device/lib/testing/test_framework/FreeRTOSConfig.h"
-  "sw/device/lib/testing/test_framework/check.h"
+  "sw/device/silicon_creator/lib/error.h"
+  "sw/device/silicon_creator/lib/drivers/hmac.h"
+  "sw/device/silicon_creator/lib/drivers/hmac.c"
+  "sw/device/silicon_creator/lib/base/chip.h"
   "sw/device/lib/testing/test_framework/status.h"
   "sw/device/lib/testing/test_framework/ottf_test_config.h"
   "sw/device/lib/testing/test_framework/ottf_main.h"
-  # "sw/device/lib/ujson/ujson.c"
-  # "sw/device/lib/ujson/ujson.h"
-  # "sw/device/lib/ujson/ujson_derive.h"
-  "sw/device/silicon_creator/lib/base/chip.h"
-  # "sw/device/silicon_creator/lib/boot_data.h"
-  # "sw/device/silicon_creator/lib/boot_log.h"
-  # "sw/device/silicon_creator/lib/chip_info.h"
-  "sw/device/silicon_creator/lib/error.h"
-  # "sw/device/silicon_creator/lib/nonce.c"
-  # "sw/device/silicon_creator/lib/nonce.h"
-  "sw/device/silicon_creator/lib/drivers/hmac.c"
-  "sw/device/silicon_creator/lib/drivers/hmac.h"
-  # "sw/device/silicon_creator/lib/drivers/lifecycle.c"
-  # "sw/device/silicon_creator/lib/drivers/lifecycle.h"
-  # "sw/device/silicon_creator/lib/drivers/retention_sram.h"
-  # "sw/device/silicon_creator/lib/ownership/datatypes.h"
-  # "sw/device/silicon_creator/lib/sigverify/ecdsa_p256_key.h"
-  # "sw/device/silicon_creator/lib/sigverify/rsa_key.h"
-  # "sw/device/silicon_creator/lib/sigverify/spx_key.h"
-  # "sw/device/silicon_creator/lib/sigverify/sphincsplus/params.h"
-  # "sw/device/silicon_creator/lib/boot_svc/*.h"
+  "sw/device/lib/testing/test_framework/FreeRTOSConfig.h"
+  "sw/device/lib/testing/test_framework/check.h"
+  "sw/device/lib/testing/*.h"
+  "sw/device/lib/testing/*.c"
+  "sw/device/lib/runtime/irq.h"
+  "sw/device/lib/runtime/irq.c"
+  "sw/device/lib/runtime/ibex.h"
+  "sw/device/lib/runtime/ibex.c"
+  "sw/device/lib/runtime/hart.h"
+  "sw/device/lib/runtime/hart.c"
+  "sw/device/lib/dif/dif_usbdev.h"
+  "sw/device/lib/dif/dif_usbdev.c"
+  "sw/device/lib/dif/dif_uart.h"
+  "sw/device/lib/dif/dif_uart.c"
+  "sw/device/lib/dif/dif_sysrst_ctrl.h"
+  "sw/device/lib/dif/dif_sysrst_ctrl.c"
+  "sw/device/lib/dif/dif_sram_ctrl.h"
+  "sw/device/lib/dif/dif_sram_ctrl.c"
+  "sw/device/lib/dif/dif_spi_host.h"
+  "sw/device/lib/dif/dif_spi_host.c"
+  "sw/device/lib/dif/dif_spi_device.h"
+  "sw/device/lib/dif/dif_spi_device.c"
+  "sw/device/lib/dif/dif_sensor_ctrl.h"
+  "sw/device/lib/dif/dif_sensor_ctrl.c"
+  "sw/device/lib/dif/dif_rv_plic.h"
+  "sw/device/lib/dif/dif_rv_plic.c"
+  "sw/device/lib/dif/dif_rv_core_ibex.h"
+  "sw/device/lib/dif/dif_rv_core_ibex.c"
+  "sw/device/lib/dif/dif_rstmgr.h"
+  "sw/device/lib/dif/dif_rstmgr.c"
+  "sw/device/lib/dif/dif_pwrmgr.h"
+  "sw/device/lib/dif/dif_pwrmgr.c"
+  "sw/device/lib/dif/dif_pinmux.h"
+  "sw/device/lib/dif/dif_pinmux.c"
+  "sw/device/lib/dif/dif_otp_ctrl.h"
+  "sw/device/lib/dif/dif_otp_ctrl.c"
+  "sw/device/lib/dif/dif_otbn.h"
+  "sw/device/lib/dif/dif_otbn.c"
+  "sw/device/lib/dif/dif_lc_ctrl.h"
+  "sw/device/lib/dif/dif_lc_ctrl.c"
+  "sw/device/lib/dif/dif_kmac.h"
+  "sw/device/lib/dif/dif_kmac.c"
+  "sw/device/lib/dif/dif_keymgr.h"
+  "sw/device/lib/dif/dif_keymgr.c"
+  "sw/device/lib/dif/dif_i2c.h"
+  "sw/device/lib/dif/dif_i2c.c"
+  "sw/device/lib/dif/dif_hmac.h"
+  "sw/device/lib/dif/dif_hmac.c"
+  "sw/device/lib/dif/dif_gpio.h"
+  "sw/device/lib/dif/dif_gpio.c"
+  "sw/device/lib/dif/dif_flash_ctrl.h"
+  "sw/device/lib/dif/dif_flash_ctrl.c"
+  "sw/device/lib/dif/dif_entropy_src.h"
+  "sw/device/lib/dif/dif_entropy_src.c"
+  "sw/device/lib/dif/dif_edn.h"
+  "sw/device/lib/dif/dif_edn.c"
+  "sw/device/lib/dif/dif_csrng.h"
+  "sw/device/lib/dif/dif_csrng.c"
+  "sw/device/lib/dif/dif_csrng_shared.h"
+  "sw/device/lib/dif/dif_csrng_shared.c"
+  "sw/device/lib/dif/dif_clkmgr.h"
+  "sw/device/lib/dif/dif_clkmgr.c"
+  "sw/device/lib/dif/dif_base.h"
+  "sw/device/lib/dif/dif_base.c"
+  "sw/device/lib/dif/dif_aon_timer.h"
+  "sw/device/lib/dif/dif_aon_timer.c"
+  "sw/device/lib/dif/dif_alert_handler.h"
+  "sw/device/lib/dif/dif_alert_handler.c"
+  "sw/device/lib/dif/dif_aes.h"
+  "sw/device/lib/dif/dif_aes.c"
+  "sw/device/lib/dif/dif_adc_ctrl.h"
+  "sw/device/lib/dif/dif_adc_ctrl.c"
+  "sw/device/lib/base/stdasm.h"
+  "sw/device/lib/base/stdasm.c"
+  "sw/device/lib/base/status.h"
+  "sw/device/lib/base/status.c"
+  "sw/device/lib/base/multibits.h"
+  "sw/device/lib/base/multibits.c"
+  "sw/device/lib/base/mmio.h"
+  "sw/device/lib/base/mmio.c"
+  "sw/device/lib/base/memory.h"
+  "sw/device/lib/base/memory.c"
+  "sw/device/lib/base/math.h"
+  "sw/device/lib/base/math.c"
+  "sw/device/lib/base/math_builtins.c"
+  "sw/device/lib/base/macros.h"
+  "sw/device/lib/base/internal/status.h"
+  "sw/device/lib/base/internal/absl_status.h"
+  "sw/device/lib/base/hardened.h"
+  "sw/device/lib/base/hardened.c"
+  "sw/device/lib/base/hardened_asm.h"
+  "sw/device/lib/base/csr.h"
+  "sw/device/lib/base/csr_registers.h"
+  "sw/device/lib/base/bitfield.h"
+  "sw/device/lib/base/bitfield.c"
+  "sw/device/lib/base/adv_macros.h"
+  "sw/device/lib/base/abs_mmio.h"
+  "sw/device/lib/base/abs_mmio.c"
+  "sw/device/lib/arch/device.h"
+  "sw/device/lib/arch/device_silicon.c"
+  "sw/device/lib/arch/boot_stage.h"
+  "hw/top_earlgrey/templates/*.tpl"
+  "hw/top_earlgrey/ip"
+  "hw/top_earlgrey/ip_autogen/*/data/*.hjson"
+  "hw/top_earlgrey/data/otp/*.hjson"
+  "hw/top_earlgrey/data/*.hjson"
+  "hw/ip/aes/model/aes_modes.h"
+  "hw/ip/aes/model/aes_modes.c"
+  "hw/ip/*/data/*.hjson"
+  "hw/ip_templates/"
   )
   
-  # ------------------------------------------------------------------------------
-  # Call the OpenTitan driver setup
-  # ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Call the OpenTitan driver setup
+# ------------------------------------------------------------------------------
 include(${CMAKE_SOURCE_DIR}/cmake/opentitan.cmake)
 
 # ------------------------------------------------------------------------------
 # Prepare for header generation using the OT tools
 # ------------------------------------------------------------------------------
-# Option for the top-level target (default is earlgrey)
-set(TOP_TARGET "earlgrey" CACHE STRING "Top-level target for OpenTitan generation")
-set(GENERATE_UART_IP_SCRIPT "${CMAKE_SOURCE_DIR}/scripts/opentitan/generate_uart_ip.py")
-set(GENERATED_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/opentitan/hw/top_${TOP_TARGET}")
-
-# Create a custom target to run the Python script.
-add_custom_target(generate_uart_ip
-  COMMAND ${Python3_EXECUTABLE} -u ${GENERATE_UART_IP_SCRIPT} ${OPENTITAN_DIR} ${TOP_TARGET}
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+add_custom_target(generate_ot_ips ALL
+  COMMAND ${Python3_EXECUTABLE} -u ${GENERATE_OT_IPS_SCRIPT} --output ${GENERATED_OUTPUT_DIR}
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}  # Ensure relative paths resolve correctly.
-  DEPENDS ${GENERATE_UART_IP_SCRIPT}
-  COMMENT "Generating OpenTitan UART IP for ${TOP_TARGET} into ${GENERATED_OUTPUT_DIR}"
+  DEPENDS ${GENERATE_OT_IPS_SCRIPT}
+  COMMENT "[CHIMERA-SDK] Generating OpenTitan UART IP for ${TOP_TARGET} into ${GENERATED_OUTPUT_DIR}"
 )
-
-# Add the dependency to the OpenTitan interface target (created in opentitan.cmake)
-add_dependencies(opentitan_interface_${OPENTITAN_COMMIT_HASH} generate_uart_ip)
 
 # ------------------------------------------------------------------------------
 # Add the UART driver library
 # ------------------------------------------------------------------------------
 add_library(uart_lib STATIC)
+add_dependencies(uart_lib generate_ot_ips)
 
 file(GLOB_RECURSE UART_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c"
+  "${OPENTITAN_DIR}/hw/top_${TOP_TARGET}/dt/*.c"
+  "${OPENTITAN_DIR}/hw/top_${TOP_TARGET}/sw/autogen/*.c"
   "${OPENTITAN_SW_DIR}/device/lib/arch/*.c"
   "${OPENTITAN_SW_DIR}/device/lib/base/*.c"
   "${OPENTITAN_SW_DIR}/device/lib/dif/*.c"
-  "${OPENTITAN_SW_DIR}/device/lib/runtime/*.c"
   "${OPENTITAN_SW_DIR}/device/lib/dif/autogen/*.c"
-  "${OPENTITAN_DIR}/hw/top_${TOP_TARGET}/sw/autogen/*.c"
-  "${OPENTITAN_DIR}/hw/top_${TOP_TARGET}/dt/*.c"
+  "${OPENTITAN_SW_DIR}/device/lib/runtime/*.c"
 )
 
+# VIVIANEP: Make sure to check for changes in the source files.
+file(GLOB_RECURSE UART_SOURCES_TMP CONFIGURE_DEPENDS ${UART_SOURCES})
 list(FILTER UART_SOURCES EXCLUDE REGEX ".*/tests/.*")
 
 if(${TOP_TARGET} STREQUAL "earlgrey")
   target_compile_definitions(uart_lib PUBLIC OPENTITAN_IS_EARLGREY)
 elseif(${TOP_TARGET} STREQUAL "darjeeling")
   target_compile_definitions(uart_lib PUBLIC OPENTITAN_IS_DARJEELING)
+else()
+  message(FATAL_ERROR "[CHIMERA-SDK] Invalid top-level target for OpenTitan IPs: ${TOP_TARGET}")
 endif()
 
-message(STATUS "USING TOP TARGET: ${TOP_TARGET}")
-
+# VIVIANEP: We must enable optimization flags to avoid overflowing
+#           the memory island of the Chimera SoC.
 target_compile_options(uart_lib PRIVATE -Os -flto)
 target_link_options(uart_lib PRIVATE -Wl,--gc-sections)
 
@@ -219,9 +199,9 @@ target_sources(
 target_include_directories(
   uart_lib
   PUBLIC
+  ${OPENTITAN_TOP_DIR}
+  ${OPENTITAN_SW_DIR}/device/lib/dif/autogen
+  ${OPENTITAN_DIR}
   ${CMAKE_SOURCE_DIR}/hal/inc
   ${CMAKE_SOURCE_DIR}/drivers/uart_opentitan/inc
-  ${OPENTITAN_DIR}
-  ${OPENTITAN_DIR}/hw/top_${TOP_TARGET}
-  ${OPENTITAN_SW_DIR}/device/lib/dif/autogen
 )
