@@ -43,7 +43,6 @@ To build the SDK, run:
     cmake -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0 -B build
     cmake --build build -j
 
-.. _usage_tests:
 
 Targets
 -------
