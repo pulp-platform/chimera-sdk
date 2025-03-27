@@ -17,8 +17,8 @@ target_include_directories(hal_host
 )
 
 target_link_libraries(hal_host
+  PRIVATE
+    "$<LINK_LIBRARY:WHOLE_ARCHIVE,uart_lib>"  
   PUBLIC
-    -Wl,--whole-archive uart_lib -Wl,--no-whole-archive
-    uart_lib
     picolibc
 )

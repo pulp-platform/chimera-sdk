@@ -22,6 +22,12 @@ set(CMAKE_AR ${TOOLCHAIN_DIR}/bin/${LLVM_TAG}-ar)
 # Disable ABI detection
 set(CMAKE_C_ABI_COMPILED "False")
 
+# Enable WHOLE_ARCHIVE feature
+set(CMAKE_LINK_LIBRARY_USING_WHOLE_ARCHIVE 
+"-Wl,--whole-archive <LIBRARY> -Wl,--no-whole-archive"
+)
+set(CMAKE_LINK_LIBRARY_USING_WHOLE_ARCHIVE_SUPPORTED True)
+
 add_compile_options("--target=riscv32-unknown-elf")
 
 # Use LLVM LLD linker

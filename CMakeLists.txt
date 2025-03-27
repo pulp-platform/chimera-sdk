@@ -6,7 +6,7 @@
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.24)
 
 # VIVIANEP: We need the C11 standard (or later) for building 
 #           the OpenTitan peripheral drivers
