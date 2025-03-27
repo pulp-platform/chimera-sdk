@@ -1,6 +1,8 @@
 // Copyright 2022 ETH Zurich and University of Bologna.
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
+// Authors: Nicole Narr, Christopher Reinwardt,
+//          Paul Scheffler, Viviane Potocnik
 
 /**
  * @defgroup targets_chimera_host Chimera-Host Target
@@ -18,12 +20,7 @@
  * automatically generated as part of the SoC generation process.
  *
  * @{
- *
- * @author Nicole Narr
- * @author Christopher Reinwardt
- * @author Paul Scheffler
- * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-02-05
+ * 
  */
 
 #pragma once

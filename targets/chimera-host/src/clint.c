@@ -31,7 +31,8 @@ int clint_mtime_less_than(clint_mtime_t a, clint_mtime_t b) {
 }
 
 void clint_spin_until(clint_mtime_t tgt_mtime) {
-    while (clint_mtime_less_than(clint_get_mtime(), tgt_mtime));
+    while (clint_mtime_less_than(clint_get_mtime(), tgt_mtime))
+        ;
 }
 
 void clint_spin_ticks(uint32_t ticks) {
@@ -59,8 +60,8 @@ uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
     do {
         end_mcycle = get_mcycle();
         end_mtime = clint_get_mtime();
-    } while (clint_mtime_less_than(
-        end_mtime, (clint_mtime_t){start_mtime.low + num_ticks, start_mtime.high}));
+    } while (clint_mtime_less_than(end_mtime,
+                                   (clint_mtime_t){start_mtime.low + num_ticks, start_mtime.high}));
 
     return (end_mcycle - start_mcycle) * ref_freq / (end_mtime.low - start_mtime.low);
 }

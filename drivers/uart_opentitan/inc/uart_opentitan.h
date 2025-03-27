@@ -20,8 +20,6 @@
  *          the `uart_apb` driver, and this implementation is still a work in
  *          progress (WIP). Use with caution.
  *
- * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-02-04
  */
 
 #ifndef UART_OPENTITAN_H

@@ -16,8 +16,6 @@
  * functions for an APB-based UART peripheral. It includes blocking read and write
  * operations along with basic configuration.
  *
- * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-02-04
  */
 
 #include "uart_apb.h"

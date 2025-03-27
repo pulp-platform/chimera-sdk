@@ -20,8 +20,6 @@
  * This file provides the implementation of UART initialization, read, and write
  * functions using OpenTitan's Device Interface Functions (DIF).
  *
- * @author Viviane Potocnik vivianep@iis.ee.ethz.ch
- * @date 2025-02-05
  */
 
 #include "uart_opentitan.h"

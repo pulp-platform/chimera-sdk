@@ -16,8 +16,6 @@
  * It is used in conjunction with the UART driver to configure and interact with
  * the hardware.
  *
- * @author Viviane Potocnik
- * @date 2025-02-04
  */
 
 #ifndef UART_APB_H
