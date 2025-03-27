@@ -149,6 +149,9 @@ ssize_t uart_opentitan_write(chi_device_t *device, const void *buffer, uint32_t 
     return bytes_written;
 }
 
+// VIVIANEP: Need to skip doxygen generation for these functions
+// to avoid duplicated defintion errors in the generated documentation
+
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
 extern int uart_open(chi_device_t *device)
     __attribute__((alias("uart_opentitan_open"), used, visibility("default")));

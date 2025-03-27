@@ -36,6 +36,9 @@ __attribute__((weak)) ssize_t uart_write(chi_device_t *device, const void *buffe
     return -1;
 }
 
+// VIVIANEP: Need to skip doxygen generation for these functions
+// to avoid duplicated defintion errors in the generated documentation
+
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
 uart_config_t default_cfg = {.baud_rate = UART_DEFAULT_BAUD_RATE,
                              .clk_freq_hz = UART_CLK_FREQ_HZ,
@@ -44,6 +47,7 @@ uart_config_t default_cfg = {.baud_rate = UART_DEFAULT_BAUD_RATE,
                              .stop_bits = UART_DEFAULT_STOP_BITS};
 /// @endcond
 
+// VIVIANEP: We document the API in uart.h in a cleaner format
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
 __attribute__((weak)) chi_device_api_t uart_api = {
     .open = uart_open, .close = uart_close, .read = uart_read, .write = uart_write};

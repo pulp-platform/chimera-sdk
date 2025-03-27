@@ -172,6 +172,9 @@ ssize_t uart_apb_write(chi_device_t *device, const void *buffer, uint32_t size,
     return (ssize_t)size;
 }
 
+// VIVIANEP: Need to skip doxygen generation for these functions
+// to avoid duplicated defintion errors in the generated documentation
+
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
 extern int uart_open(chi_device_t *device)
     __attribute__((alias("uart_apb_open"), used, visibility("default")));
