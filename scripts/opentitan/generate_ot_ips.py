@@ -38,18 +38,17 @@ def main():
     # Compute absolute path to the OpenTitan repository.
     script_dir = os.path.dirname(__file__)
     opentitan_dir = os.path.abspath(
-        os.path.join(script_dir, 
-                     "../../drivers/uart_opentitan/thirdparty/opentitan")
-    )
+        os.path.join(script_dir,
+                     "../../drivers/uart_opentitan/thirdparty/opentitan"))
 
     # Define paths to tools and key input files.
     regtool_py = os.path.join(opentitan_dir, "util/regtool.py")
     topgen_py = os.path.join(opentitan_dir, "util/topgen.py")
     dttool_py = os.path.join(opentitan_dir, "util/dttool.py")
     autogen_dif_py = os.path.join(opentitan_dir, "util/autogen_dif.py")
-    dt_ext_py = os.path.join(opentitan_dir, 
+    dt_ext_py = os.path.join(opentitan_dir,
                              "hw/ip_templates/rstmgr/util/dt.py")
-    top_hjson = os.path.join(opentitan_dir, 
+    top_hjson = os.path.join(opentitan_dir,
                              "hw/top_earlgrey/data/top_earlgrey.hjson")
     autogen_dif_out = os.path.join(opentitan_dir, "sw/device/lib/dif/autogen")
 
@@ -118,7 +117,7 @@ def main():
     # Generate top-level autogen HJSON using topgen.
     cmd_topgen = [topgen_py, "-t", top_hjson, "-o", args.output]
     run_tool(cmd_topgen)
-    autogen_hjson = os.path.join(args.output, 
+    autogen_hjson = os.path.join(args.output,
                                  "data/autogen/top_earlgrey.gen.hjson")
 
     # Generate top-level DT files.
