@@ -39,6 +39,11 @@ SECTIONS {
   . = ALIGN(32);
   __bss_end = .;
 
+  .heap : ALIGN(16) {
+    __heap_start = .;
+    __heap_end = ORIGIN(memisl) + LENGTH(memisl);
+  } > memisl
+
   .bulk : ALIGN(16) {
     *(.bulk)
     *(.bulk.*)
