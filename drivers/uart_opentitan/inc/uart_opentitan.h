@@ -9,7 +9,6 @@
  * @{
  * \defgroup drivers_uart_opentitan UART OpenTitan Driver
  * @{
- * @file uart_opentitan.h
  * @brief OpenTitan-specific UART driver interface for Chimera-SDK.
  *
  * This file defines the UART context structure for OpenTitan-based UART

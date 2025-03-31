@@ -10,7 +10,6 @@
  * \defgroup drivers_uart_opentitan UART OpenTitan Driver
  * @{
  *
- * @file uart_opentitan.c
  * @brief OpenTitan UART driver implementation for Chimera-SDK.
  *
  * @warning This driver has not been fully validated yet. Chimera currently supports

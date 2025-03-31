@@ -9,7 +9,6 @@
  * @{
  * \defgroup drivers_uart_apb UART APB Driver
  * @{
- * @file uart_apb.h
  * @brief APB UART register definitions for Chimera-SDK.
  *
  * This file defines register offsets and fields for an APB-based UART peripheral.

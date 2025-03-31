@@ -9,7 +9,6 @@
  * @{
  * \defgroup drivers_uart_apb UART APB Driver
  * @{
- * @file uart_apb.c
  * @brief APB UART driver implementation for Chimera-SDK.
  *
  * This file provides the implementation of UART initialization, read, and write
