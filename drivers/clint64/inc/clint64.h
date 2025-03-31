@@ -8,9 +8,7 @@
 //          Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers
- * @{
- * \defgroup drivers_clint64 64-bit CLINT Driver
+ * \defgroup drivers_clint_64 64-bit CLINT Driver
  * @{
  * @brief 64-bit CLINT driver implementation for Chimera-SDK.
  *
@@ -41,5 +39,4 @@ extern "C" {
 }
 #endif
 
-/** @} */ // End of drivers_clint64 group
-/** @} */ // End of drivers group
+/** @} */ // End of drivers_clint_64 group

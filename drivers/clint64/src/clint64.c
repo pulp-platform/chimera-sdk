@@ -6,15 +6,11 @@
 //          Christopher Reinwardt <creinwar@student.ethz.ch>
 //          Paul Scheffler <paulsc@iis.ee.ethz.ch>
 //          Viviane Potocnik <vivianep@iis.ee.ethz.ch>
-//
 
 /**
- * \addtogroup drivers
- * @{
- * \defgroup drivers_clint64 64-bit CLINT Driver
+ * \defgroup drivers_clint_64 64-bit CLINT Driver
  * @{
  * @brief 64-bit CLINT driver implementation for Chimera-SDK.
- *
  *
  */
 
@@ -125,8 +121,7 @@ static void clint64_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
     clint64_sleep_until(timer_idx, clint64_get_mtime() + ticks);
 }
 
-// VIVIANEP: Need to skip doxygen generation for these functions
-// to avoid duplicated defintion errors in the generated documentation
+// VIVIANEP: Skip Doxygen generation for these alias functions to avoid duplicate definitions
 
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
 extern int clint_get_mtime()
@@ -141,7 +136,6 @@ extern void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks)
     __attribute__((alias("clint64_sleep_ticks"), used, visibility("default")));
 extern uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv)
     __attribute__((alias("clint64_get_core_freq"), used, visibility("default")));
-// // @endcond
+/// @endcond
 
-/** @} */ // End of drivers_clint64 group
-/** @} */ // End of drivers group
+/** @} */ // End of drivers_clint_64 group

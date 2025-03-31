@@ -5,9 +5,7 @@
 // Authors: Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers
- * @{
- * \defgroup drivers_clint32 32-bit CLINT Driver
+ * \defgroup drivers_clint_32 32-bit CLINT Driver
  * @{
  * @brief 32-bit CLINT driver implementation for Chimera-SDK.
  *
@@ -35,5 +33,4 @@ extern "C" {
 }
 #endif
 
-/** @} */ // End of drivers_clint32 group
-/** @} */ // End of drivers group
+/** @} */ // End of drivers_clint_32 group

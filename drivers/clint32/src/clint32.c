@@ -7,15 +7,15 @@
 // This file provides the strong (driver-specific) implementations for the
 // CLINT functions using a 32-bit representation (a struct with 'low' and 'high').
 // These functions will override the weak HAL symbols.
-//
 
 /**
- * \addtogroup drivers
- * @{
- * \defgroup drivers_clint32 32-bit CLINT Driver
+ * \defgroup drivers_clint_32 32-bit CLINT Driver
  * @{
  * @brief 32-bit CLINT driver implementation for Chimera-SDK.
  *
+ * This file provides the implementation of the 32-bit CLINT driver.
+ * It includes functions for reading the current time, comparing times,
+ * spinning until a target time, and sleeping until a target time.
  *
  */
 
@@ -48,7 +48,7 @@ clint_mtime_t clint32_get_mtime(void) {
  *
  * @param a First CLINT time value.
  * @param b Second CLINT time value.
- * @return 1 if a < b, 0 otherwise.
+ * @return 1 if a is smaller than b, 0 otherwise.
  */
 int clint32_mtime_less_than(clint_mtime_t a, clint_mtime_t b) {
     return (a.high < b.high) || (a.high == b.high && a.low < b.low);
@@ -148,8 +148,7 @@ void clint32_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
     clint32_sleep_until(timer_idx, target);
 }
 
-// VIVIANEP: Need to skip doxygen generation for these functions
-// to avoid duplicated defintion errors in the generated documentation
+// VIVIANEP: Skip Doxygen generation for these alias functions to avoid duplicate definitions
 
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
 extern clint_mtime_t clint_get_mtime()
@@ -170,5 +169,4 @@ extern void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks)
     __attribute__((alias("clint32_sleep_ticks"), used, visibility("default")));
 /// @endcond
 
-/** @} */ // End of drivers_clint32 group
-/** @} */ // End of drivers group
+/** @} */ // End of drivers_clint_32 group

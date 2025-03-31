@@ -36,6 +36,15 @@ jobs:
           cd docs
           make html
       -
+        name: Upload Doxygen Build Files
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: _build_doxygen
+          path: |
+            docs/_build_doxygen_ll
+            docs/_build_doxygen_hal
+      -
         name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
