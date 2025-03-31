@@ -7,9 +7,9 @@
 
 # Define mappings for drivers
 set(DRIVER_MAPPINGS
-    chimera-convolve:cluster,uart_apb
-    chimera-open:cluster,uart_apb
-    chimera-host:uart_opentitan
+    chimera-convolve:cluster,uart_apb,clint32
+    chimera-open:cluster,uart_apb,clint32
+    chimera-host:uart_apb,clint32
 )
 
 # Call the macro
