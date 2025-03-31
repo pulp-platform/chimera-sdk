@@ -168,7 +168,7 @@ extern void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime)
     __attribute__((alias("clint32_sleep_until"), used, visibility("default")));
 extern void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks)
     __attribute__((alias("clint32_sleep_ticks"), used, visibility("default")));
-// @endcond
+/// @endcond
 
 /** @} */ // End of drivers_clint32 group
 /** @} */ // End of drivers group
