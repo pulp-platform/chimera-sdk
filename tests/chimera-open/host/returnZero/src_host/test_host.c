@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
+// Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
+#include "common.h"
 #include "soc.h"
 #include "driver.h"
 

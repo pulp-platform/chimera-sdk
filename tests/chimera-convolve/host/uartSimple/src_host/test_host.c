@@ -6,6 +6,7 @@
 
 #include "params.h"
 #include "clint.h"
+#include "common.h"
 #include "uart.h"
 #include "util.h"
 #include "regs/cheshire.h"
