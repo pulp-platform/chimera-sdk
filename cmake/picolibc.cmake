@@ -6,13 +6,24 @@
 
 include(ExternalProject)
 
-message(STATUS "[CHIMERA-SDK] Setting up picolibc for target ${TARGET}")
+message(STATUS "[CHIMERA-SDK] Setting up picolibc for Host (ISA: ${ISA_HOST}, ABI: ${ABI})")
 
-foreach(var CROSS_C_COMPILER CROSS_C_COMPILER_ARGS CROSS_AR CROSS_STRIP CROSS_CPU CROSS_CPU_FAMILY CROSS_ENDIAN CROSS_SYSTEM CROSS_C_ARGS CROSS_C_LINK_ARGS)
-    if(NOT DEFINED ${var})
-        message(FATAL_ERROR "[CHIMERA-SDK] Variable ${var} is not set. It must be defined before including picolibc.cmake.")
-    endif()
-endforeach()
+set(CROSS_C_COMPILER "${CMAKE_C_COMPILER}")
+set(CROSS_C_COMPILER_ARGS "-target ${CROSS_COMPILE_HOST} -march=${ISA_HOST} -nostdlib" CACHE STRING "Compiler arguments (Host)")
+# VIVIANEP: These flags are only for building Picolibc; adding them globally breaks
+#           app builds (e.g., missing <sys/types.h>) or causes issues in freestanding mode.
+set(CROSS_C_ARGS "-Werror=double-promotion -Wno-unsupported-floating-point-opt -fshort-enums ${CMAKE_ALT_C_OPTIONS} -march=${ISA_HOST} -mabi=${ABI}")
+set(CROSS_C_LINK_ARGS "-Wl,-z,noexecstack -march=${ISA_HOST} -mabi=${ABI}")
+
+set(CROSS_AR "${CMAKE_AR}")
+set(CROSS_STRIP "${CMAKE_STRIP}")
+
+set(CROSS_CPU "${HOST_ARCH}")
+set(CROSS_CPU_FAMILY "${HOST_FAMILY}")
+set(CROSS_ENDIAN "${HOST_ENDIAN}")
+set(CROSS_SYSTEM "${HOST_SYSTEM}")
+
+set(CROSS_SKIP_SANITY_CHECK "true")
 
 # Prepare Meson arrays
 function(prepare_meson_array output_var input_string)
@@ -30,9 +41,10 @@ prepare_meson_array(CROSS_C_ARGS_LIST "${CROSS_C_ARGS}")
 prepare_meson_array(CROSS_C_LINK_ARGS_LIST "${CROSS_C_LINK_ARGS}")
 
 set(PICOLIBC_SRC_DIR ${CMAKE_BINARY_DIR}/picolibc-src)
-set(PICOLIBC_BUILD_DIR ${CMAKE_BINARY_DIR}/picolibc-build-${TARGET})
-set(PICOLIBC_INSTALL_DIR ${CMAKE_BINARY_DIR}/picolibc-install-${TARGET})
-set(PICOLIBC_CROSS_FILE ${CMAKE_BINARY_DIR}/picolibc-cross-file-${TARGET}.txt)
+
+set(PICOLIBC_BUILD_DIR ${CMAKE_BINARY_DIR}/picolibc-build-${ISA_HOST}-${ABI})
+set(PICOLIBC_INSTALL_DIR ${CMAKE_BINARY_DIR}/picolibc-install-${ISA_HOST}-${ABI})
+set(PICOLIBC_CROSS_FILE ${CMAKE_BINARY_DIR}/picolibc-cross-file-${ISA_HOST}-${ABI}.txt)
 
 
 # Generate the Meson cross-file
@@ -41,7 +53,7 @@ configure_file(${CMAKE_CURRENT_LIST_DIR}/../scripts/picolibc-cross-file.txt.in $
 message(STATUS "[CHIMERA-SDK] Saving cross compilation file to ${PICOLIBC_CROSS_FILE}")
 # Add picolibc as an external project
 ExternalProject_Add(
-    picolibc-${TARGET}
+    picolibc-${ISA_HOST}-${ABI}
     GIT_REPOSITORY https://github.com/picolibc/picolibc.git
     GIT_TAG main
     SOURCE_DIR ${PICOLIBC_SRC_DIR}
@@ -53,7 +65,7 @@ ExternalProject_Add(
 )
 
 set(PICOLIBC_INSTALL_DIR ${PICOLIBC_INSTALL_DIR})
-set(PICOLIBC_TARGET picolibc-${TARGET})
+set(PICOLIBC_TARGET picolibc-${ISA_HOST}-${ABI})
 
 add_library(picolibc STATIC IMPORTED GLOBAL)
 
@@ -61,4 +73,4 @@ set_target_properties(picolibc PROPERTIES
     IMPORTED_LOCATION "${PICOLIBC_INSTALL_DIR}/lib/libc.a"
 )
 
-add_dependencies(picolibc picolibc-${TARGET})
+add_dependencies(picolibc picolibc-${ISA_HOST}-${ABI})

@@ -19,19 +19,16 @@ set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-# SCHEREMO: This toolchain file is only used for test compilation!
-set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-project(chimera-sdk LANGUAGES C ASM)
-
 # WIESEP: It is important to set the ISA and ABI for the host and the cluster snitch
 set(ABI ilp32)
 set(ISA_CLUSTER_SNITCH rv32im)
 set(ISA_HOST rv32imc)
+
+# Set host-specific flags
+set(HOST_ARCH "riscv32")
+set(HOST_FAMILY "riscv32")
+set(HOST_ENDIAN "little")
+set(HOST_SYSTEM "none")
 
 message(STATUS "[CHIMERA-SDK] ABI                   : ${ABI}")
 message(STATUS "[CHIMERA-SDK] ISA_HOST              : ${ISA_HOST}")
@@ -41,6 +38,16 @@ if (${DISASSEMBLE_LIBRARIES})
 else()
   message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : OFF")
 endif()
+
+# SCHEREMO: This toolchain file is only used for test compilation!
+set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+project(chimera-sdk LANGUAGES C ASM)
+
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
