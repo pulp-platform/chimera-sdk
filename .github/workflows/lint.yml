@@ -26,7 +26,7 @@ jobs:
           (Solderpad Hardware License, Version 0.51|Licensed under the Apache License, Version 2.0), see LICENSE for details.
           SPDX-License-Identifier: (SHL-0.51|Apache-2.0)
         exclude_paths: |
-          targets/**/include/regs/*
+          targets/**/inc/regs/*
           scripts/run_clang_format.py
 
   lint-cxx:

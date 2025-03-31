@@ -20,8 +20,7 @@
  *
  * @{
  *
- * @file util.h
- * 
+ *
  */
 
 #pragma once

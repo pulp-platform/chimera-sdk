@@ -25,8 +25,6 @@
  *
  * @{
  *
- * @file clint.h
- * @date 2025-01-31
  */
 
 #ifndef _CLINT_REG_DEFS_

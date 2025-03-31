@@ -30,7 +30,6 @@
  *
  * @{
  *
- * @date 2025-01-31
  */
 
 #ifndef _CHESHIRE_REG_DEFS_

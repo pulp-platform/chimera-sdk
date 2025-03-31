@@ -137,10 +137,10 @@ static inline void set_mie(int enable) {
 
 /**
  * @brief Gets the number of cycles since system reset.
- * @return 64-bit cycle count.
+ * @return 32-bit cycle count.
  */
-static inline uint64_t get_mcycle() {
-    uint64_t mcycle;
+static inline uint32_t get_mcycle() {
+    uint32_t mcycle;
     asm volatile("csrr %0, mcycle" : "=r"(mcycle)::"memory");
     return mcycle;
 }
@@ -160,8 +160,8 @@ static inline uint64_t get_mcycle() {
  * @param code Pointer to the function to invoke.
  * @return Return value of the invoked function.
  */
-static inline uint64_t invoke(void *code) {
-    uint64_t (*code_fun_ptr)(void) = code;
+static inline uint32_t invoke(void *code) {
+    uint32_t (*code_fun_ptr)(void) = code;
     fencei();
     return code_fun_ptr();
 }

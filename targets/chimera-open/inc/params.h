@@ -20,7 +20,7 @@
  * automatically generated as part of the SoC generation process.
  *
  * @{
- * 
+ *
  */
 
 #pragma once
