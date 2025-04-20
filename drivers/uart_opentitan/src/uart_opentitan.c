@@ -12,9 +12,6 @@
  *
  * @brief OpenTitan UART driver implementation for Chimera-SDK.
  *
- * @warning This driver has not been fully validated yet. Chimera currently supports
- *          the `uart_apb` driver, and this implementation is still work in progress (WIP).
- *          Use with caution.
  *
  * This file provides the implementation of UART initialization, read, and write
  * functions using OpenTitan's Device Interface Functions (DIF).
@@ -89,6 +86,11 @@ int uart_opentitan_close(chi_device_t *device) {
 /**
  * @brief Reads data from the OpenTitan UART receiver.
  *
+ * This is a blocking operation that only returns once the requested number of bytes
+ * has been read or a read failure occurs. The optional callback, if provided, is
+ * invoked immediately after the blocking read completes, serving as a notification
+ * hook. The callback is **not** called asynchronously.
+ *
  * @param device Pointer to the UART device.
  * @param buffer Buffer to store received data.
  * @param size Number of bytes to read.
@@ -118,6 +120,11 @@ ssize_t uart_opentitan_read(chi_device_t *device, void *buffer, uint32_t size,
 
 /**
  * @brief Writes data to the OpenTitan UART transmitter.
+ *
+ * This is a blocking operation that only returns once the data has been written.
+ * The optional callback, if provided, is invoked immediately after the blocking
+ * write completes, serving as a notification hook. The callback is **not**
+ * called asynchronously.
  *
  * @param device Pointer to the UART device.
  * @param buffer Data to send.
