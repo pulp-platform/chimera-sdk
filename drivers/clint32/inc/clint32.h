@@ -6,13 +6,13 @@
 
 /**
  * \defgroup drivers_clint_32 32-bit CLINT Driver
+ * @ingroup hal_interrupt
  * @{
  * @brief 32-bit CLINT driver implementation for Chimera-SDK.
  *
  * This header provides the declarations for the 32-bit CLINT driver.
  * The generic CLINT HAL API functions (declared in hal/inc/clint.h) are
  * aliased to the 32-bit implementations in this driver.
- *
  */
 
 #pragma once

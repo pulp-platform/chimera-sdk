@@ -4,24 +4,44 @@
 //
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
 // Philip Wiese <wiesep@iis.ee.ethz.ch>
+// Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 #include "soc.h"
 #include "offload_snitchCluster.h"
+#include "device_api.h"
 
 #include <stdint.h>
 #include <stddef.h>
 
-/** \addtogroup cluster
- *  @{
+/**
+ * \defgroup hal_snitchcluster Snitch Cluster HAL Device
+ * @ingroup device
+ * @brief Offload driver for Snitch cluster accelerators in Chimera-SDK.
+ * @{
  */
 
-// Persistent trampoline function pointer for each core
+/** \addtogroup cluster
+ *  @{ */
+
+/**
+ * @brief Persistent trampoline function pointers for each cluster core.
+ *
+ * Each entry holds the function to be called by the trampoline on the corresponding core.
+ */
 void (*_trampoline_function[NUM_CLUSTER_CORES])(void *) = {NULL};
 
-// Peristent argument storage for the trampoline function
+/**
+ * @brief Persistent argument storage for each cluster core's trampoline function.
+ *
+ * Each entry holds the `void*` argument passed to the trampoline on the corresponding core.
+ */
 void *_trampoline_args[NUM_CLUSTER_CORES] = {NULL};
 
-// Persistant stack pointer storage for each core
+/**
+ * @brief Persistent stack pointer storage for each cluster core's trampoline context.
+ *
+ * Each entry holds the stack pointer to be loaded by the trampoline on the corresponding core.
+ */
 void *_trampoline_stack[NUM_CLUSTER_CORES] = {NULL};
 
 /**
@@ -92,8 +112,6 @@ void offload_snitchCluster_core(void *function, void *args, void *stack_ptr, uin
 
     // Check if the cluster is busy
     wait_snitchCluster_busy(clusterId);
-
-    // Send interrupt to the core
     volatile uint32_t *interruptTarget = ((uint32_t *)CLINT_CTRL_BASE) + hartId;
     *interruptTarget = 1;
 }
@@ -142,16 +160,22 @@ void offload_snitchCluster(void *function, void *args, void *stack_ptr, uint8_t 
 void wait_snitchCluster_busy(uint8_t clusterId) {
     volatile int32_t *busy_ptr;
 
-    if (clusterId == 0) {
+    switch (clusterId) {
+    case 0:
         busy_ptr = (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_CLUSTER_0_BUSY_REG_OFFSET);
-    } else if (clusterId == 1) {
+        break;
+    case 1:
         busy_ptr = (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_CLUSTER_1_BUSY_REG_OFFSET);
-    } else if (clusterId == 2) {
+        break;
+    case 2:
         busy_ptr = (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_CLUSTER_2_BUSY_REG_OFFSET);
-    } else if (clusterId == 3) {
+        break;
+    case 3:
         busy_ptr = (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_CLUSTER_3_BUSY_REG_OFFSET);
-    } else if (clusterId == 4) {
+        break;
+    case 4:
         busy_ptr = (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_CLUSTER_4_BUSY_REG_OFFSET);
+        break;
     }
 
     while (*busy_ptr == 1) {
@@ -176,21 +200,27 @@ void wait_snitchCluster_busy(uint8_t clusterId) {
  */
 uint32_t wait_snitchCluster_return(uint8_t clusterId) {
     volatile int32_t *snitchReturnAddr;
-    if (clusterId == 0) {
+    switch (clusterId) {
+    case 0:
         snitchReturnAddr =
             (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_CLUSTER_0_RETURN_REG_OFFSET);
-    } else if (clusterId == 1) {
+        break;
+    case 1:
         snitchReturnAddr =
             (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_CLUSTER_1_RETURN_REG_OFFSET);
-    } else if (clusterId == 2) {
+        break;
+    case 2:
         snitchReturnAddr =
             (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_CLUSTER_2_RETURN_REG_OFFSET);
-    } else if (clusterId == 3) {
+        break;
+    case 3:
         snitchReturnAddr =
             (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_CLUSTER_3_RETURN_REG_OFFSET);
-    } else if (clusterId == 4) {
+        break;
+    case 4:
         snitchReturnAddr =
             (volatile int32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_CLUSTER_4_RETURN_REG_OFFSET);
+        break;
     }
 
     while (*snitchReturnAddr == 0) {
@@ -198,8 +228,36 @@ uint32_t wait_snitchCluster_return(uint8_t clusterId) {
 
     uint32_t retVal = *snitchReturnAddr;
     *snitchReturnAddr = 0;
-
     return retVal;
 }
 
-/** @}*/
+/** @}
+ *  @} */ // end defgroup hal_snitchcluster
+
+/// @cond DOXYGEN_SHOULD_SKIP_THIS
+
+static int snitchcluster_open(chi_device_t *dev) {
+    (void)dev;
+    return 0;
+}
+static int snitchcluster_close(chi_device_t *dev) {
+    (void)dev;
+    return 0;
+}
+static ssize_t snitchcluster_read(chi_device_t *dev, void *buf, uint32_t len,
+                                  chi_device_callback_t cb) {
+    (void)dev;
+    (void)buf;
+    (void)len;
+    (void)cb;
+    return -1;
+}
+
+chi_device_api_t snitchcluster_api = {.open = snitchcluster_open,
+                                      .close = snitchcluster_close,
+                                      .read = snitchcluster_read,
+                                      .write =
+                                          (ssize_t(*)(chi_device_t *, const void *, uint32_t,
+                                                      chi_device_callback_t))offload_snitchCluster};
+
+/// @endcond

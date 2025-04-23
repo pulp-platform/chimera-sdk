@@ -1,4 +1,4 @@
-// Copyright 2022 ETH Zurich and University of Bologna.
+// Copyright 2025 ETH Zurich and University of Bologna.
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -23,6 +23,13 @@
 #include "regs/clint.h"
 #include "util.h"
 #include "params.h"
+#include "interrupt_api.h"
+#include <stdint.h>
+#include <stdbool.h>
+
+/*---------------------------------------------------------------------------*/
+/* 32‑bit CLINT core routines                                                */
+/*---------------------------------------------------------------------------*/
 
 /**
  * @brief Retrieves the current CLINT `mtime` value.
@@ -167,6 +174,55 @@ extern void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime)
     __attribute__((alias("clint32_sleep_until"), used, visibility("default")));
 extern void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks)
     __attribute__((alias("clint32_sleep_ticks"), used, visibility("default")));
+
+/*---------------------------------------------------------------------------*/
+/* Provide driver-specific chi_interrupt_api_t for CLINT                     */
+/*---------------------------------------------------------------------------*/
+static int clint32_init(chi_interrupt_t *ctrl) {
+    (void)ctrl;
+    return 0;
+}
+static int clint32_register_handler(chi_interrupt_t *ctrl, int irq, chi_irq_handler_t handler,
+                                    void *arg) {
+    (void)ctrl;
+    (void)irq;
+    (void)handler;
+    (void)arg;
+    return -1;
+}
+static int clint32_enable_irq(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+static int clint32_disable_irq(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+static int clint32_set_priority(chi_interrupt_t *ctrl, int irq, int prio) {
+    (void)ctrl;
+    (void)irq;
+    (void)prio;
+    return -1;
+}
+static int clint32_acknowledge(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+static void clint32_dispatch(chi_interrupt_t *ctrl) {
+    (void)ctrl;
+}
+
+/* Export the CLINT-specific interrupt API */
+chi_interrupt_api_t clint_api = {.init = clint32_init,
+                                 .register_handler = clint32_register_handler,
+                                 .enable_irq = clint32_enable_irq,
+                                 .disable_irq = clint32_disable_irq,
+                                 .set_priority = clint32_set_priority,
+                                 .acknowledge = clint32_acknowledge,
+                                 .dispatch = clint32_dispatch};
 /// @endcond
 
-/** @} */ // End of drivers_clint_32 group
+/** @} */ // end drivers_clint_32 group

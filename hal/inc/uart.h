@@ -4,30 +4,23 @@
 //
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-/**
- * @defgroup hal Hardware Abstraction Layer (HAL)
- * @brief The HAL module provides a unified API for hardware peripherals.
- * @{
- */
-
-/**
- * @defgroup hal_uart UART HAL Interface
- * @ingroup hal
- * @brief UART HAL interface for Chimera-SDK.
- *
- * This module defines the UART configuration structure and HAL API functions
- * for interfacing with different UART drivers in Chimera-SDK.
- *
- * @{
- *
- */
-
 #ifndef UART_H
 #define UART_H
 
 #include <stdint.h>
-#include <sys/types.h> // Needed for ssize_t
-#include "device_api.h"
+#include <stdbool.h>
+#include <sys/types.h> // for ssize_t
+#include "interface_api.h"
+
+/**
+ * @defgroup hal_uart UART HAL Interface
+ * @ingroup hal_interface
+ * @brief UART HAL interface for Chimera-SDK.
+ *
+ * This module defines the UART configuration structure and HAL API functions
+ * for interfacing with different UART drivers in Chimera-SDK.
+ * @{
+ */
 
 /** @name UART Parity Modes
  *  @brief Defines available parity options for UART.
@@ -81,44 +74,44 @@ typedef struct {
 } uart_config_t;
 
 /**
- * @brief Opens and initializes the UART device.
+ * @brief Opens and initializes the UART interface.
  *
- * @param device Pointer to the UART device structure.
+ * @param iface Pointer to the UART interface instance.
  * @return 0 on success, negative value on failure.
  */
-extern int uart_open(chi_device_t *device);
+extern int uart_open(chi_interface_t *iface);
 
 /**
- * @brief Closes the UART device.
+ * @brief Closes the UART interface.
  *
- * @param device Pointer to the UART device structure.
+ * @param iface Pointer to the UART interface instance.
  * @return 0 on success, negative value on failure.
  */
-extern int uart_close(chi_device_t *device);
+extern int uart_close(chi_interface_t *iface);
 
 /**
  * @brief Reads data from the UART receiver.
  *
- * @param device Pointer to the UART device structure.
+ * @param iface  Pointer to the UART interface instance.
  * @param buffer Pointer to the buffer where received data will be stored.
- * @param size Number of bytes to read.
- * @param cb Optional callback function to signal completion.
+ * @param size   Number of bytes to read.
+ * @param cb     Optional callback function to signal completion.
  * @return Number of bytes read on success, negative value on failure.
  */
-extern ssize_t uart_read(chi_device_t *device, void *buffer, uint32_t size,
-                         chi_device_callback_t cb);
+extern ssize_t uart_read(chi_interface_t *iface, void *buffer, uint32_t size,
+                         chi_interface_callback_t cb);
 
 /**
  * @brief Writes data to the UART transmitter.
  *
- * @param device Pointer to the UART device structure.
+ * @param iface  Pointer to the UART interface instance.
  * @param buffer Pointer to the data to send.
- * @param size Number of bytes to write.
- * @param cb Optional callback function to signal completion.
+ * @param size   Number of bytes to write.
+ * @param cb     Optional callback function to signal completion.
  * @return Number of bytes written on success, negative value on failure.
  */
-extern ssize_t uart_write(chi_device_t *device, const void *buffer, uint32_t size,
-                          chi_device_callback_t cb);
+extern ssize_t uart_write(chi_interface_t *iface, const void *buffer, uint32_t size,
+                          chi_interface_callback_t cb);
 
 /**
  * @brief Default UART configuration settings.
@@ -129,11 +122,11 @@ extern ssize_t uart_write(chi_device_t *device, const void *buffer, uint32_t siz
  * **Default Configuration:**
  * @code
  * uart_config_t default_cfg = {
- *     .baud_rate   = UART_DEFAULT_BAUD_RATE,  // Default baud rate
- *     .clk_freq_hz = UART_CLK_FREQ_HZ,        // Default clock frequency
- *     .data_bits   = UART_DEFAULT_DATA_BITS,  // Default number of data bits
- *     .parity      = UART_DEFAULT_PARITY,     // Default parity setting
- *     .stop_bits   = UART_DEFAULT_STOP_BITS   // Default number of stop bits
+ *     .baud_rate   = UART_DEFAULT_BAUD_RATE,
+ *     .clk_freq_hz = UART_CLK_FREQ_HZ,
+ *     .data_bits   = UART_DEFAULT_DATA_BITS,
+ *     .parity      = UART_DEFAULT_PARITY,
+ *     .stop_bits   = UART_DEFAULT_STOP_BITS
  * };
  * @endcode
  */
@@ -148,7 +141,7 @@ extern uart_config_t default_cfg;
  * The default implementation uses weak symbols that can be overridden by specific drivers.
  *
  * @code
- * __attribute__((weak)) chi_device_api_t uart_api = {
+ * __attribute__((weak)) chi_interface_api_t uart_api = {
  *     .open  = uart_open,
  *     .close = uart_close,
  *     .read  = uart_read,
@@ -156,9 +149,8 @@ extern uart_config_t default_cfg;
  * };
  * @endcode
  */
-extern chi_device_api_t uart_api;
+extern chi_interface_api_t uart_api;
+
+/** @} */ // end defgroup hal_uart
 
 #endif // UART_H
-
-/** @} */ // End of hal_uart group
-/** @} */ // End of hal group

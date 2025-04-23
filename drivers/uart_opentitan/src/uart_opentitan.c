@@ -6,46 +6,36 @@
 
 /**
  * \addtogroup drivers
+ * @{ \defgroup drivers_uart_opentitan UART OpenTitan Driver
+ * @ingroup hal_interface
  * @{
- * \defgroup drivers_uart_opentitan UART OpenTitan Driver
- * @{
- *
  * @brief OpenTitan UART driver implementation for Chimera-SDK.
  *
- *
- * This file provides the implementation of UART initialization, read, and write
- * functions using OpenTitan's Device Interface Functions (DIF).
- *
+ * This file defines the OpenTitan UART driver using the HAL interface.
+ * It adapts the DIF-based implementation to the generic chi_interface API.
  */
 
 #include "uart_opentitan.h"
+#include "interface_api.h"
 #include <stdlib.h>
 #include <string.h>
+#include "sw/device/lib/dif/dif_uart.h"
 
 /**
- * @brief Opens and initializes the OpenTitan UART device.
+ * @brief Opens and initializes the OpenTitan UART interface.
  *
- * @param device Pointer to the UART device.
- * @return 0 on success, -1 on invalid argument, -2 on memory allocation failure, -3 on
- * configuration failure.
+ * @param iface UART interface instance.
+ * @return 0 on success, -1 on error.
  */
-int uart_opentitan_open(chi_device_t *device) {
-    if (!device || !device->device_addr || !device->cfg) {
-        return -1; // Invalid argument
+int uart_opentitan_open(chi_interface_t *iface) {
+    if (!iface || !iface->cfg) {
+        return -1;
     }
 
-    // Retrieve the device-specific configuration
-    uart_config_t *config = (uart_config_t *)device->cfg;
+    uart_config_t *config = (uart_config_t *)iface->cfg;
+    opentitan_uart_context_t *context = (opentitan_uart_context_t *)config;
 
-    // Allocate memory for OpenTitan-specific UART context
-    opentitan_uart_context_t *context =
-        (opentitan_uart_context_t *)malloc(sizeof(opentitan_uart_context_t));
-    if (!context) {
-        return -2; // Memory allocation failed
-    }
-
-    // Configure the UART using the retrieved configuration
-    dif_uart_config_t dif_config = {
+    dif_uart_config_t dif_cfg = {
         .baudrate = config->baud_rate,
         .clk_freq_hz = config->clk_freq_hz,
         .parity_enable =
@@ -53,69 +43,51 @@ int uart_opentitan_open(chi_device_t *device) {
         .parity = (config->parity == UART_PARITY_EVEN) ? kDifUartParityEven : kDifUartParityOdd,
     };
 
-    // Initialize the UART using the OpenTitan DIF
-    dif_result_t result = dif_uart_configure(&context->uart, dif_config);
+    dif_result_t result = dif_uart_configure(&context->uart, dif_cfg);
     if (result != kDifOk) {
-        free(context);
-        return -3; // Configuration failed
+        return -1;
     }
-
-    // Save the driver-specific context in the device's cfg field
-    device->cfg = context;
-
-    return 0; // Success
+    return 0;
 }
 
 /**
- * @brief Closes the OpenTitan UART device.
+ * @brief Closes the OpenTitan UART interface.
  *
- * @param device Pointer to the UART device.
- * @return 0 on success, -1 on invalid argument.
+ * @param iface UART interface instance.
+ * @return 0
  */
-int uart_opentitan_close(chi_device_t *device) {
-    if (!device || !device->cfg) {
-        return -1; // Invalid argument
-    }
-
-    // Free the allocated context
-    free(device->cfg);
-    device->cfg = NULL;
-    return 0; // Success
+int uart_opentitan_close(chi_interface_t *iface) {
+    (void)iface;
+    return 0;
 }
 
 /**
- * @brief Reads data from the OpenTitan UART receiver.
+ * @brief Reads data from the OpenTitan UART.
  *
  * This is a blocking operation that only returns once the requested number of bytes
  * has been read or a read failure occurs. The optional callback, if provided, is
  * invoked immediately after the blocking read completes, serving as a notification
  * hook. The callback is **not** called asynchronously.
  *
- * @param device Pointer to the UART device.
+ * @param iface UART interface instance.
  * @param buffer Buffer to store received data.
  * @param size Number of bytes to read.
  * @param cb Optional callback function (set to NULL if not needed).
- * @return Number of bytes read on success, -1 on invalid argument, -2 on read failure.
+ * @return Number of bytes read on success, -1 on error.
  */
-ssize_t uart_opentitan_read(chi_device_t *device, void *buffer, uint32_t size,
-                            chi_device_callback_t cb) {
-    if (!device || !device->cfg || !buffer || size == 0) {
-        return -1; // Invalid argument
+ssize_t uart_opentitan_read(chi_interface_t *iface, void *buffer, uint32_t size,
+                            chi_interface_callback_t cb) {
+    if (!iface || !iface->cfg || !buffer || size == 0) {
+        return -1;
     }
-
-    opentitan_uart_context_t *context = (opentitan_uart_context_t *)device->cfg;
-
-    size_t bytes_read = 0;
-    dif_result_t result = dif_uart_bytes_receive(&context->uart, size, buffer, &bytes_read);
+    opentitan_uart_context_t *context = (opentitan_uart_context_t *)iface->cfg;
+    size_t read;
+    dif_result_t result = dif_uart_bytes_receive(&context->uart, size, buffer, &read);
     if (result != kDifOk) {
-        return -2; // Read failed
+        return -1;
     }
-
-    if (cb) {
-        cb(device); // Invoke the callback
-    }
-
-    return bytes_read;
+    if (cb) cb(iface);
+    return (ssize_t)read;
 }
 
 /**
@@ -126,55 +98,47 @@ ssize_t uart_opentitan_read(chi_device_t *device, void *buffer, uint32_t size,
  * write completes, serving as a notification hook. The callback is **not**
  * called asynchronously.
  *
- * @param device Pointer to the UART device.
+ * @param iface UART interface instance.
  * @param buffer Data to send.
  * @param size Number of bytes to write.
  * @param cb Optional callback function (set to NULL if not needed).
- * @return Number of bytes written on success, -1 on invalid argument, -2 on write failure.
+ * @return Number of bytes written on success, -1 on error.
  */
-ssize_t uart_opentitan_write(chi_device_t *device, const void *buffer, uint32_t size,
-                             chi_device_callback_t cb) {
-    if (!device || !device->cfg || !buffer || size == 0) {
-        return -1; // Invalid argument
+ssize_t uart_opentitan_write(chi_interface_t *iface, const void *buffer, uint32_t size,
+                             chi_interface_callback_t cb) {
+    if (!iface || !iface->cfg || !buffer || size == 0) {
+        return -1;
     }
-
-    opentitan_uart_context_t *context = (opentitan_uart_context_t *)device->cfg;
-
-    size_t bytes_written = 0;
-    dif_result_t result = dif_uart_bytes_send(&context->uart, size, buffer, &bytes_written);
+    opentitan_uart_context_t *context = (opentitan_uart_context_t *)iface->cfg;
+    size_t written;
+    dif_result_t result = dif_uart_bytes_send(&context->uart, size, buffer, &written);
     if (result != kDifOk) {
-        return -2; // Write failed
+        return -1;
     }
-
-    if (cb) {
-        cb(device); // Invoke the callback
-    }
-
-    return bytes_written;
+    if (cb) cb(iface);
+    return (ssize_t)written;
 }
 
 // VIVIANEP: Need to skip doxygen generation for these functions
 // to avoid duplicated defintion errors in the generated documentation
 
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
-extern int uart_open(chi_device_t *device)
+extern int uart_open(chi_interface_t *iface)
     __attribute__((alias("uart_opentitan_open"), used, visibility("default")));
-extern int uart_close(chi_device_t *device)
+extern int uart_close(chi_interface_t *iface)
     __attribute__((alias("uart_opentitan_close"), used, visibility("default")));
-extern ssize_t uart_read(chi_device_t *device, void *buffer, uint32_t size,
-                         chi_device_callback_t cb)
+extern ssize_t uart_read(chi_interface_t *iface, void *buffer, uint32_t size,
+                         chi_interface_callback_t cb)
     __attribute__((alias("uart_opentitan_read"), used, visibility("default")));
-extern ssize_t uart_write(chi_device_t *device, const void *buffer, uint32_t size,
-                          chi_device_callback_t cb)
+extern ssize_t uart_write(chi_interface_t *iface, const void *buffer, uint32_t size,
+                          chi_interface_callback_t cb)
     __attribute__((alias("uart_opentitan_write"), used, visibility("default")));
-// @endcond
 
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-chi_device_api_t uart_api = {.open = uart_opentitan_open,
-                             .close = uart_opentitan_close,
-                             .read = uart_opentitan_read,
-                             .write = uart_opentitan_write};
-// @endcond
+chi_interface_api_t uart_api = {.open = uart_opentitan_open,
+                                .close = uart_opentitan_close,
+                                .read = uart_opentitan_read,
+                                .write = uart_opentitan_write};
+/// @endcond
 
 /** @} */ // End of drivers_uart_opentitan group
 /** @} */ // End of drivers group

@@ -8,13 +8,13 @@
  * \addtogroup drivers
  * @{
  * \defgroup drivers_uart_apb UART APB Driver
+ * @ingroup hal_interface
  * @{
  * @brief APB UART register definitions for Chimera-SDK.
  *
  * This file defines register offsets and fields for an APB-based UART peripheral.
  * It is used in conjunction with the UART driver to configure and interact with
  * the hardware.
- *
  */
 
 #ifndef UART_APB_H

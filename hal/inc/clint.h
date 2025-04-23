@@ -4,28 +4,19 @@
 //
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-/**
- * @defgroup hal Hardware Abstraction Layer (HAL)
- * @brief The HAL module provides a unified API for hardware peripherals.
- * @{
- */
-
-/**
- * @defgroup hal_clint CLINT HAL Interface
- * @ingroup hal
- * @brief CLINT HAL interface for Chimera-SDK.
- *
- * This module defines the CLINT configuration structure and is used to
- * interface with the CLINT drivers in Chimera-SDK.
- *
- * @{
- *
- */
-
 #ifndef HAL_CLINT_H
 #define HAL_CLINT_H
 
+#include "interrupt_api.h"
 #include <stdint.h>
+#include <stdbool.h>
+
+/**
+ * \defgroup hal_clint CLINT HAL Interface
+ * @ingroup hal_interrupt
+ * @brief CLINT-specific implementation of the generic interrupt-controller API.
+ * @{
+ */
 
 /**
  * @brief Platform-specific mtime type definition.
@@ -40,7 +31,7 @@
 typedef uint64_t clint_mtime_t;
 #else
 /**
- * @
+ * @brief 32-bit representation of mtime (split into low/high).
  */
 typedef struct {
     uint32_t low;  /**< Lower 32 bits of mtime. */
@@ -121,7 +112,14 @@ extern void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks);
 }
 #endif
 
-#endif // HAL_CLINT_H
+/**
+ * @brief CLINT’s implementation of the generic interrupt-controller API.
+ *
+ * Users should use the `chi_interrupt_t` + `interrupt_api` abstraction
+ * when driving CLINT.
+ */
+extern chi_interrupt_api_t clint_api;
 
-/** @} */ // End of hal_clint group
-/** @} */ // End of hal group
+/** @} */ // end defgroup hal_clint
+
+#endif // HAL_CLINT_H

@@ -6,9 +6,11 @@
 
 #include "clint.h"
 
-// Provide weak stubs that can be overridden by target-specific strong implementations
+/*---------------------------------------------------------------------------*/
+/* CLINT‐specific weak stubs (can be overridden by platform implementations) */
+/*---------------------------------------------------------------------------*/
 
-__attribute__((weak)) clint_mtime_t clint_get_mtime() {
+__attribute__((weak)) clint_mtime_t clint_get_mtime(void) {
     clint_mtime_t dummy = {0};
     return dummy;
 }
@@ -47,3 +49,64 @@ __attribute__((weak)) void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks)
     (void)timer_idx;
     (void)ticks;
 }
+
+/*---------------------------------------------------------------------------*/
+/* Generic interrupt‐controller stubs                                      */
+/*---------------------------------------------------------------------------*/
+
+__attribute__((weak)) int clint_init(chi_interrupt_t *ctrl) {
+    (void)ctrl;
+    return 0;
+}
+
+__attribute__((weak)) int clint_register_handler(chi_interrupt_t *ctrl, int irq,
+                                                 chi_irq_handler_t handler, void *arg) {
+    (void)ctrl;
+    (void)irq;
+    (void)handler;
+    (void)arg;
+    return -1;
+}
+
+__attribute__((weak)) int clint_enable_irq(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+
+__attribute__((weak)) int clint_disable_irq(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+
+__attribute__((weak)) int clint_set_priority(chi_interrupt_t *ctrl, int irq, int priority) {
+    (void)ctrl;
+    (void)irq;
+    (void)priority;
+    return -1;
+}
+
+__attribute__((weak)) int clint_acknowledge(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+
+__attribute__((weak)) void clint_dispatch(chi_interrupt_t *ctrl) {
+    (void)ctrl;
+}
+
+/*---------------------------------------------------------------------------*/
+/* Export the generic interrupt‐controller API for CLINT                    */
+/*---------------------------------------------------------------------------*/
+
+__attribute__((weak)) chi_interrupt_api_t clint_api = {
+    .init = clint_init,
+    .register_handler = clint_register_handler,
+    .enable_irq = clint_enable_irq,
+    .disable_irq = clint_disable_irq,
+    .set_priority = clint_set_priority,
+    .acknowledge = clint_acknowledge,
+    .dispatch = clint_dispatch,
+};

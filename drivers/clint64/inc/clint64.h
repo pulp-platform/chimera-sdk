@@ -9,6 +9,7 @@
 
 /**
  * \defgroup drivers_clint_64 64-bit CLINT Driver
+ * @ingroup hal_interrupt
  * @{
  * @brief 64-bit CLINT driver implementation for Chimera-SDK.
  *

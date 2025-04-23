@@ -18,6 +18,13 @@
 #include "regs/clint.h"
 #include "util.h"
 #include "params.h"
+#include "interrupt_api.h"
+#include <stdint.h>
+#include <stdbool.h>
+
+/*---------------------------------------------------------------------------*/
+/* 64‑bit CLINT core routines                                                 */
+/*---------------------------------------------------------------------------*/
 
 /**
  * @brief Retrieves the current CLINT `mtime` value.
@@ -84,7 +91,7 @@ static uint32_t clint64_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) 
  * The high register is written first, then the low register.
  *
  * @param timer_idx Timer index to configure.
- * @param value Target `mtimecmp` value.
+ * @param value     Target `mtimecmp` value.
  */
 static void clint64_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
     uint32_t vlo = (uint32_t)(value);
@@ -115,7 +122,7 @@ static void clint64_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
  * @brief Puts the core into sleep mode for a specified number of ticks.
  *
  * @param timer_idx Timer index.
- * @param ticks Number of clock cycles to sleep.
+ * @param ticks     Number of clock cycles to sleep.
  */
 static void clint64_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
     clint64_sleep_until(timer_idx, clint64_get_mtime() + ticks);
@@ -128,14 +135,67 @@ extern int clint_get_mtime()
     __attribute__((alias("clint64_get_mtime"), used, visibility("default")));
 extern int clint_mtime_less_than(clint_mtime_t a, clint_mtime_t b)
     __attribute__((alias("clint64_mtime_less_than"), used, visibility("default")));
+extern void clint_spin_until(clint_mtime_t tgt_mtime)
+    __attribute__((alias("clint64_spin_until"), used, visibility("default")));
+extern void clint_spin_ticks(uint32_t ticks)
+    __attribute__((alias("clint64_spin_ticks"), used, visibility("default")));
+extern uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv)
+    __attribute__((alias("clint64_get_core_freq"), used, visibility("default")));
 extern void clint_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value)
     __attribute__((alias("clint64_set_mtimecmpx"), used, visibility("default")));
 extern void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime)
     __attribute__((alias("clint64_sleep_until"), used, visibility("default")));
 extern void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks)
     __attribute__((alias("clint64_sleep_ticks"), used, visibility("default")));
-extern uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv)
-    __attribute__((alias("clint64_get_core_freq"), used, visibility("default")));
+
+/*---------------------------------------------------------------------------*/
+/* Provide driver‑specific chi_interrupt_api_t for CLINT                      */
+/*---------------------------------------------------------------------------*/
+static int clint64_init(chi_interrupt_t *ctrl) {
+    (void)ctrl;
+    return 0;
+}
+static int clint64_register_handler(chi_interrupt_t *ctrl, int irq, chi_irq_handler_t handler,
+                                    void *arg) {
+    (void)ctrl;
+    (void)irq;
+    (void)handler;
+    (void)arg;
+    return -1;
+}
+static int clint64_enable_irq(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+static int clint64_disable_irq(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+static int clint64_set_priority(chi_interrupt_t *ctrl, int irq, int priority) {
+    (void)ctrl;
+    (void)irq;
+    (void)priority;
+    return -1;
+}
+static int clint64_acknowledge(chi_interrupt_t *ctrl, int irq) {
+    (void)ctrl;
+    (void)irq;
+    return -1;
+}
+static void clint64_dispatch(chi_interrupt_t *ctrl) {
+    (void)ctrl;
+}
+
+/* Export the CLINT-specific interrupt API */
+chi_interrupt_api_t clint_api = {.init = clint64_init,
+                                 .register_handler = clint64_register_handler,
+                                 .enable_irq = clint64_enable_irq,
+                                 .disable_irq = clint64_disable_irq,
+                                 .set_priority = clint64_set_priority,
+                                 .acknowledge = clint64_acknowledge,
+                                 .dispatch = clint64_dispatch};
 /// @endcond
 
 /** @} */ // End of drivers_clint_64 group

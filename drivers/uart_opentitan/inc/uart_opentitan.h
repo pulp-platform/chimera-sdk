@@ -8,6 +8,7 @@
  * \addtogroup drivers
  * @{
  * \defgroup drivers_uart_opentitan UART OpenTitan Driver
+ * @ingroup hal_interface
  * @{
  * @brief OpenTitan-specific UART driver interface for Chimera-SDK.
  *
@@ -32,8 +33,8 @@
  * \ingroup drivers_uart_opentitan
  * @brief OpenTitan-specific UART context.
  *
- * This structure holds the device interface function (DIF) handle
- * for OpenTitan-based UART communication.
+ * This structure holds the DIF UART handle and any driver‑specific state
+ * needed to drive an OpenTitan UART via the HAL interface.
  */
 typedef struct {
     dif_uart_t uart; /**< OpenTitan DIF UART handle. */
@@ -41,5 +42,5 @@ typedef struct {
 
 #endif // UART_OPENTITAN_H
 
-/** @} */ // End of drivers_uart_opentitan group
-/** @} */ // End of drivers group
+/** @} */ // end drivers_uart_opentitan
+/** @} */ // end drivers

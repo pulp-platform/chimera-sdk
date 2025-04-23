@@ -5,6 +5,12 @@
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
+/**
+ * \defgroup hal Hardware Abstraction Layer (HAL)
+ * @brief The HAL module provides a unified API for Chimera‑SDK peripherals.
+ * @{
+ */
+
 #ifndef DEVICE_API_H
 #define DEVICE_API_H
 
@@ -14,7 +20,8 @@
 
 /**
  * \defgroup device Device API
- * @brief Defines the API for device interactions in Chimera-SDK.
+ * @ingroup hal
+ * @brief Defines the API for device interactions in Chimera‑SDK.
  * @{
  */
 
@@ -49,8 +56,6 @@ typedef bool (*chi_device_callback_t)(chi_device_t *device);
  *
  * This structure contains function pointers for device operations,
  * enabling a standardized interface for device drivers.
- *
-
  */
 struct chi_device_api {
     /**
@@ -101,6 +106,8 @@ struct chi_device_api {
                      chi_device_callback_t cb);
 };
 
-/** @} */
+/** @} */ // end defgroup device
 
 #endif // DEVICE_API_H
+
+/** @} */ // end defgroup hal

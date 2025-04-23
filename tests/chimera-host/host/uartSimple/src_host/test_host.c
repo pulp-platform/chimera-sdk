@@ -27,17 +27,15 @@ int main(void) {
     // 4. Update the UART config with the calculated frequency
     uart_cfg.clk_freq_hz = reset_freq;
 
-    // 5. Initialize the UART device
-    struct chi_device uart_device = {
-        .device_addr = (uint32_t *)&__base_uart,
+    // 5. Initialize the UART interface
+    chi_interface_t uart_iface = {
+        .base = (uintptr_t)&__base_uart,
         .cfg = &uart_cfg,
         .api = &uart_api,
     };
 
-    // 6. Open the UART device
-    int open_result = uart_open(&uart_device);
-
-    if (open_result != 0) {
+    // 6. Open the UART interface
+    if (uart_open(&uart_iface) != 0) {
         return -1;
     }
 
@@ -51,30 +49,19 @@ int main(void) {
     char response_buffer[sizeof(expected_response)] = {0};
 
     // 9. Write the command to UART
-    ssize_t bytes_written = uart_write(&uart_device, uart_cmd, (uint32_t)cmd_len, NULL);
-
-    if (bytes_written < 0) {
-        uart_close(&uart_device);
+    if (uart_write(&uart_iface, uart_cmd, (uint32_t)cmd_len, NULL) < 0) {
+        uart_close(&uart_iface);
         return -1;
     }
 
     // 10. Read the response from UART
-    ssize_t bytes_read = uart_read(&uart_device, response_buffer, (uint32_t)expected_len, NULL);
-
-    if (bytes_read < 0) {
-        uart_close(&uart_device);
+    if (uart_read(&uart_iface, response_buffer, (uint32_t)expected_len, NULL) < 0) {
+        uart_close(&uart_iface);
         return -1;
     }
 
     // 11. Validate the response
-    if ((size_t)bytes_read == expected_len &&
-        strncmp(response_buffer, expected_response, expected_len) == 0) {
-        uart_close(&uart_device);
-        return 0;
-    } else {
-        uart_close(&uart_device);
-        return -1;
-    }
-
-    return 0;
+    bool ok = (strncmp(response_buffer, expected_response, expected_len) == 0);
+    uart_close(&uart_iface);
+    return ok ? 0 : -1;
 }

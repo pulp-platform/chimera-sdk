@@ -8,6 +8,7 @@
  * \addtogroup drivers
  * @{
  * \defgroup drivers_uart_apb UART APB Driver
+ * @ingroup hal_interface
  * @{
  * @brief APB UART driver implementation for Chimera-SDK.
  *
@@ -45,23 +46,23 @@ static inline int tx_ready(uint32_t base) {
 }
 
 /**
- * @brief Opens and initializes the UART device.
+ * @brief Opens and initializes the UART interface.
  *
- * @param device Pointer to the UART device.
+ * @param iface UART interface instance.
  * @return 0 on success, -1 on failure.
  */
-int uart_apb_open(chi_device_t *device) {
-    if (!device || !device->device_addr) {
+int uart_apb_open(chi_interface_t *iface) {
+    if (!iface || !iface->base) {
         return -1;
     }
 
-    // Use default config if none is provided
-    if (!device->cfg) {
-        device->cfg = &default_cfg;
+    // Use default config if none provided
+    if (!iface->cfg) {
+        iface->cfg = &default_cfg;
     }
 
-    uart_config_t *cfg = (uart_config_t *)device->cfg;
-    uint32_t base = (uint32_t)device->device_addr;
+    uart_config_t *cfg = (uart_config_t *)iface->cfg;
+    uint32_t base = (uint32_t)iface->base;
     uint32_t divisor = cfg->clk_freq_hz / (cfg->baud_rate << 4);
     uint8_t dlo = (uint8_t)(divisor);
     uint8_t dhi = (uint8_t)(divisor >> 8);
@@ -87,17 +88,17 @@ int uart_apb_open(chi_device_t *device) {
 }
 
 /**
- * @brief Closes the UART device.
+ * @brief Closes the UART interface.
  *
- * @param device Pointer to the UART device.
+ * @param iface UART interface instance.
  * @return 0 on success, -1 on failure.
  */
-int uart_apb_close(chi_device_t *device) {
-    if (!device || !device->device_addr) {
+int uart_apb_close(chi_interface_t *iface) {
+    if (!iface || !iface->base) {
         return -1;
     }
 
-    uint32_t base = (uint32_t)device->device_addr;
+    uint32_t base = (uint32_t)iface->base;
 
     // Reset control registers
     reg8_write(base, UART_INTR_ENABLE_REG_OFFSET, 0x00);
@@ -111,28 +112,29 @@ int uart_apb_close(chi_device_t *device) {
 /**
  * @brief Reads data from the UART receiver (blocking mode).
  *
- * @param device Pointer to the UART device.
+ * @param iface UART interface instance.
  * @param buffer Buffer to store received data.
  * @param size Number of bytes to read.
  * @param cb Optional callback function (set to NULL if not needed).
  * @return Number of bytes read on success, -1 on failure.
  */
-ssize_t uart_apb_read(chi_device_t *device, void *buffer, uint32_t size, chi_device_callback_t cb) {
-    if (!device || !device->device_addr || !buffer || size == 0) {
+ssize_t uart_apb_read(chi_interface_t *iface, void *buffer, uint32_t size,
+                      chi_interface_callback_t cb) {
+    if (!iface || !iface->base || !buffer || size == 0) {
         return -1;
     }
 
     uint8_t *dst = (uint8_t *)buffer;
-    uint32_t base = (uint32_t)device->device_addr;
+    uint32_t base = (uint32_t)iface->base;
 
     for (uint32_t i = 0; i < size; i++) {
         while (!rx_ready(base)) {
-        } // Wait until data is available
+        }
         dst[i] = reg8_read(base, UART_RBR_REG_OFFSET);
     }
 
     if (cb) {
-        (void)cb(device);
+        (void)cb(iface);
     }
 
     return (ssize_t)size;
@@ -141,29 +143,29 @@ ssize_t uart_apb_read(chi_device_t *device, void *buffer, uint32_t size, chi_dev
 /**
  * @brief Writes data to the UART transmitter (blocking mode).
  *
- * @param device Pointer to the UART device.
+ * @param iface UART interface instance.
  * @param buffer Data to send.
  * @param size Number of bytes to write.
  * @param cb Optional callback function (set to NULL if not needed).
  * @return Number of bytes written on success, -1 on failure.
  */
-ssize_t uart_apb_write(chi_device_t *device, const void *buffer, uint32_t size,
-                       chi_device_callback_t cb) {
-    if (!device || !device->device_addr || !buffer || size == 0) {
+ssize_t uart_apb_write(chi_interface_t *iface, const void *buffer, uint32_t size,
+                       chi_interface_callback_t cb) {
+    if (!iface || !iface->base || !buffer || size == 0) {
         return -1;
     }
 
     const uint8_t *src = (const uint8_t *)buffer;
-    uint32_t base = (uint32_t)device->device_addr;
+    uint32_t base = (uint32_t)iface->base;
 
     for (uint32_t i = 0; i < size; i++) {
         while (!tx_ready(base)) {
-        } // Wait until the transmitter is ready
+        }
         reg8_write(base, UART_THR_REG_OFFSET, src[i]);
     }
 
     if (cb) {
-        (void)cb(device);
+        (void)cb(iface);
     }
 
     return (ssize_t)size;
@@ -173,22 +175,20 @@ ssize_t uart_apb_write(chi_device_t *device, const void *buffer, uint32_t size,
 // to avoid duplicated defintion errors in the generated documentation
 
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
-extern int uart_open(chi_device_t *device)
+extern int uart_open(chi_interface_t *iface)
     __attribute__((alias("uart_apb_open"), used, visibility("default")));
-extern int uart_close(chi_device_t *device)
+extern int uart_close(chi_interface_t *iface)
     __attribute__((alias("uart_apb_close"), used, visibility("default")));
-extern ssize_t uart_read(chi_device_t *device, void *buffer, uint32_t size,
-                         chi_device_callback_t cb)
+extern ssize_t uart_read(chi_interface_t *iface, void *buffer, uint32_t size,
+                         chi_interface_callback_t cb)
     __attribute__((alias("uart_apb_read"), used, visibility("default")));
-extern ssize_t uart_write(chi_device_t *device, const void *buffer, uint32_t size,
-                          chi_device_callback_t cb)
+extern ssize_t uart_write(chi_interface_t *iface, const void *buffer, uint32_t size,
+                          chi_interface_callback_t cb)
     __attribute__((alias("uart_apb_write"), used, visibility("default")));
-// @endcond
 
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-chi_device_api_t uart_api = {
+chi_interface_api_t uart_api = {
     .open = uart_apb_open, .close = uart_apb_close, .read = uart_apb_read, .write = uart_apb_write};
-// @endcond
+/// @endcond
 
 /** @} */ // End of drivers_uart_apb group
 /** @} */ // End of drivers group
