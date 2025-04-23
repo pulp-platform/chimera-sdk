@@ -2,9 +2,10 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
-# Authors: 
+# Authors:
 # - Philip Wiese <wiesep@iis.ee.ethz.ch>
 # - Victor Jung <jungvi@iis.ee.ethz.ch>
+# - Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 ROOT_DIR := $(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
@@ -26,7 +27,16 @@ help:
 format:
 	@echo "Formatting code..."
 	@python scripts/run_clang_format.py -ir tests/ hal/ targets/ drivers/ devices/ --clang-format-executable=$(CLANG_FORMAT_EXECUTABLE)
-	@python -m yapf -rip .
+	@echo "Formatting Python files with YAPF..."
+	@find . \
+	    -type f \
+	    -name "*.py" \
+	    ! -path "*/thirdparty/*" \
+	    ! -name ".*" \
+	    ! -path "*/.*/*" \
+	    ! -path "*/build/*" \
+	    -print0 \
+	    | xargs -0 -I{} sh -c 'echo "Formatting Python file: {}" && python -m yapf -i "{}"'
 
 export-symbols:
 	@echo "Please export the following symbols:"
