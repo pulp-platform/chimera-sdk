@@ -57,3 +57,21 @@ endif()
 # Define global flags
 set(CROSS_COMPILE_HOST "riscv32-unknown-elf")
 add_compile_options("--target=${CROSS_COMPILE_HOST}")
+
+# ————————————————————————————————————————————————————————————————
+# Ensure we pull in real 64-bit div/mod helpers on 32-bit RISC-V hosts
+# ————————————————————————————————————————————————————————————————
+if (HOST_ARCH STREQUAL "riscv32" AND ABI STREQUAL "ilp32")
+  message(STATUS "[CHIMERA-SDK] Linking compiler-rt builtins for RV32HOST")
+  # Prefer compiler-rt rather than libgcc
+  add_link_options("-rtlib=compiler-rt")
+
+  # Point at the compiler-rt builtins
+  link_directories(
+    ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib
+  )
+
+  # Globally add the real builtins if RV32
+  add_link_options("-lclang_rt.builtins-riscv32")
+endif()
+# ————————————————————————————————————————————————————————————————
