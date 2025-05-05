@@ -5,9 +5,6 @@ An interrupt controller is represented by the `chi_interrupt_t` structure and
 provides methods to register handlers, enable/disable lines, acknowledge events,
 and dispatch.
 
-Interrupt Controller API
-========================
-
 .. doxygengroup:: hal_interrupt
     :content-only:
     :members:
@@ -15,7 +12,7 @@ Interrupt Controller API
     :project: chimera_hal
 
 CLINT (HAL)
-~~~~~~~~~~~
+===========
 
 .. doxygengroup:: hal_clint
     :content-only:
