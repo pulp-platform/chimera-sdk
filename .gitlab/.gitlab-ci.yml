@@ -5,7 +5,7 @@
 # Author: Victor Jung <jungvi@iis.ee.ethz.ch>
 
 variables:
-  CMAKE: '/usr/sepp/bin/cmake-3.18.1'
+  CMAKE: 'riscv /usr/sepp/bin/cmake-3.28.3'
   LLVM_INSTALL_PATH: '/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
   GVSOC_HOME: '/scratch/jungvi/chimera-sdk/install/gvsoc'
 
@@ -15,7 +15,7 @@ stages: # List of stages for jobs with their order of execution
 
 .setup:
   script:
-    - bash 
+    - bash
     - eval "$(micromamba shell hook --shell bash)"
     - micromamba activate chimera-sdk-ci
     - rm -rf build

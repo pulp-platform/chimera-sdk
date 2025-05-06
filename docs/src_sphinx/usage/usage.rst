@@ -79,6 +79,7 @@ To enable automatic configuration of the C/C++ extension and support for the int
             "TOOLCHAIN_DIR": "/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0",
             "TARGET_PLATFORM": "chimera-convolve",
         },
+        "cmake.cmakePath": "cmake-3.28.3",
     }
 
 If you are not on an IIS system, you need to adjust the paths according to your local installation.
