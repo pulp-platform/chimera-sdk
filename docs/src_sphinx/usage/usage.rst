@@ -40,8 +40,8 @@ To build the SDK, run:
 .. code-block:: bash
 
     riscv zsh # Setup the default riscv environment (modifies PATH and LD_LIBRARY_PATH)
-    cmake -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0 -B build
-    cmake --build build -j
+    cmake-3.28.3 -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0 -B build
+    cmake-3.28.3 --build build -j
 
 
 Targets
@@ -52,8 +52,8 @@ The SDK supports multiple targets, each with a different configuration. The avai
 - ``chimera-host``: Target with a single host core without clusters.
 - ``chimera-open``: Default target with multiple clusters.
 
-Tests
------
+Testing
+-------
 You can test the functional correctness of your code with the event-based simulator `GVSoC <https://github.com/gvsoc/gvsoc>`_. To install GVSoC, run:
 
 .. code-block:: bash

@@ -6,6 +6,7 @@
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
+
 ################################################################################
 # Host Runtime Library                                                         #
 ################################################################################
@@ -30,7 +31,7 @@ target_sources(runtime_host
 # WIESEP: Export the target specific include directory
 target_include_directories(runtime_host
   PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}/include
+  ${CMAKE_CURRENT_LIST_DIR}/inc
 )
 
 target_compile_options(runtime_host

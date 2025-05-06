@@ -7,8 +7,8 @@
 
 # Define mappings for tests
 set(TEST_MAPPINGS
-    chimera-convolve:chimera-convolve,chimera-open,chimera-host
-    chimera-open:chimera-open,chimera-host
+    chimera-convolve:chimera-convolve
+    chimera-open:chimera-open
     chimera-host:chimera-host
 )
 

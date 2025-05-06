@@ -12,5 +12,9 @@ file(GLOB_RECURSE C_SOURCES
   "offload_snitchCluster.c"
 )
 
+target_include_directories(runtime_host
+  PRIVATE ${CMAKE_SOURCE_DIR}/hal/inc
+)
+
 target_sources(runtime_host PRIVATE ${C_SOURCES})
 target_compile_definitions(runtime_host INTERFACE CHIMERA_DRIVER_CLUSTER)

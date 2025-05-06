@@ -25,8 +25,11 @@ We recomment that you setup a virtual environment and install the required depen
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-docs.txt
 ```
 Alternatively you can also use any mamba/conda environment.
+
+> **_NOTE:_** Some of the packages in `requirements.txt` originate from the OpenTitan project. The upstream dependencies are defined in OpenTitan’s [`pyproject.toml`](https://github.com/lowRISC/opentitan/blob/master/pyproject.toml). We’ve mirrored these requirements here to ensure consistency with the build flow. If you are interested in the original dependency specifications, please refer to the OpenTitan repository.
 
 Then, to format the code, run the following command:
 

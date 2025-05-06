@@ -29,14 +29,24 @@ jobs:
         run: |
               sudo apt-get update && sudo apt-get install -y doxygen
               python -m pip install --upgrade pip
-              pip install -r docs/requirements.txt
+              pip install -r requirements-docs.txt
       - 
         name: Build HTML
         run : |
           cd docs
           make html
       -
-        name: Upload artifacts
+        name: Upload Build Files
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-docs
+          path: |
+            docs/_build_doxygen_ll
+            docs/_build_doxygen_hal
+            docs/_build_sphinx
+      -
+        name: Upload HTML Documentation
         uses: actions/upload-artifact@v4
         with:
           name: html-docs

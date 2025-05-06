@@ -4,6 +4,9 @@
 //
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
 
+#include "soc.h"
+#include "driver.h"
+
 int main() {
     return 0;
 }

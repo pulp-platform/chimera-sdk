@@ -2,13 +2,14 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 #
+# Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 # Define mappings for drivers
 set(DRIVER_MAPPINGS
-    chimera-convolve:cluster
-    chimera-open:cluster
-    chimera-host:
+    chimera-convolve:cluster,uart_apb,clint32
+    chimera-open:cluster,uart_apb,clint32
+    chimera-host:uart_apb,clint32
 )
 
 # Call the macro

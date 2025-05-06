@@ -6,9 +6,12 @@
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.24)
 
-set(CMAKE_C_STANDARD 99)
+# VIVIANEP: We need the C11 standard (or later) for building 
+#           the OpenTitan peripheral drivers
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # SCHEREMO: Needed to skip compiler test, which doesn't support baremetal targets
 set(CMAKE_C_COMPILER_WORKS 1)
@@ -16,8 +19,25 @@ set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
-# SCHEREMO: Help most IDE's LSPs find definitions
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+# WIESEP: It is important to set the ISA and ABI for the host and the cluster snitch
+set(ABI ilp32)
+set(ISA_CLUSTER_SNITCH rv32im)
+set(ISA_HOST rv32imc)
+
+# Set host-specific flags
+set(HOST_ARCH "riscv32")
+set(HOST_FAMILY "riscv32")
+set(HOST_ENDIAN "little")
+set(HOST_SYSTEM "none")
+
+message(STATUS "[CHIMERA-SDK] ABI                   : ${ABI}")
+message(STATUS "[CHIMERA-SDK] ISA_HOST              : ${ISA_HOST}")
+message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_SNITCH    : ${ISA_CLUSTER_SNITCH}")
+if (${DISASSEMBLE_LIBRARIES})
+  message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : ON")
+else()
+  message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : OFF")
+endif()
 
 # SCHEREMO: This toolchain file is only used for test compilation!
 set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
@@ -28,19 +48,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 project(chimera-sdk LANGUAGES C ASM)
 
-# WIESEP: It is important to set the ISA and ABI for the host and the cluster snitch
-set(ABI ilp32)
-set(ISA_CLUSTER_SNITCH rv32im)
-set(ISA_HOST rv32imc)
-
-message(STATUS "[CHIMERA-SDK] ABI                   : ${ABI}")
-message(STATUS "[CHIMERA-SDK] ISA_HOST              : ${ISA_HOST}")
-message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_SNITCH    : ${ISA_CLUSTER_SNITCH}")
-if (${DISASSEMBLE_LIBRARIES})
-  message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : ON")
-else()
-  message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : OFF")
-endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
@@ -52,6 +59,10 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 # - runtime_host
 # - runtime_cluster_snitch
 add_subdirectory(targets)
+
+
+# VIVIANEP: Include the picolibc library
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/picolibc.cmake)
 
 # Include other subdirectories
 add_subdirectory(hal)
