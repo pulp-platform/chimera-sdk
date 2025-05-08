@@ -41,7 +41,7 @@ int main(void) {
     }
 
     // 7. Prepare data to send
-    const char uart_cmd[] = "UartWB";
+    const char uart_cmd[] = "WB";
     size_t cmd_len = sizeof(uart_cmd) - 1;
 
     // 8. Prepare expected response and buffer
