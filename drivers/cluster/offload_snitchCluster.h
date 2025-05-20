@@ -23,6 +23,10 @@
 void setup_snitchCluster_interruptHandler(void *handler);
 
 // Function Offloading
+void *generate_snitchCluster_SPs(uint8_t clusterId, void *sp, uint32_t *stack_size,
+                                 void **stack_ptr);
+void *generate_snitchCluster_SPs_uniform(uint8_t clusterId, void *sp, uint32_t stack_size,
+                                         void **stack_ptr);
 void offload_snitchCluster(void *function, void *args, void *stack_ptr, uint8_t clusterId);
 void offload_snitchCluster_core(void *function, void *args, void *stack_ptr, uint8_t clusterId,
                                 uint32_t core_id);

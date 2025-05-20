@@ -37,10 +37,12 @@ void __attribute__((naked)) _trampoline() {
         "csrr t1, mhartid\n" // Load mhartid into a0
 
         // Set up stack pointer
-        "la a0, _trampoline_stack\n" // Load address of _trampoline_stack
-        "slli t1, t1, 2\n"           // Multiply hart ID by 4 (size of pointer)
-        "add a0, a0, t1\n"           // Compute the address of _trampoline_stack[hartId]
-        "lw sp, 0(a0)\n"             // Load stack pointer from the computed address
+        "la a0, _trampoline_stack\n"    // Load address of _trampoline_stack
+        "addi t1, t1, -%[hartOffset]\n" // Subtract cluster hart base offset
+        "slli t1, t1, 2\n"              // Multiply hart ID by 4 (size of pointer)
+        "add a0, a0, t1\n"              // Compute the address of _trampoline_stack[hartId]
+        "lw sp, 0(a0)\n"                // Load stack pointer from the computed address
+        "andi sp, sp, -0xF\n"           // Ensure stack pointer is 16-Byte aligned (ABI)
 
         // Load function pointer and arguments
         "la a0, _trampoline_function\n" // Load address of _trampoline_function
@@ -53,7 +55,8 @@ void __attribute__((naked)) _trampoline() {
 
         // Call the offloaded function
         "jr a1\n" // Jump and link to the function pointer in a1
-    );
+        :         /* No outputs */
+        : [hartOffset] "i"(CLUSTER_HART_BASE));
 }
 
 /** @}*/

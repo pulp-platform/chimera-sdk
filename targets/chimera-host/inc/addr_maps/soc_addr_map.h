@@ -13,9 +13,15 @@
 
 #define SOC_CTRL_BASE 0x30001000
 
-#define NUM_CLUSTER_CORES 0
+#define HOST_NUMCORES 1
 
-static uint8_t _chimera_numCores[] = {0};
+#define NUM_CLUSTER_CORES 0
+#define NUM_CORES (HOST_NUMCORES + NUM_CLUSTER_CORES)
+
+#define HOST_HART_BASE 0
+
+static const uint8_t _chimera_numCores[] = {0};
+static const uint8_t _chimera_hartBase[] = {0};
 
 #define _chimera_numClusters 0
 
