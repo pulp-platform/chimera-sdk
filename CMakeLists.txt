@@ -73,10 +73,11 @@ add_subdirectory(drivers)
 # Testing                                                                      #
 ################################################################################
 
-set(VALID_TEST_MODES "simulation" "none")
+# JUNGVI: "simulation" compiles and run the test, "compile" just compiles the tests, and none does neither.
+set(VALID_TEST_MODES "simulation" "compile" "none")
 
 # Option for TEST_MODE with default value
-set(TEST_MODE "none" CACHE STRING "Set what validation target the tests should be run on")
+set(TEST_MODE "compile" CACHE STRING "Set what validation target the tests should be run on")
 
 # Check if TEST_MODE is set to a valid option
 if(NOT TEST_MODE IN_LIST VALID_TEST_MODES)
@@ -98,6 +99,10 @@ endif()
 set(SOC_MODEL_BINARY "chim.bin" CACHE STRING "Path to the simulation binary")
 set(PRELOAD_MODE "0" CACHE STRING "Preload mode for simulation")
 
+if (TEST_MODE STREQUAL "compile" OR TEST_MODE STREQUAL "compile")
+  add_subdirectory(tests)
+endif()
+
 if (TEST_MODE STREQUAL "simulation")
   enable_testing()
 
@@ -115,5 +120,3 @@ if (TEST_MODE STREQUAL "simulation")
   message(STATUS "[CHIMERA-SDK] SoC Model Binary      : ${SOC_MODEL_BINARY}")
   message(STATUS "[CHIMERA-SDK] Preload Mode          : ${PRELOAD_MODE}")
 endif()
-
-add_subdirectory(tests)
