@@ -45,7 +45,7 @@ string(REGEX MATCH "^[0-9]+" LLVM_VERSION_MAJOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_MINOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
 
-if (LLVM_VERSION_MAJOR LESS 15)
+if (LLVM_VERSION_MAJOR LESS 16)
     message(STATUS "Disable linker relaxation for LLVM < 15")
     set(CMAKE_ALT_C_OPTIONS "-mno-relax")
     set(CMAKE_ALT_LINK_OPTIONS "-Wl,--no-relax")
@@ -65,10 +65,13 @@ if (HOST_ARCH STREQUAL "riscv32" AND ABI STREQUAL "ilp32")
   message(STATUS "[CHIMERA-SDK] Linking compiler-rt builtins for RV32HOST")
   # Prefer compiler-rt rather than libgcc
   add_link_options("-rtlib=compiler-rt")
+  add_link_options("-nostdlib")
+
+  include_directories(${CMAKE_BINARY_DIR}/picolibc-install-${ISA_HOST}-${ABI}/include)
 
   # Point at the compiler-rt builtins
   link_directories(
-    ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib
+    ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib/baremetal/rv32imc
   )
 
   # Globally add the real builtins if RV32
