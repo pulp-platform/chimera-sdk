@@ -45,7 +45,7 @@ __attribute__((weak)) ssize_t uart_write(chi_interface_t *iface, const void *buf
 /*---------------------------------------------------------------------------*/
 
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
-uart_config_t default_cfg = {.baud_rate = UART_DEFAULT_BAUD_RATE,
+const uart_config_t default_cfg = {.baud_rate = UART_DEFAULT_BAUD_RATE,
                              .clk_freq_hz = UART_CLK_FREQ_HZ,
                              .data_bits = UART_DEFAULT_DATA_BITS,
                              .parity = UART_DEFAULT_PARITY,

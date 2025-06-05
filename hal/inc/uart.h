@@ -130,7 +130,7 @@ extern ssize_t uart_write(chi_interface_t *iface, const void *buffer, uint32_t s
  * };
  * @endcode
  */
-extern uart_config_t default_cfg;
+extern const uart_config_t default_cfg;
 
 /**
  * @brief UART HAL API structure.
@@ -152,5 +152,7 @@ extern uart_config_t default_cfg;
 extern chi_interface_api_t uart_api;
 
 /** @} */ // end defgroup hal_uart
+
+extern chi_interface_t uart_iface;
 
 #endif // UART_H

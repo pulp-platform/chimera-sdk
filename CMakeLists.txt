@@ -68,6 +68,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/picolibc.cmake)
 add_subdirectory(hal)
 add_subdirectory(devices)
 add_subdirectory(drivers)
+add_subdirectory(generic_runtime)
 
 ################################################################################
 # Testing                                                                      #
@@ -119,4 +120,4 @@ if (TEST_MODE STREQUAL "simulation")
 
   message(STATUS "[CHIMERA-SDK] SoC Model Binary      : ${SOC_MODEL_BINARY}")
   message(STATUS "[CHIMERA-SDK] Preload Mode          : ${PRELOAD_MODE}")
-endif()
+  endif()

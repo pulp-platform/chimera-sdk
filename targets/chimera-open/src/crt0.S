@@ -67,7 +67,9 @@ _zero_bss_rem:
 
 _fp_init:
     // Full fence, then jump to main
+    call _uart_init
     call main
+    call _uart_deinit
 
 // If main returns, we end up here
 .global _exit
