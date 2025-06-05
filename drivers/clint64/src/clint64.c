@@ -45,8 +45,7 @@ static clint_mtime_t clint64_get_mtime(void) {
  * @param tgt_mtime Target CLINT time value.
  */
 static void clint64_spin_until(clint_mtime_t tgt_mtime) {
-    while (clint64_get_mtime() < tgt_mtime)
-        ;
+    while (clint64_get_mtime() < tgt_mtime);
 }
 
 /**

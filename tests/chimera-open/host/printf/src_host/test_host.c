@@ -9,14 +9,14 @@
 #include <stdio.h>
 
 int main(void) {
-    
+
     volatile int a = 42;
     printf("%d\n", a);
     printf("CIAO\n");
 
     // JUNGVI: This is here to give enough time to the UART buffer to finish it's transaction
-    for(int i = 0; i < 420; i++){
-        a += a*5;
+    for (int i = 0; i < 420; i++) {
+        a += a * 5;
     }
 
     return 0;
