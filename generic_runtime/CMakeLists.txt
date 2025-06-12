@@ -9,3 +9,4 @@ file(GLOB_RECURSE C_SOURCES
 )
 
 target_sources(runtime_host PRIVATE ${C_SOURCES})
+add_dependencies(runtime_host picolibc)
