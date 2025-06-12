@@ -9,3 +9,4 @@
 add_subdirectory(returnZero)
 add_subdirectory(uartSimple)
 add_subdirectory(printf)
+add_subdirectory(alloc)
