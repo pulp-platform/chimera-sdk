@@ -69,7 +69,10 @@ _fp_init:
     // Full fence, then jump to main
     call _uart_init
     call main
+    mv t0, a0 // Preserve the output of the main
     call _uart_deinit
+    mv a0, t0
+    j _exit
 
 // If main returns, we end up here
 .global _exit
