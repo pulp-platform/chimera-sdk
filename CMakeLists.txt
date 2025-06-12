@@ -100,7 +100,7 @@ endif()
 set(SOC_MODEL_BINARY "chim.bin" CACHE STRING "Path to the simulation binary")
 set(PRELOAD_MODE "0" CACHE STRING "Preload mode for simulation")
 
-if (TEST_MODE STREQUAL "compile" OR TEST_MODE STREQUAL "compile")
+if (TEST_MODE STREQUAL "compile")
   add_subdirectory(tests)
 endif()
 
