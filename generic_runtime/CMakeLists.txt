@@ -8,5 +8,9 @@ file(GLOB_RECURSE C_SOURCES
   "*.c"
 )
 
+target_include_directories(runtime_host
+  PRIVATE ${PROJECT_SOURCE_DIR}/hal/inc
+)
+
 target_sources(runtime_host PRIVATE ${C_SOURCES})
 add_dependencies(runtime_host picolibc)
