@@ -46,7 +46,7 @@ string(REGEX MATCH "[0-9]+$" LLVM_VERSION_MINOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
 
 if (LLVM_VERSION_MAJOR LESS 16)
-    message(STATUS "Disable linker relaxation for LLVM < 15")
+    message(STATUS "Disable linker relaxation for LLVM < 16")
     set(CMAKE_ALT_C_OPTIONS "-mno-relax")
     set(CMAKE_ALT_LINK_OPTIONS "-Wl,--no-relax")
     # WIESEP: Disable linker relaxation for LLVM 12
