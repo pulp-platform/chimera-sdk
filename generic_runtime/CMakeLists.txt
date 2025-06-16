@@ -10,14 +10,14 @@ target_include_directories(runtime_host
     ${PROJECT_SOURCE_DIR}/generic_runtime/inc
 )
 
-if(VALID_SIMULATION_BACKEND STREQUAL "RTL")
+if(SIMULATION_BACKEND STREQUAL "RTL")
   message(STATUS "Using RTL UART backend")
   target_sources(runtime_host PRIVATE
   src/putc_rtl.c
   src/uart_init_rtl.c
   src/uart_deinit_rtl.c
   )
-elseif(VALID_SIMULATION_BACKEND STREQUAL "GVSoC")
+elseif(SIMULATION_BACKEND STREQUAL "GVSoC")
   message(STATUS "Using GVSOC UART backend")
   target_sources(runtime_host PRIVATE 
   src/putc_gvsoc.c
