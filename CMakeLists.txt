@@ -51,6 +51,12 @@ project(chimera-sdk LANGUAGES C ASM)
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
+set(VALID_SIMULATION_BACKEND "RTL" "GVSoC")
+set(SIMULATION_BACKEND "GVSoC" CACHE STRING "Toogle the simulation backend")
+
+set(error_messages "")
+
+
 ################################################################################
 # Add subdirectories                                                           #
 ################################################################################
@@ -76,27 +82,23 @@ add_subdirectory(generic_runtime)
 
 # JUNGVI: "simulation" compiles and run the test, "compile" just compiles the tests, and none does neither.
 set(VALID_TEST_MODES "simulation" "compile" "none")
-set(VALID_SIMULATION_BACKEND "RTL" "GVSoC")
-
-# Config Variables Default Values
-set(TEST_MODE "compile" CACHE STRING "Set what validation target the tests should be run on")
-set(SIMULATION_BACKEND "GVSoC" CACHE STRING "Toogle the simulation backend")
-
-set(error_messages "")
-
-if(NOT TEST_MODE IN_LIST VALID_TEST_MODES)
-  list(APPEND error_messages "[CHIMERA-SDK] Invalid TEST_MODE: ${TEST_MODE}")
-  list(APPEND error_messages "[CHIMERA-SDK] Available options for TEST_MODE are:")
-  foreach(mode IN LISTS VALID_TEST_MODES)
-    list(APPEND error_messages " - ${mode}")
-  endforeach()
-endif()
 
 if(NOT SIMULATION_BACKEND IN_LIST VALID_SIMULATION_BACKEND)
   list(APPEND error_messages "[CHIMERA-SDK] Invalid SIMULATION_BACKEND: ${SIMULATION_BACKEND}")
   list(APPEND error_messages "[CHIMERA-SDK] Available options for SIMULATION_BACKEND are:")
   foreach(mode IN LISTS VALID_SIMULATION_BACKEND)
       list(APPEND error_messages " - ${mode}")
+  endforeach()
+endif()
+
+# Config Variables Default Values
+set(TEST_MODE "compile" CACHE STRING "Set what validation target the tests should be run on")
+
+if(NOT TEST_MODE IN_LIST VALID_TEST_MODES)
+  list(APPEND error_messages "[CHIMERA-SDK] Invalid TEST_MODE: ${TEST_MODE}")
+  list(APPEND error_messages "[CHIMERA-SDK] Available options for TEST_MODE are:")
+  foreach(mode IN LISTS VALID_TEST_MODES)
+    list(APPEND error_messages " - ${mode}")
   endforeach()
 endif()
 
