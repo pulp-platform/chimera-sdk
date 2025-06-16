@@ -33,7 +33,7 @@ help:
 
 format:
 	@echo "Formatting code..."
-	@python scripts/run_clang_format.py -ir tests/ hal/ targets/ drivers/ devices/ --clang-format-executable=$(CLANG_FORMAT_EXECUTABLE)
+	@python scripts/run_clang_format.py -ir tests/ hal/ targets/ drivers/ devices/ generic_runtime/ --clang-format-executable=$(CLANG_FORMAT_EXECUTABLE)
 	@yapf -rip -e "install/" -e "toolchain/" .
 
 export-symbols:
