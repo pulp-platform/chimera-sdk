@@ -15,11 +15,8 @@
 //     return c;
 // }
 
-static FILE __stdio = FDEV_SETUP_STREAM(uart_putc,
-                        NULL,
-                        NULL,
-                        _FDEV_SETUP_WRITE);
+static FILE __stdio = FDEV_SETUP_STREAM(uart_putc, NULL, NULL, _FDEV_SETUP_WRITE);
 
-FILE *const stdin  = &__stdio;
+FILE *const stdin = &__stdio;
 FILE *const stdout = &__stdio;
 FILE *const stderr = &__stdio;

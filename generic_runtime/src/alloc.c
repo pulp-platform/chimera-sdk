@@ -11,14 +11,15 @@
 #define ALIGNMENT 4
 #define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
 
-// JUNGVI: We should probably only put the allocator logic here and then instanciate allocators in the specific platform
+// JUNGVI: We should probably only put the allocator logic here and then instanciate allocators in
+// the specific platform
 
 // JUNGVI: The source of truth of this macros should be target specific
 #define MEM_ISLAND_START 0x48000000
-#define MEM_ISLAND_SIZE  (64 * 1024) // In bytes
+#define MEM_ISLAND_SIZE (64 * 1024) // In bytes
 
-static uint8_t *memory_island_end  = (uint8_t *)(MEM_ISLAND_START + MEM_ISLAND_SIZE);
-static uint8_t *memory_island_ptr  = (uint8_t *)MEM_ISLAND_START;
+static uint8_t *memory_island_end = (uint8_t *)(MEM_ISLAND_START + MEM_ISLAND_SIZE);
+static uint8_t *memory_island_ptr = (uint8_t *)MEM_ISLAND_START;
 
 typedef struct MemoryBlock {
     struct MemoryBlock *next;
@@ -42,8 +43,7 @@ static void *region_malloc(uint8_t **ptr, uint8_t *end, MemoryBlock **freelist, 
         curr = curr->next;
     }
 
-    if (*ptr + total_size > end)
-        return NULL;
+    if (*ptr + total_size > end) return NULL;
 
     MemoryBlock *b = (MemoryBlock *)(*ptr);
     b->size = size;

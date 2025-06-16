@@ -6,4 +6,5 @@
 
 #include "uart_setup.h"
 
-void _uart_deinit(void){ }
+void _uart_deinit(void) {
+}

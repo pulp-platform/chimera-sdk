@@ -11,6 +11,6 @@
 #include "params.h"
 #include "regs/cheshire.h"
 
-void _uart_deinit(void){
+void _uart_deinit(void) {
     uart_close(&uart_iface);
 }
