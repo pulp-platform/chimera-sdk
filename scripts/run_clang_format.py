@@ -124,12 +124,14 @@ def make_diff(file, original, reformatted):
 
 
 class DiffError(Exception):
+
     def __init__(self, message, errs=None):
         super(DiffError, self).__init__(message)
         self.errs = errs or []
 
 
 class UnexpectedError(Exception):
+
     def __init__(self, message, exc=None):
         super(UnexpectedError, self).__init__(message)
         self.formatted_traceback = traceback.format_exc()
@@ -225,6 +227,7 @@ def bold_red(s):
 
 
 def colorize(diff_lines):
+
     def bold(s):
         return '\x1b[1m' + s + '\x1b[0m'
 
