@@ -12,20 +12,20 @@ int main(void) {
 
     int8_t ret = 0;
 
-    int8_t *bufferA = (int8_t *) memory_island_malloc(42);
-    int8_t *bufferB = (int8_t *) memory_island_malloc(58);
+    int8_t *bufferA = (int8_t *)memory_island_malloc(42);
+    int8_t *bufferB = (int8_t *)memory_island_malloc(58);
     memory_island_free(bufferA);
-    int8_t *bufferC = (int8_t *) memory_island_malloc(21);
+    int8_t *bufferC = (int8_t *)memory_island_malloc(21);
 
     // JUNGVI: Debug prints
     // printf("A: %p\n", bufferA);
     // printf("B: %p\n", bufferB);
     // printf("C: %p\n", bufferC);
 
-    if(bufferA != (int8_t *)0x48000008) ret = -1;
-    if(bufferB != (int8_t *)0x4800003c) ret = -1;
-    
-    if(bufferA != bufferC) ret = -1;
+    if (bufferA != (int8_t *)0x48000008) ret = -1;
+    if (bufferB != (int8_t *)0x4800003c) ret = -1;
+
+    if (bufferA != bufferC) ret = -1;
 
     return ret;
 }

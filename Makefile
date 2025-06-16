@@ -34,7 +34,7 @@ help:
 format:
 	@echo "Formatting code..."
 	@python scripts/run_clang_format.py -ir tests/ hal/ targets/ drivers/ devices/ --clang-format-executable=$(CLANG_FORMAT_EXECUTABLE)
-	@python -m yapf -rip .
+	@yapf -rip -e "install/" -e "toolchain/" .
 
 export-symbols:
 	@echo "Please export the following symbols:"
