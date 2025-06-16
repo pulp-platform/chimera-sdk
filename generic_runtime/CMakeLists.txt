@@ -10,23 +10,20 @@ target_include_directories(runtime_host
     ${PROJECT_SOURCE_DIR}/generic_runtime/inc
 )
 
-
-option(RTL_SIM "Enable RTL simulation backend" OFF)
-
-if(RTL_SIM)
-message(STATUS "Using RTL UART backend")
-target_sources(runtime_host PRIVATE
-src/putc_rtl.c
-src/uart_init_rtl.c
-src/uart_deinit_rtl.c
-)
-else()
-message(STATUS "Using GVSOC UART backend")
-target_sources(runtime_host PRIVATE 
-src/putc_gvsoc.c
-src/uart_init_gvsoc.c 
-src/uart_deinit_gvsoc.c
-)
+if(VALID_SIMULATION_BACKEND STREQUAL "RTL")
+  message(STATUS "Using RTL UART backend")
+  target_sources(runtime_host PRIVATE
+  src/putc_rtl.c
+  src/uart_init_rtl.c
+  src/uart_deinit_rtl.c
+  )
+elseif(VALID_SIMULATION_BACKEND STREQUAL "GVSoC")
+  message(STATUS "Using GVSOC UART backend")
+  target_sources(runtime_host PRIVATE 
+  src/putc_gvsoc.c
+  src/uart_init_gvsoc.c 
+  src/uart_deinit_gvsoc.c
+  )
 endif()
 
 target_sources(runtime_host PRIVATE 

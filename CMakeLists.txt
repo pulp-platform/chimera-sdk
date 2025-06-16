@@ -76,24 +76,32 @@ add_subdirectory(generic_runtime)
 
 # JUNGVI: "simulation" compiles and run the test, "compile" just compiles the tests, and none does neither.
 set(VALID_TEST_MODES "simulation" "compile" "none")
+set(VALID_SIMULATION_BACKEND "RTL" "GVSoC")
 
-# Option for TEST_MODE with default value
+# Config Variables Default Values
 set(TEST_MODE "compile" CACHE STRING "Set what validation target the tests should be run on")
+set(SIMULATION_BACKEND "GVSoC" CACHE STRING "Toogle the simulation backend")
 
-# Check if TEST_MODE is set to a valid option
+set(error_messages "")
+
 if(NOT TEST_MODE IN_LIST VALID_TEST_MODES)
-  # Collect all error messages into a single string
-  set(error_messages "")
   list(APPEND error_messages "[CHIMERA-SDK] Invalid TEST_MODE: ${TEST_MODE}")
   list(APPEND error_messages "[CHIMERA-SDK] Available options for TEST_MODE are:")
   foreach(mode IN LISTS VALID_TEST_MODES)
     list(APPEND error_messages " - ${mode}")
   endforeach()
+endif()
 
-  # Convert the list of messages into a single multi-line string
+if(NOT SIMULATION_BACKEND IN_LIST VALID_SIMULATION_BACKEND)
+  list(APPEND error_messages "[CHIMERA-SDK] Invalid SIMULATION_BACKEND: ${SIMULATION_BACKEND}")
+  list(APPEND error_messages "[CHIMERA-SDK] Available options for SIMULATION_BACKEND are:")
+  foreach(mode IN LISTS VALID_SIMULATION_BACKEND)
+      list(APPEND error_messages " - ${mode}")
+  endforeach()
+endif()
+
+if(error_messages)
   list(JOIN error_messages "\n" error_message)
-
-  # Raise fatal error with all messages
   message(FATAL_ERROR "${error_message}")
 endif()
 
