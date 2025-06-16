@@ -52,7 +52,7 @@ jobs:
           AllowShortLoopsOnASingleLine: true
           }
 
-  ling-py:
+  lint-py:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
