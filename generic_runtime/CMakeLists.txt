@@ -11,7 +11,7 @@ target_include_directories(runtime_host
 )
 
 
-option(RTL_SIM "Enable RTL simulation backend" ON)
+option(RTL_SIM "Enable RTL simulation backend" OFF)
 
 if(RTL_SIM)
 message(STATUS "Using RTL UART backend")
