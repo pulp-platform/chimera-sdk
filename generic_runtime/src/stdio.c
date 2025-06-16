@@ -7,14 +7,13 @@
 #include <stdio.h>
 
 #include "uart.h"
+#include "uart_setup.h"
 
-chi_interface_t uart_iface;
-
-static int uart_putc(char c, FILE *file){
-        (void) file;
-        uart_write(&uart_iface, &c, 1, NULL);
-        return c;
-    }
+// char uart_putc(char c, FILE *file){
+//     (void) file;
+//     *(volatile uint32_t *)(long)(0x03004000) = c;
+//     return c;
+// }
 
 static FILE __stdio = FDEV_SETUP_STREAM(uart_putc,
                         NULL,

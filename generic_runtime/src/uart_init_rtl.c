@@ -5,6 +5,7 @@
 // Victor Jung <jungvi@iis.ee.ethz.ch>
 
 #include "uart.h"
+#include "uart_setup.h"
 
 #include "util.h"
 #include "params.h"

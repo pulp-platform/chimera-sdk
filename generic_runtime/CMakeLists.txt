@@ -4,13 +4,34 @@
 #
 # Victor Jung <jungvi@iis.ee.ethz.ch>
 
-file(GLOB_RECURSE C_SOURCES
-  "*.c"
-)
-
 target_include_directories(runtime_host
-  PRIVATE ${PROJECT_SOURCE_DIR}/hal/inc
+  PRIVATE 
+    ${PROJECT_SOURCE_DIR}/hal/inc
+    ${PROJECT_SOURCE_DIR}/generic_runtime/inc
 )
 
-target_sources(runtime_host PRIVATE ${C_SOURCES})
+
+option(RTL_SIM "Enable RTL simulation backend" ON)
+
+if(RTL_SIM)
+message(STATUS "Using RTL UART backend")
+target_sources(runtime_host PRIVATE
+src/putc_rtl.c
+src/uart_init_rtl.c
+src/uart_deinit_rtl.c
+)
+else()
+message(STATUS "Using GVSOC UART backend")
+target_sources(runtime_host PRIVATE 
+src/putc_gvsoc.c
+src/uart_init_gvsoc.c 
+src/uart_deinit_gvsoc.c
+)
+endif()
+
+target_sources(runtime_host PRIVATE 
+  src/alloc.c
+  src/stdio.c
+)
+
 add_dependencies(runtime_host picolibc)

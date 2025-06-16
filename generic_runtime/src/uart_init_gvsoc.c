@@ -4,12 +4,6 @@
 //
 // Victor Jung <jungvi@iis.ee.ethz.ch>
 
-#include "uart.h"
+#include "uart_setup.h"
 
-#include "util.h"
-#include "params.h"
-#include "regs/cheshire.h"
-
-void _uart_deinit(void){
-    uart_close(&uart_iface);
-}
+void _uart_init(void){ }
