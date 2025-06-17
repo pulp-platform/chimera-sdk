@@ -18,11 +18,11 @@
 #define MEM_ISLAND_START 0x48000000
 #define MEM_ISLAND_SIZE (64 * 1024) // In bytes
 
-extern void * __heap_start;
-extern void * __heap_end;
+extern void *__heap_start;
+extern void *__heap_end;
 
-static uint8_t *memory_island_heap_end = (uint8_t *) &__heap_end;
-static uint8_t *memory_island_heap_start = (uint8_t *) &__heap_start;
+static uint8_t *memory_island_heap_end = (uint8_t *)&__heap_end;
+static uint8_t *memory_island_heap_start = (uint8_t *)&__heap_start;
 
 typedef struct MemoryBlock {
     struct MemoryBlock *next;
@@ -63,7 +63,8 @@ static void region_free(MemoryBlock **freelist, void *ptr) {
 }
 
 void *memory_island_malloc(size_t size) {
-    return region_malloc(&memory_island_heap_start, memory_island_heap_end, &memory_island_freelist, size);
+    return region_malloc(&memory_island_heap_start, memory_island_heap_end, &memory_island_freelist,
+                         size);
 }
 
 void memory_island_free(void *ptr) {
