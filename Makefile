@@ -42,12 +42,12 @@ export-symbols:
 
 gvsoc:
 	mkdir -p ${GVSOC_INSTALL_DIR} && cd ${GVSOC_INSTALL_DIR} && \
-	git clone git@github.com:gvsoc/gvsoc.git && \
+	git clone https://github.com/gvsoc/gvsoc.git && \
 	cd ${GVSOC_INSTALL_DIR}/gvsoc && git checkout ${GVSOC_COMMIT_HASH} && \
 	git submodule update --init --recursive && \
 	pip install -r core/requirements.txt && \
 	pip install -r gapy/requirements.txt && \
-	CXX=g++-11.2.0 CC=gcc-11.2.0 CMAKE=cmake-3.18.1 make all TARGETS=chimera
+	make all TARGETS=chimera
 
 
 ${TOOLCHAIN_DIR}/llvm-project:
