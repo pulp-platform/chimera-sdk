@@ -19,7 +19,7 @@ target_sources(uart_lib
 
 target_include_directories(uart_lib
   PUBLIC
-    ${CMAKE_SOURCE_DIR}/hal/inc
+    ${PROJECT_SOURCE_DIR}/hal/inc
     "inc/"
 )
 

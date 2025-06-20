@@ -51,6 +51,12 @@ project(chimera-sdk LANGUAGES C ASM)
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
 
+set(VALID_SIMULATION_BACKEND "RTL" "GVSoC")
+set(SIMULATION_BACKEND "GVSoC" CACHE STRING "Toogle the simulation backend")
+
+set(error_messages "")
+
+
 ################################################################################
 # Add subdirectories                                                           #
 ################################################################################
@@ -68,35 +74,45 @@ include(${CMAKE_CURRENT_LIST_DIR}/cmake/picolibc.cmake)
 add_subdirectory(hal)
 add_subdirectory(devices)
 add_subdirectory(drivers)
+add_subdirectory(generic_runtime)
 
 ################################################################################
 # Testing                                                                      #
 ################################################################################
 
-set(VALID_TEST_MODES "simulation" "none")
+# JUNGVI: "simulation" compiles and run the test, "compile" just compiles the tests, and none does neither.
+set(VALID_TEST_MODES "simulation" "compile" "none")
 
-# Option for TEST_MODE with default value
-set(TEST_MODE "none" CACHE STRING "Set what validation target the tests should be run on")
+if(NOT SIMULATION_BACKEND IN_LIST VALID_SIMULATION_BACKEND)
+  list(APPEND error_messages "[CHIMERA-SDK] Invalid SIMULATION_BACKEND: ${SIMULATION_BACKEND}")
+  list(APPEND error_messages "[CHIMERA-SDK] Available options for SIMULATION_BACKEND are:")
+  foreach(mode IN LISTS VALID_SIMULATION_BACKEND)
+      list(APPEND error_messages " - ${mode}")
+  endforeach()
+endif()
 
-# Check if TEST_MODE is set to a valid option
+# Config Variables Default Values
+set(TEST_MODE "compile" CACHE STRING "Set what validation target the tests should be run on")
+
 if(NOT TEST_MODE IN_LIST VALID_TEST_MODES)
-  # Collect all error messages into a single string
-  set(error_messages "")
   list(APPEND error_messages "[CHIMERA-SDK] Invalid TEST_MODE: ${TEST_MODE}")
   list(APPEND error_messages "[CHIMERA-SDK] Available options for TEST_MODE are:")
   foreach(mode IN LISTS VALID_TEST_MODES)
     list(APPEND error_messages " - ${mode}")
   endforeach()
+endif()
 
-  # Convert the list of messages into a single multi-line string
+if(error_messages)
   list(JOIN error_messages "\n" error_message)
-
-  # Raise fatal error with all messages
   message(FATAL_ERROR "${error_message}")
 endif()
 
 set(SOC_MODEL_BINARY "chim.bin" CACHE STRING "Path to the simulation binary")
 set(PRELOAD_MODE "0" CACHE STRING "Preload mode for simulation")
+
+if (TEST_MODE STREQUAL "compile")
+  add_subdirectory(tests)
+endif()
 
 if (TEST_MODE STREQUAL "simulation")
   enable_testing()
@@ -114,6 +130,4 @@ if (TEST_MODE STREQUAL "simulation")
 
   message(STATUS "[CHIMERA-SDK] SoC Model Binary      : ${SOC_MODEL_BINARY}")
   message(STATUS "[CHIMERA-SDK] Preload Mode          : ${PRELOAD_MODE}")
-endif()
-
-add_subdirectory(tests)
+  endif()

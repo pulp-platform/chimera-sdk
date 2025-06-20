@@ -19,8 +19,8 @@ target_sources(clint_lib
 
 target_include_directories(clint_lib
   PUBLIC
-    ${CMAKE_SOURCE_DIR}/hal/inc
-    ${CMAKE_SOURCE_DIR}/targets/${TARGET_PLATFORM}/inc
+    ${PROJECT_SOURCE_DIR}/hal/inc
+    ${PROJECT_SOURCE_DIR}/targets/${TARGET_PLATFORM}/inc
     "inc/"
 )
 

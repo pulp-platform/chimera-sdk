@@ -13,7 +13,7 @@ file(GLOB_RECURSE C_SOURCES
 )
 
 target_include_directories(runtime_host
-  PRIVATE ${CMAKE_SOURCE_DIR}/hal/inc
+  PRIVATE ${PROJECT_SOURCE_DIR}/hal/inc
 )
 
 target_sources(runtime_host PRIVATE ${C_SOURCES})

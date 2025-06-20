@@ -41,6 +41,7 @@ target_compile_options(runtime_host
 
 target_compile_options(runtime_host
   PUBLIC
+  --target=riscv32-unknown-elf
   -march=${ISA_HOST}
   -mabi=${ABI}
 )
@@ -50,6 +51,7 @@ target_link_options(runtime_host
   PUBLIC
   -L${CMAKE_CURRENT_LIST_DIR}
   -Tlink.ld
+  --target=riscv32-unknown-elf
   -march=${ISA_HOST}
   -mabi=${ABI}
   -nostartfiles
@@ -75,6 +77,7 @@ target_compile_options(runtime_cluster_snitch
 
 target_compile_options(runtime_cluster_snitch
   PUBLIC
+  --target=riscv32-unknown-elf
   -march=${ISA_CLUSTER_SNITCH}
   -mabi=${ABI}
 )
@@ -82,6 +85,7 @@ target_compile_options(runtime_cluster_snitch
 # WIESEP: Expose common link option
 target_link_options(runtime_cluster_snitch
   PUBLIC
+  --target=riscv32-unknown-elf
   -march=${ISA_CLUSTER_SNITCH}
   -mabi=${ABI}
   -nostartfiles

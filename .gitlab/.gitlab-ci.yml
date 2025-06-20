@@ -6,12 +6,8 @@
 
 variables:
   CMAKE: 'riscv /usr/sepp/bin/cmake-3.28.3'
-  LLVM_INSTALL_PATH: '/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0'
+  LLVM_INSTALL_PATH: '/usr/scratch/normandie/jungvi/llvm'
   GVSOC_HOME: '/scratch/jungvi/chimera-sdk/install/gvsoc'
-
-stages: # List of stages for jobs with their order of execution
-  - build
-  - test
 
 .setup:
   script:
@@ -21,7 +17,6 @@ stages: # List of stages for jobs with their order of execution
     - rm -rf build
 
 build_sdk:
-  stage: build
   parallel:
     matrix:
       - TARGET: [chimera-open, chimera-host, chimera-convolve]
@@ -31,7 +26,6 @@ build_sdk:
     - $CMAKE --build build -j
 
 test:
-  stage: test
   parallel:
     matrix:
       - TARGET: [chimera-open]

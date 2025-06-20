@@ -143,7 +143,7 @@ set(OPENTITAN_SPARSE_PATTERNS
 # ------------------------------------------------------------------------------
 # Call the OpenTitan driver setup
 # ------------------------------------------------------------------------------
-include(${CMAKE_SOURCE_DIR}/cmake/opentitan.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/opentitan.cmake)
 
 # ------------------------------------------------------------------------------
 # Prepare for header generation using the OT tools
@@ -202,6 +202,6 @@ target_include_directories(
   ${OPENTITAN_TOP_DIR}
   ${OPENTITAN_SW_DIR}/device/lib/dif/autogen
   ${OPENTITAN_DIR}
-  ${CMAKE_SOURCE_DIR}/hal/inc
-  ${CMAKE_SOURCE_DIR}/drivers/uart_opentitan/inc
+  ${PROJECT_SOURCE_DIR}/hal/inc
+  ${PROJECT_SOURCE_DIR}/drivers/uart_opentitan/inc
 )

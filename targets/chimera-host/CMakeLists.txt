@@ -41,6 +41,7 @@ target_compile_options(runtime_host
 
 target_compile_options(runtime_host
   PUBLIC
+  --target=riscv32-unknown-elf
   -march=${ISA_HOST}
   -mabi=${ABI}
 )
@@ -50,6 +51,7 @@ target_link_options(runtime_host
   PUBLIC
   -L${CMAKE_CURRENT_LIST_DIR}
   -Tlink.ld
+  --target=riscv32-unknown-elf
   -march=${ISA_HOST}
   -mabi=${ABI}
   -nostartfiles
