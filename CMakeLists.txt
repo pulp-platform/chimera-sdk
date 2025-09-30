@@ -71,10 +71,8 @@ add_subdirectory(targets)
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/picolibc.cmake)
 
 # Include other subdirectories
-add_subdirectory(hal)
 add_subdirectory(devices)
-add_subdirectory(drivers)
-add_subdirectory(generic_runtime)
+add_subdirectory(host)
 
 ################################################################################
 # Testing                                                                      #

@@ -32,6 +32,7 @@ target_sources(runtime_host
 target_include_directories(runtime_host
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/inc
+  ${PROJECT_SOURCE_DIR}/host/hal/inc
 )
 
 target_compile_options(runtime_host

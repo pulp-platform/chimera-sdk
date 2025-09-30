@@ -2,7 +2,7 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
-# Authors: 
+# Authors:
 # - Philip Wiese <wiesep@iis.ee.ethz.ch>
 # - Victor Jung <jungvi@iis.ee.ethz.ch>
 
@@ -33,7 +33,7 @@ help:
 
 format:
 	@echo "Formatting code..."
-	@python scripts/run_clang_format.py -ir tests/ hal/ targets/ drivers/ devices/ generic_runtime/ --clang-format-executable=$(CLANG_FORMAT_EXECUTABLE)
+	@python scripts/run_clang_format.py -ir tests/ devices/ host/ --clang-format-executable=$(CLANG_FORMAT_EXECUTABLE)
 	@yapf -rip -e "install/" -e "toolchain/" .
 
 export-symbols:

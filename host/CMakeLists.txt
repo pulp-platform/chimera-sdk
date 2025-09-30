@@ -4,9 +4,11 @@
 #
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-# Add test for host core
-# add_subdirectory(host)
+add_subdirectory(hal)
+add_subdirectory(drivers)
+add_subdirectory(runtime)
 
-# Add test for snitchCluster
-# add_subdirectory(snitchCluster)
-
+target_link_libraries(runtime_host
+  PUBLIC
+    picolibc
+)

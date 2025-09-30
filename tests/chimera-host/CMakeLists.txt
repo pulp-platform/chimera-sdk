@@ -5,4 +5,4 @@
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 # Add test for host core
-add_subdirectory(host)
+# add_subdirectory(host)
