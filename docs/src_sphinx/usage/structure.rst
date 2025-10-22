@@ -9,28 +9,31 @@ The SDK is organized into the following main folders:
     ├─ cmake                                # CMake configuration and utility files
     ├─ devices                              # Device-specific code with potential external dependencies such as runtime libraries
     │ ├─ snitch_cluster
+    │ │ ├─ runtime                          # Runtime library for the Snitch cluster
+    │ │ ├─ third_party                      # External dependencies such as snitch-sdk
     │ │ ├─ trampoline_snitchCluster.c       # Trampoline code to offload functions to the cluster
     │ │ └─ snitch_runtime (external repo)   # External runtime library for the Snitch cluster
     │ └─ <more devices>
-    ├─ drivers                              # Host drivers for peripherals and clusters
-    │ ├─ cluster
-    │ ├─ uart_<version>                     # UART driver for a specific version of the UART
-    │ └─ <more drivers>
-    ├─ hal                                  # Hardware Abstraction Layer (HAL)
+    ├─ host                                 # Host code with drivers, HAL, runtime and external dependencies
+    │ ├─ drivers                            # Drivers for peripherals and devices such as clusters and accelerators
+    │ │ ├─ cluster
+    │ │ ├─ uart_abb
+    │ │ └─ <more drivers>
+    │ ├─ hal                                # Hardware Abstraction Layer (HAL)
+    │ ├─ runtime                            # Runtime library for the host
+    │ ├─ third_party                        # External dependencies such as opentitan drivers
     ├─ scripts                              # Utility scripts
     ├─ targets                              # Target definitions such as memory map, register definitions and build configurations
     │ ├─ chimera-open
     │ └─ <more targets>
     ├─ tests                                # Test applications for each target
-    | ├─ chimera-open    
+    | ├─ chimera-open
     | └─ <more targets>
     └─ CMakelists.txt                       # Top level CMakeLists.txt
 
 .. note::
-    The UART driver version is determined by the ``DRIVER_MAPPINGS`` variable 
-    in the build system. This allows switching between different UART driver 
-    implementations at compile time.
-
+    The drivers are selected by the ``DRIVER_MAPPINGS`` variable
+    in the build system. This allows to easily include or exclude drivers as needed.
 
 Tests
 -----
@@ -41,7 +44,7 @@ Each target has a corresponding folder in the ```tests``` directory. The tests a
     tests
     ├─ chimera-open                   # Test applications for the chimera-open target
     | ├─ <category>                   # Test categories (what part of the system is tested, e.g host, snitchCluster)
-    | │ ├─ test_1               
+    | │ ├─ test_1
     | │ │ ├─ host                     # Host code
     | │ │ └─ snitchCluster            # Snitch sluster code
     | │ └─ <more tests>

@@ -11,11 +11,3 @@ and dispatch.
     :protected-members:
     :project: chimera_hal
 
-CLINT (HAL)
-===========
-
-.. doxygengroup:: hal_clint
-    :content-only:
-    :members:
-    :protected-members:
-    :project: chimera_hal

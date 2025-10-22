@@ -48,8 +48,9 @@ html_static_path = ['static']
 # https://breathe.readthedocs.io/en/latest/
 
 breathe_projects = {
-    "chimera_ll": "../_build_doxygen_ll/xml",
-    "chimera_hal": "../_build_doxygen_hal/xml",
+    "chimera_ll": "../_build_doxygen_host_ll/xml",
+    "chimera_hal": "../_build_doxygen_host_hal/xml",
+    "chimera_devices": "../_build_doxygen_devices/xml",
 }
 
 breathe_default_project = "chimera_ll"
