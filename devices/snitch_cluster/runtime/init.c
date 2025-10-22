@@ -17,7 +17,7 @@ void snrt_init() {
     extern volatile uint32_t __cbss_start, __cbss_end, __cdata_start, __cdata_end;
     extern volatile uint32_t __cdata_lma_start, __cdata_lma_end;
     extern char __l1_c4_start, __l1_c4_end;
-    extern uint32_t _edram;
+    extern uint32_t __l3_heap_start, __l3_heap_end;
 
     /********** Cluster Memory Initialization **********/
     if (snrt_is_dm_core()) {
@@ -59,8 +59,8 @@ void snrt_init() {
         snrt_l1_allocator()->end = snrt_l1_end_addr();
         snrt_l1_allocator()->next = snrt_l1_allocator()->base;
 
-        snrt_l3_allocator()->base = ALIGN_UP((uint32_t)&_edram, MIN_CHUNK_SIZE);
-        snrt_l3_allocator()->end = snrt_l3_allocator()->base;
+        snrt_l3_allocator()->base = ALIGN_UP((uint32_t)&__l3_heap_start, MIN_CHUNK_SIZE);
+        snrt_l3_allocator()->end = (uint32_t)&__l3_heap_end;
         snrt_l3_allocator()->next = snrt_l3_allocator()->base;
 
         // Initialize the printf mutex

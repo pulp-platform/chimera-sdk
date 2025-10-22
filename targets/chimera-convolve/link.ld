@@ -83,15 +83,14 @@ SECTIONS {
     __cbss_end = .;
   } > l1_c4 AT > memisl
 
-
-  .heap : ALIGN(16) {
-    __heap_start = .;
-    __heap_end = ORIGIN(memisl) + LENGTH(memisl);
-  } > memisl
-
   .bulk : ALIGN(16) {
     *(.bulk)
     *(.bulk.*)
+  } > memisl
+
+  .l2_heap : ALIGN(16) {
+    __l2_heap_start = .;
+    __l2_heap_end = ORIGIN(memisl) + LENGTH(memisl);
   } > memisl
 
   .l1 (NOLOAD) : ALIGN(16) {
@@ -130,7 +129,13 @@ SECTIONS {
 
   .dram :
   {
+    __dram_start = .;
     *(.dram)
-    _edram = .;
+    __dram_end = .;
+  } > dram
+
+  .l3_heap : ALIGN(16) {
+    __l3_heap_start = .;
+    __l3_heap_end = ORIGIN(dram) + LENGTH(dram);
   } > dram
 }

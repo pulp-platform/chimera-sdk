@@ -20,11 +20,11 @@
  * @{
  */
 
-extern void *__heap_start;
-extern void *__heap_end;
+extern void *__l2_heap_start;
+extern void *__l2_heap_end;
 
-static uint8_t *memory_island_heap_end = (uint8_t *)&__heap_end;
-static uint8_t *memory_island_heap_start = (uint8_t *)&__heap_start;
+static uint8_t *memory_island_heap_end = (uint8_t *)&__l2_heap_end;
+static uint8_t *memory_island_heap_start = (uint8_t *)&__l2_heap_start;
 
 static MemoryBlock *memory_island_freelist = NULL;
 
