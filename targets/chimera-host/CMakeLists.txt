@@ -6,11 +6,17 @@
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-
 ################################################################################
 # Host Runtime Library                                                         #
 ################################################################################
 add_library(runtime_host STATIC)
+
+target_link_directories(runtime_host PUBLIC
+  ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib/baremetal/${COMPILERRT_HOST}
+)
+
+# WIESEP: Make sure picolibc exists before building the host runtime for the header files
+add_dependencies(runtime_host picolibc)
 
 file(GLOB_RECURSE ASM_SOURCES
   "src/crt0.S"
@@ -32,6 +38,7 @@ target_sources(runtime_host
 target_include_directories(runtime_host
   PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}/inc
+  ${CMAKE_CURRENT_LIST_DIR}/inc/regs
   ${PROJECT_SOURCE_DIR}/host/hal/inc
 )
 
@@ -40,11 +47,13 @@ target_compile_options(runtime_host
   -O2
 )
 
+target_compile_definitions(runtime_host PUBLIC TARGET_PLATFORM_CHIMERA_HOST)
+
 target_compile_options(runtime_host
   PUBLIC
   --target=riscv32-unknown-elf
   -march=${ISA_HOST}
-  -mabi=${ABI}
+  -mabi=${ABI_HOST}
 )
 
 # WIESEP: Export the target specific linkerscript
@@ -53,8 +62,7 @@ target_link_options(runtime_host
   -L${CMAKE_CURRENT_LIST_DIR}
   -Tlink.ld
   --target=riscv32-unknown-elf
-  -march=${ISA_HOST}
-  -mabi=${ABI}
+  -mabi=${ABI_HOST}
   -nostartfiles
   -ffreestanding
 )

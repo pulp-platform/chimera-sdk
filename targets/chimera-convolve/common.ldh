@@ -11,11 +11,15 @@
 ENTRY(_start)
 
 MEMORY {
+  l1 (rwx)      : ORIGIN = 0x18000000, LENGTH = 128K
+  l1_c0 (rwx)   : ORIGIN = 0x40000000, LENGTH = 128K
+  l1_c1 (rwx)   : ORIGIN = 0x40200000, LENGTH = 128K
+  l1_c2 (rwx)   : ORIGIN = 0x40400000, LENGTH = 128K
+  l1_c3 (rwx)   : ORIGIN = 0x40600000, LENGTH = 128K
+  l1_c4 (rwx)   : ORIGIN = 0x40800000, LENGTH = 128K
   bootrom (rx)  : ORIGIN = 0x02000000, LENGTH = 16K
   extrom (rx)   : ORIGIN = 0x00000000, LENGTH = 48K
-  memisl (rwx)  : ORIGIN = 0x48000000, LENGTH = 128K
-  /* SPM of Cluster 4 (ETH Cluster) */
-  l1_c4(rwx) : ORIGIN = 0x40800000, LENGTH = 128K
+  memisl (rwx)  : ORIGIN = 0x48000000, LENGTH = 256K
   /* We  assume at least 8 MiB of DRAM (minimum for Linux). */
   dram (rwx)    : ORIGIN = 0x80000000, LENGTH = 8M
 }
