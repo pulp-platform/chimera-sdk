@@ -5,10 +5,9 @@
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers
- * @{
  * \defgroup drivers_uart_apb UART APB Driver
- * @ingroup hal_interface
+ * @ingroup drivers_uart
+ * @ingroup drivers
  * @{
  * @brief APB UART driver implementation for Chimera-SDK.
  *
@@ -18,10 +17,24 @@
  *
  */
 
-#include "uart_apb.h"
-#include "util.h"
+// Include Standard Libraries
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+
+// Include Target Specific Headers
+#include "soc.h"
+
+// Include Driver Headers
+#include "uart_apb.h"
+
+// Include Runtime Headers
+#include "util.h"
+
+// Import HAL Headers
+#include "interface_api.h"
 
 /**
  * @brief Checks if data is available to read from the UART receiver.
@@ -46,19 +59,43 @@ static inline int tx_ready(uint32_t base) {
 }
 
 /**
+ * @brief Checks if the transmitter is completely empty.
+ *
+ * @param base Base address of the UART peripheral.
+ * @return 1 if the transmitter is empty, 0 otherwise.
+ */
+static inline int tx_empty(uint32_t base) {
+    uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
+    return (status & (1 << UART_LINE_STATUS_TMIT_EMPTY_BIT)) != 0;
+}
+
+/**
+ * @brief Flushes the UART transmitter, ensuring all data is sent.
+ *
+ * @param iface UART interface instance.
+ * @return 0 on success, -1 on failure.
+ */
+int uart_apb_flush(const chi_interface_t *iface) {
+    if (!iface || !iface->base) {
+        return -1;
+    }
+
+    uint32_t base = (uint32_t)iface->base;
+
+    while (!tx_empty(base));
+
+    return 0;
+}
+
+/**
  * @brief Opens and initializes the UART interface.
  *
  * @param iface UART interface instance.
  * @return 0 on success, -1 on failure.
  */
-int uart_apb_open(chi_interface_t *iface) {
+int uart_apb_open(const chi_interface_t *iface) {
     if (!iface || !iface->base) {
         return -1;
-    }
-
-    // Use default config if none provided
-    if (!iface->cfg) {
-        iface->cfg = &default_cfg;
     }
 
     uart_config_t *cfg = (uart_config_t *)iface->cfg;
@@ -93,7 +130,7 @@ int uart_apb_open(chi_interface_t *iface) {
  * @param iface UART interface instance.
  * @return 0 on success, -1 on failure.
  */
-int uart_apb_close(chi_interface_t *iface) {
+int uart_apb_close(const chi_interface_t *iface) {
     if (!iface || !iface->base) {
         return -1;
     }
@@ -118,7 +155,7 @@ int uart_apb_close(chi_interface_t *iface) {
  * @param cb Optional callback function (set to NULL if not needed).
  * @return Number of bytes read on success, -1 on failure.
  */
-ssize_t uart_apb_read(chi_interface_t *iface, void *buffer, uint32_t size,
+ssize_t uart_apb_read(const chi_interface_t *iface, void *buffer, uint32_t size,
                       chi_interface_callback_t cb) {
     if (!iface || !iface->base || !buffer || size == 0) {
         return -1;
@@ -149,7 +186,7 @@ ssize_t uart_apb_read(chi_interface_t *iface, void *buffer, uint32_t size,
  * @param cb Optional callback function (set to NULL if not needed).
  * @return Number of bytes written on success, -1 on failure.
  */
-ssize_t uart_apb_write(chi_interface_t *iface, const void *buffer, uint32_t size,
+ssize_t uart_apb_write(const chi_interface_t *iface, const void *buffer, uint32_t size,
                        chi_interface_callback_t cb) {
     if (!iface || !iface->base || !buffer || size == 0) {
         return -1;
@@ -164,6 +201,9 @@ ssize_t uart_apb_write(chi_interface_t *iface, const void *buffer, uint32_t size
         reg8_write(base, UART_THR_REG_OFFSET, src[i]);
     }
 
+    // Make sure all data is transmitted
+    while (!tx_ready(base));
+
     if (cb) {
         (void)cb(iface);
     }
@@ -173,22 +213,12 @@ ssize_t uart_apb_write(chi_interface_t *iface, const void *buffer, uint32_t size
 
 // VIVIANEP: Need to skip doxygen generation for these functions
 // to avoid duplicated defintion errors in the generated documentation
-
 /// @cond DOXYGEN_SHOULD_SKIP_THIS
-extern int uart_open(chi_interface_t *iface)
-    __attribute__((alias("uart_apb_open"), used, visibility("default")));
-extern int uart_close(chi_interface_t *iface)
-    __attribute__((alias("uart_apb_close"), used, visibility("default")));
-extern ssize_t uart_read(chi_interface_t *iface, void *buffer, uint32_t size,
-                         chi_interface_callback_t cb)
-    __attribute__((alias("uart_apb_read"), used, visibility("default")));
-extern ssize_t uart_write(chi_interface_t *iface, const void *buffer, uint32_t size,
-                          chi_interface_callback_t cb)
-    __attribute__((alias("uart_apb_write"), used, visibility("default")));
-
-chi_interface_api_t uart_api = {
-    .open = uart_apb_open, .close = uart_apb_close, .read = uart_apb_read, .write = uart_apb_write};
+const chi_interface_api_t default_uart_api = {.open = uart_apb_open,
+                                              .close = uart_apb_close,
+                                              .read = uart_apb_read,
+                                              .write = uart_apb_write,
+                                              .flush = uart_apb_flush};
 /// @endcond
 
 /** @} */ // End of drivers_uart_apb group
-/** @} */ // End of drivers group

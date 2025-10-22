@@ -5,12 +5,11 @@
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
- * \addtogroup drivers
- * @{
  * \defgroup drivers_uart_apb UART APB Driver
- * @ingroup hal_interface
- * @{
+ * @ingroup drivers_uart
+ * @ingroup drivers
  * @brief APB UART register definitions for Chimera-SDK.
+ * @{
  *
  * This file defines register offsets and fields for an APB-based UART peripheral.
  * It is used in conjunction with the UART driver to configure and interact with
@@ -23,7 +22,6 @@
 #include "uart.h"
 
 /**
- * \ingroup drivers_uart_apb
  * @name UART Register Offsets
  * @brief Defines the register offsets for the APB UART peripheral.
  * @{
@@ -42,7 +40,6 @@
 /** @} */                                // End of UART Register Offsets
 
 /**
- * \ingroup drivers_uart_apb
  * @name UART Line Status Register (LSR) Bit Definitions
  * @brief Defines the bit positions for the Line Status Register (LSR).
  * @{
@@ -57,4 +54,3 @@
 #endif // UART_APB_H
 
 /** @} */ // End of drivers_uart_apb group
-/** @} */ // End of drivers group

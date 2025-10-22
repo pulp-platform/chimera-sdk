@@ -17,9 +17,7 @@ target_include_directories(hal_host
 )
 
 target_link_libraries(hal_host
-  PRIVATE
-    "$<LINK_LIBRARY:WHOLE_ARCHIVE,uart_lib>"
-    "$<LINK_LIBRARY:WHOLE_ARCHIVE,clint_lib>"
   PUBLIC
-    picolibc
+  picolibc_host
 )
+

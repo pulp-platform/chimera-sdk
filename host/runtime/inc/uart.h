@@ -4,21 +4,27 @@
 //
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-#ifndef UART_H
-#define UART_H
+#pragma once
 
+#ifdef CHIMERA_DRIVER_UART
+
+// Include Standard Libraries
 #include <stdint.h>
 #include <stdbool.h>
-#include <sys/types.h> // for ssize_t
+#include <stdio.h>
+
+// Include Target Specific Headers
+
+// Include Driver Headers
+
+// Include Runtime Headers
 #include "interface_api.h"
 
 /**
- * @defgroup hal_uart UART HAL Interface
- * @ingroup hal_interface
- * @brief UART HAL interface for Chimera-SDK.
- *
- * This module defines the UART configuration structure and HAL API functions
- * for interfacing with different UART drivers in Chimera-SDK.
+ * \defgroup drivers_uart UART Driver
+ * @ingroup runtime
+ * @ingroup drivers
+ * @brief Generic UART driver implementation for Chimera-SDK.
  * @{
  */
 
@@ -36,7 +42,7 @@
  *  @{
  */
 #ifndef UART_DEFAULT_BAUD_RATE
-#define UART_DEFAULT_BAUD_RATE 115200 /**< Default baud rate (bps). */
+#define UART_DEFAULT_BAUD_RATE 4800 /**< Default baud rate (bps). */
 #endif
 
 #ifndef UART_DEFAULT_DATA_BITS
@@ -74,46 +80,6 @@ typedef struct {
 } uart_config_t;
 
 /**
- * @brief Opens and initializes the UART interface.
- *
- * @param iface Pointer to the UART interface instance.
- * @return 0 on success, negative value on failure.
- */
-extern int uart_open(chi_interface_t *iface);
-
-/**
- * @brief Closes the UART interface.
- *
- * @param iface Pointer to the UART interface instance.
- * @return 0 on success, negative value on failure.
- */
-extern int uart_close(chi_interface_t *iface);
-
-/**
- * @brief Reads data from the UART receiver.
- *
- * @param iface  Pointer to the UART interface instance.
- * @param buffer Pointer to the buffer where received data will be stored.
- * @param size   Number of bytes to read.
- * @param cb     Optional callback function to signal completion.
- * @return Number of bytes read on success, negative value on failure.
- */
-extern ssize_t uart_read(chi_interface_t *iface, void *buffer, uint32_t size,
-                         chi_interface_callback_t cb);
-
-/**
- * @brief Writes data to the UART transmitter.
- *
- * @param iface  Pointer to the UART interface instance.
- * @param buffer Pointer to the data to send.
- * @param size   Number of bytes to write.
- * @param cb     Optional callback function to signal completion.
- * @return Number of bytes written on success, negative value on failure.
- */
-extern ssize_t uart_write(chi_interface_t *iface, const void *buffer, uint32_t size,
-                          chi_interface_callback_t cb);
-
-/**
  * @brief Default UART configuration settings.
  *
  * This global configuration structure defines default parameters for UART communication,
@@ -130,7 +96,7 @@ extern ssize_t uart_write(chi_interface_t *iface, const void *buffer, uint32_t s
  * };
  * @endcode
  */
-extern const uart_config_t default_cfg;
+extern const uart_config_t default_uart_cfg;
 
 /**
  * @brief UART HAL API structure.
@@ -138,21 +104,48 @@ extern const uart_config_t default_cfg;
  * This structure defines function pointers for UART operations, allowing for
  * modular driver implementations.
  *
- * The default implementation uses weak symbols that can be overridden by specific drivers.
- *
  * @code
- * __attribute__((weak)) chi_interface_api_t uart_api = {
+ * chi_interface_api_t uart_api = {
  *     .open  = uart_open,
  *     .close = uart_close,
  *     .read  = uart_read,
- *     .write = uart_write
+ *     .write = uart_write,
+ *     .flush = uart_flush
  * };
  * @endcode
  */
-extern chi_interface_api_t uart_api;
+extern const chi_interface_api_t default_uart_api;
 
-/** @} */ // end defgroup hal_uart
+extern chi_interface_t default_uart_inst;
 
-extern chi_interface_t uart_iface;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#endif // UART_H
+/**
+ * @brief Initializes the UART interface.
+ * This function sets up the UART hardware with the specified configuration.
+ */
+void _uart_init(void);
+
+/**
+ * @brief De-initializes the UART interface.
+ * This function releases any resources held by the UART driver.
+ */
+void _uart_deinit(void);
+
+/**
+ * @brief Puts a character to the UART.
+ * @param c Character to send.
+ * @param file Pointer to the FILE structure (unused).
+ * @return The character written as an unsigned char cast to an int or EOF on error.
+ */
+int uart_putc(char c, FILE *file);
+
+#ifdef __cplusplus
+}
+#endif
+
+/** @} */ // end defgroup drivers_uart
+
+#endif // CHIMERA_DRIVER_UART

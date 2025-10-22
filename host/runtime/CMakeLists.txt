@@ -4,31 +4,25 @@
 #
 # Victor Jung <jungvi@iis.ee.ethz.ch>
 
+
 target_include_directories(runtime_host
-  PRIVATE 
-    ${PROJECT_SOURCE_DIR}/hal/inc
-    ${PROJECT_SOURCE_DIR}/generic_runtime/inc
+  PUBLIC
+  ${CMAKE_CURRENT_LIST_DIR}/inc
 )
 
-if(SIMULATION_BACKEND STREQUAL "RTL")
-  message(STATUS "Using RTL UART backend")
-  target_sources(runtime_host PRIVATE
-  src/putc_rtl.c
-  src/uart_init_rtl.c
-  src/uart_deinit_rtl.c
-  )
-elseif(SIMULATION_BACKEND STREQUAL "GVSoC")
-  message(STATUS "Using GVSOC UART backend")
-  target_sources(runtime_host PRIVATE 
-  src/putc_gvsoc.c
-  src/uart_init_gvsoc.c 
-  src/uart_deinit_gvsoc.c
-  )
+if(HARDWARE_BACKEND STREQUAL "RTL")
+  target_compile_definitions(runtime_host PUBLIC HARDWARE_BACKEND_RTL)
+elseif(HARDWARE_BACKEND STREQUAL "GVSoC")
+  target_compile_definitions(runtime_host PUBLIC HARDWARE_BACKEND_GVSOC)
+elseif(HARDWARE_BACKEND STREQUAL "ASIC")
+  target_compile_definitions(runtime_host PUBLIC HARDWARE_BACKEND_ASIC)
 endif()
 
-target_sources(runtime_host PRIVATE 
+target_sources(runtime_host PRIVATE
+  src/putc.c
   src/alloc.c
   src/stdio.c
+  src/uart.c
+  src/clint.c
+  src/log.c
 )
-
-add_dependencies(runtime_host picolibc)

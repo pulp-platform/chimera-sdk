@@ -4,12 +4,21 @@
 //
 // Victor Jung <jungvi@iis.ee.ethz.ch>
 
+// Include Standard Libraries
 #include <stdint.h>
 #include <stddef.h>
 
-// JUNGVI: Number of bytes to align to.
-#define ALIGNMENT 4
-#define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+// Include Target Specific Headers
+
+// Include Driver Headers
+
+// Include Runtime Headers
+#include "alloc.h"
+
+/**
+ * \addtogroup runtime_alloc
+ * @{
+ */
 
 extern void *__heap_start;
 extern void *__heap_end;
@@ -17,15 +26,10 @@ extern void *__heap_end;
 static uint8_t *memory_island_heap_end = (uint8_t *)&__heap_end;
 static uint8_t *memory_island_heap_start = (uint8_t *)&__heap_start;
 
-typedef struct MemoryBlock {
-    struct MemoryBlock *next;
-    size_t size;
-} MemoryBlock;
-
 static MemoryBlock *memory_island_freelist = NULL;
 
 static void *region_malloc(uint8_t **ptr, uint8_t *end, MemoryBlock **freelist, size_t size) {
-    size_t total_size = ALIGN(size + sizeof(MemoryBlock));
+    size_t total_size = ALLOC_ALIGN(size + sizeof(MemoryBlock));
 
     MemoryBlock **prev = freelist;
     MemoryBlock *curr = *freelist;
@@ -55,8 +59,6 @@ static void region_free(MemoryBlock **freelist, void *ptr) {
     *freelist = b;
 }
 
-// JUNGVI: We should probably only put the allocator logic here and then instanciate allocators in
-// the specific platform
 void *memory_island_malloc(size_t size) {
     return region_malloc(&memory_island_heap_start, memory_island_heap_end, &memory_island_freelist,
                          size);
@@ -65,3 +67,5 @@ void *memory_island_malloc(size_t size) {
 void memory_island_free(void *ptr) {
     region_free(&memory_island_freelist, ptr);
 }
+
+/** @} */ // end addtogroup runtime_alloc

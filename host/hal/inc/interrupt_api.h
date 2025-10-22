@@ -42,9 +42,9 @@ typedef struct chi_interrupt_api chi_interrupt_api_t;
  * and any controller-specific configuration.
  */
 struct chi_interrupt {
-    chi_interrupt_api_t *api; /**< Controller operations. */
-    uintptr_t base;           /**< MMIO base address (if applicable). */
-    void *cfg;                /**< Controller-specific configuration. */
+    const chi_interrupt_api_t *api; /**< Controller operations. */
+    uintptr_t base;                 /**< MMIO base address (if applicable). */
+    void *cfg;                      /**< Controller-specific configuration. */
 };
 
 /**
@@ -64,7 +64,7 @@ struct chi_interrupt_api {
      * @param ctrl Controller instance.
      * @return 0 on success, negative on failure.
      */
-    int (*init)(chi_interrupt_t *ctrl);
+    int (*init)(const chi_interrupt_t *ctrl);
 
     /**
      * @brief Register or replace an IRQ handler.
@@ -77,7 +77,7 @@ struct chi_interrupt_api {
      * @param arg  Context pointer for handler.
      * @return 0 on success, negative on failure.
      */
-    int (*register_handler)(chi_interrupt_t *ctrl, int irq, chi_irq_handler_t h, void *arg);
+    int (*register_handler)(const chi_interrupt_t *ctrl, int irq, chi_irq_handler_t h, void *arg);
 
     /**
      * @brief Enable a specific IRQ line.
@@ -86,7 +86,7 @@ struct chi_interrupt_api {
      * @param irq  Interrupt number.
      * @return 0 on success, negative on failure.
      */
-    int (*enable_irq)(chi_interrupt_t *ctrl, int irq);
+    int (*enable_irq)(const chi_interrupt_t *ctrl, int irq);
 
     /**
      * @brief Disable a specific IRQ line.
@@ -95,7 +95,7 @@ struct chi_interrupt_api {
      * @param irq  Interrupt number.
      * @return 0 on success, negative on failure.
      */
-    int (*disable_irq)(chi_interrupt_t *ctrl, int irq);
+    int (*disable_irq)(const chi_interrupt_t *ctrl, int irq);
 
     /**
      * @brief Set the priority of an IRQ (if supported).
@@ -107,7 +107,7 @@ struct chi_interrupt_api {
      * @param prio Priority level.
      * @return 0 on success, -ENOSYS if not supported.
      */
-    int (*set_priority)(chi_interrupt_t *ctrl, int irq, int prio);
+    int (*set_priority)(const chi_interrupt_t *ctrl, int irq, int prio);
 
     /**
      * @brief Acknowledge (clear) a pending IRQ.
@@ -118,7 +118,7 @@ struct chi_interrupt_api {
      * @param irq  Interrupt number.
      * @return 0 on success, negative on failure.
      */
-    int (*acknowledge)(chi_interrupt_t *ctrl, int irq);
+    int (*acknowledge)(const chi_interrupt_t *ctrl, int irq);
 
     /**
      * @brief Dispatch pending IRQs (optional).
@@ -127,7 +127,7 @@ struct chi_interrupt_api {
      *
      * @param ctrl Controller instance.
      */
-    void (*dispatch)(chi_interrupt_t *ctrl);
+    void (*dispatch)(const chi_interrupt_t *ctrl);
 };
 
 #endif // INTERRUPT_API_H

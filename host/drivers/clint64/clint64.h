@@ -9,9 +9,10 @@
 
 /**
  * \defgroup drivers_clint_64 64-bit CLINT Driver
- * @ingroup hal_interrupt
- * @{
+ * @ingroup drivers_clint
+ * @ingroup drivers
  * @brief 64-bit CLINT driver implementation for Chimera-SDK.
+ * @{
  *
  * This header provides the declarations for the 64-bit CLINT driver.
  * The generic CLINT HAL API functions (declared in hal/inc/clint.h) are

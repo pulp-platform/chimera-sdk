@@ -9,8 +9,8 @@
 # Host Runtime Library                                                         #
 ################################################################################
 file(GLOB_RECURSE C_SOURCES
-  "offload_snitchCluster.c"
+  "fll.c"
 )
 
 target_sources(runtime_host PRIVATE ${C_SOURCES})
-target_compile_definitions(runtime_host PUBLIC CHIMERA_DRIVER_CLUSTER)
+target_compile_definitions(runtime_host PUBLIC CHIMERA_DRIVER_FLL)

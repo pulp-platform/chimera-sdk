@@ -2,11 +2,19 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
-// Moritz Scherer <scheremo@iis.ee.ethz.ch>
+// Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-#include "soc.h"
-#include "driver.h"
+#pragma once
 
-int main() {
-    return 0;
-}
+// Include Standard Libraries
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+
+// Include Target Specific Headers
+
+// Include Driver Headers
+
+// Include Runtime Headers
+
+int printf_log(const char *fmt, ...);

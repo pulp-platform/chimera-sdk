@@ -8,7 +8,4 @@ add_subdirectory(hal)
 add_subdirectory(drivers)
 add_subdirectory(runtime)
 
-target_link_libraries(runtime_host
-  PUBLIC
-    picolibc
-)
+add_subdirectory(third_party)

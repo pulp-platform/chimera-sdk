@@ -19,7 +19,7 @@
 #include <sys/types.h>
 
 /**
- * \defgroup device Device API
+ * \defgroup hal_device Device API
  * @ingroup hal
  * @brief Defines the API for device interactions in Chimera‑SDK.
  * @{

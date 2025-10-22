@@ -1,0 +1,3 @@
+[submodule "host/third_party/opentitan_peripherals"]
+	path = host/third_party/opentitan/opentitan_peripherals
+	url = https://github.com/pulp-platform/opentitan_peripherals.git

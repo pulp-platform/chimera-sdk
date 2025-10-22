@@ -6,25 +6,10 @@
 
 # 32-bit CLINT Driver CMake Configuration
 
-add_library(clint_lib STATIC)
-
-file(GLOB_RECURSE SOURCES
-  "src/*.c"
+file(GLOB_RECURSE C_SOURCES
+  "clint32.c"
 )
 
-target_sources(clint_lib
-  PRIVATE
-    ${SOURCES}
-)
-
-target_include_directories(clint_lib
-  PUBLIC
-    ${PROJECT_SOURCE_DIR}/host/hal/inc
-    ${PROJECT_SOURCE_DIR}/targets/${TARGET_PLATFORM}/inc
-    "inc/"
-)
-
-target_link_libraries(clint_lib
-  PUBLIC
-    runtime_host
-)
+target_sources(runtime_host PRIVATE ${C_SOURCES})
+target_compile_definitions(runtime_host PUBLIC CHIMERA_DRIVER_CLINT32)
+target_compile_definitions(runtime_host PUBLIC CHIMERA_DRIVER_CLINT)

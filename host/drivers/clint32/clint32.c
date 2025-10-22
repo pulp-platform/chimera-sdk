@@ -10,8 +10,9 @@
 
 /**
  * \defgroup drivers_clint_32 32-bit CLINT Driver
- * @{
+ * @ingroup drivers
  * @brief 32-bit CLINT driver implementation for Chimera-SDK.
+ * @{
  *
  * This file provides the implementation of the 32-bit CLINT driver.
  * It includes functions for reading the current time, comparing times,
@@ -19,13 +20,26 @@
  *
  */
 
-#include "clint32.h"
-#include "regs/clint.h"
-#include "util.h"
-#include "params.h"
-#include "interrupt_api.h"
+// Include Standard Libraries
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
+
+// Include Target Specific Headers
+#include "soc.h"
+
+// Include Driver Headers
+#include "clint32.h"
+
+// Include Runtime Headers
+#include "util.h"
+
+// Import HAL Headers
+#include "interrupt_api.h"
+
+// VIVIANEP: Need to skip doxygen generation for these functions
+// to avoid duplicated defintion errors in the generated documentation
+/// @cond DOXYGEN_SHOULD_SKIP_THIS
 
 /*---------------------------------------------------------------------------*/
 /* 32‑bit CLINT core routines                                                */
@@ -39,7 +53,7 @@
  *
  * @return The current CLINT time as a clint_mtime_t structure.
  */
-clint_mtime_t clint32_get_mtime(void) {
+clint_mtime_t clint_get_mtime(void) {
     clint_mtime_t mtime;
     uint32_t high_check;
     do {
@@ -57,7 +71,7 @@ clint_mtime_t clint32_get_mtime(void) {
  * @param b Second CLINT time value.
  * @return 1 if a is smaller than b, 0 otherwise.
  */
-int clint32_mtime_less_than(clint_mtime_t a, clint_mtime_t b) {
+int clint_mtime_less_than(clint_mtime_t a, clint_mtime_t b) {
     return (a.high < b.high) || (a.high == b.high && a.low < b.low);
 }
 
@@ -66,8 +80,8 @@ int clint32_mtime_less_than(clint_mtime_t a, clint_mtime_t b) {
  *
  * @param tgt_mtime Target CLINT time value.
  */
-void clint32_spin_until(clint_mtime_t tgt_mtime) {
-    while (clint32_mtime_less_than(clint32_get_mtime(), tgt_mtime)) {
+void clint_spin_until(clint_mtime_t tgt_mtime) {
+    while (clint_mtime_less_than(clint_get_mtime(), tgt_mtime)) {
         ; // Busy wait
     }
 }
@@ -77,13 +91,13 @@ void clint32_spin_until(clint_mtime_t tgt_mtime) {
  *
  * @param ticks Number of clock cycles to wait.
  */
-void clint32_spin_ticks(uint32_t ticks) {
-    clint_mtime_t start = clint32_get_mtime();
+void clint_spin_ticks(uint32_t ticks) {
+    clint_mtime_t start = clint_get_mtime();
     clint_mtime_t target = {start.low + ticks, start.high};
     if (target.low < start.low) {
         target.high++;
     }
-    clint32_spin_until(target);
+    clint_spin_until(target);
 }
 
 /**
@@ -93,20 +107,20 @@ void clint32_spin_ticks(uint32_t ticks) {
  * @param ref_time_inv Inverse of the measurement period.
  * @return Estimated core frequency in Hz.
  */
-uint32_t clint32_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
+uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
     uint32_t start_mcycle, end_mcycle;
     uint32_t num_ticks = ref_freq / ref_time_inv;
-    clint_mtime_t start, end = clint32_get_mtime();
+    clint_mtime_t start, end = clint_get_mtime();
 
     do {
         start_mcycle = get_mcycle();
-        start = clint32_get_mtime();
+        start = clint_get_mtime();
     } while (start.low == end.low && start.high == end.high);
 
     do {
         end_mcycle = get_mcycle();
-        end = clint32_get_mtime();
-    } while (clint32_mtime_less_than(end, (clint_mtime_t){start.low + num_ticks, start.high}));
+        end = clint_get_mtime();
+    } while (clint_mtime_less_than(end, (clint_mtime_t){start.low + num_ticks, start.high}));
 
     return ((end_mcycle - start_mcycle) * ref_freq) / (end.low - start.low);
 }
@@ -117,7 +131,7 @@ uint32_t clint32_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
  * @param timer_idx Timer index to configure.
  * @param value Target `mtimecmp` value.
  */
-void clint32_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
+void clint_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
     uint32_t offs = timer_idx << 3;
     *reg32(&__base_clint, CLINT_MTIMECMP_HIGH0_REG_OFFSET + offs) = value.high;
     *reg32(&__base_clint, CLINT_MTIMECMP_LOW0_REG_OFFSET + offs) = value.low;
@@ -131,9 +145,9 @@ void clint32_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
  * @param timer_idx Timer index.
  * @param tgt_mtime Target CLINT time value.
  */
-void clint32_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
-    if (clint32_mtime_less_than(clint32_get_mtime(), tgt_mtime)) return;
-    clint32_set_mtimecmpx(timer_idx, tgt_mtime);
+void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
+    if (clint_mtime_less_than(clint_get_mtime(), tgt_mtime)) return;
+    clint_set_mtimecmpx(timer_idx, tgt_mtime);
     fence();
     set_mtie(1);
     set_mie(1);
@@ -146,43 +160,25 @@ void clint32_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
  * @param timer_idx Timer index.
  * @param ticks Number of clock cycles to sleep.
  */
-void clint32_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
-    clint_mtime_t start = clint32_get_mtime();
+void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
+    clint_mtime_t start = clint_get_mtime();
     clint_mtime_t target = {start.low + ticks, start.high};
     if (target.low < start.low) {
         target.high++;
     }
-    clint32_sleep_until(timer_idx, target);
+    clint_sleep_until(timer_idx, target);
 }
 
-// VIVIANEP: Skip Doxygen generation for these alias functions to avoid duplicate definitions
-
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-extern clint_mtime_t clint_get_mtime()
-    __attribute__((alias("clint32_get_mtime"), used, visibility("default")));
-extern int clint_mtime_less_than(clint_mtime_t a, clint_mtime_t b)
-    __attribute__((alias("clint32_mtime_less_than"), used, visibility("default")));
-extern void clint_spin_until(clint_mtime_t tgt_mtime)
-    __attribute__((alias("clint32_spin_until"), used, visibility("default")));
-extern void clint_spin_ticks(uint32_t ticks)
-    __attribute__((alias("clint32_spin_ticks"), used, visibility("default")));
-extern uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv)
-    __attribute__((alias("clint32_get_core_freq"), used, visibility("default")));
-extern void clint_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value)
-    __attribute__((alias("clint32_set_mtimecmpx"), used, visibility("default")));
-extern void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime)
-    __attribute__((alias("clint32_sleep_until"), used, visibility("default")));
-extern void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks)
-    __attribute__((alias("clint32_sleep_ticks"), used, visibility("default")));
+/// @endcond
 
 /*---------------------------------------------------------------------------*/
 /* Provide driver-specific chi_interrupt_api_t for CLINT                     */
 /*---------------------------------------------------------------------------*/
-static int clint32_init(chi_interrupt_t *ctrl) {
+static int clint32_init(const chi_interrupt_t *ctrl) {
     (void)ctrl;
     return 0;
 }
-static int clint32_register_handler(chi_interrupt_t *ctrl, int irq, chi_irq_handler_t handler,
+static int clint32_register_handler(const chi_interrupt_t *ctrl, int irq, chi_irq_handler_t handler,
                                     void *arg) {
     (void)ctrl;
     (void)irq;
@@ -190,39 +186,42 @@ static int clint32_register_handler(chi_interrupt_t *ctrl, int irq, chi_irq_hand
     (void)arg;
     return -1;
 }
-static int clint32_enable_irq(chi_interrupt_t *ctrl, int irq) {
+static int clint32_enable_irq(const chi_interrupt_t *ctrl, int irq) {
     (void)ctrl;
     (void)irq;
     return -1;
 }
-static int clint32_disable_irq(chi_interrupt_t *ctrl, int irq) {
+static int clint32_disable_irq(const chi_interrupt_t *ctrl, int irq) {
     (void)ctrl;
     (void)irq;
     return -1;
 }
-static int clint32_set_priority(chi_interrupt_t *ctrl, int irq, int prio) {
+static int clint32_set_priority(const chi_interrupt_t *ctrl, int irq, int prio) {
     (void)ctrl;
     (void)irq;
     (void)prio;
     return -1;
 }
-static int clint32_acknowledge(chi_interrupt_t *ctrl, int irq) {
+static int clint32_acknowledge(const chi_interrupt_t *ctrl, int irq) {
     (void)ctrl;
     (void)irq;
     return -1;
 }
-static void clint32_dispatch(chi_interrupt_t *ctrl) {
+static void clint32_dispatch(const chi_interrupt_t *ctrl) {
     (void)ctrl;
 }
 
+// VIVIANEP: Skip Doxygen generation for these alias functions to avoid duplicate definitions
+/// @cond DOXYGEN_SHOULD_SKIP_THIS
+
 /* Export the CLINT-specific interrupt API */
-chi_interrupt_api_t clint_api = {.init = clint32_init,
-                                 .register_handler = clint32_register_handler,
-                                 .enable_irq = clint32_enable_irq,
-                                 .disable_irq = clint32_disable_irq,
-                                 .set_priority = clint32_set_priority,
-                                 .acknowledge = clint32_acknowledge,
-                                 .dispatch = clint32_dispatch};
+const chi_interrupt_api_t default_clint_api = {.init = clint32_init,
+                                               .register_handler = clint32_register_handler,
+                                               .enable_irq = clint32_enable_irq,
+                                               .disable_irq = clint32_disable_irq,
+                                               .set_priority = clint32_set_priority,
+                                               .acknowledge = clint32_acknowledge,
+                                               .dispatch = clint32_dispatch};
 /// @endcond
 
 /** @} */ // end drivers_clint_32 group

@@ -3,6 +3,3 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
-
-#include <stdint.h>
-#include <stdio.h>
