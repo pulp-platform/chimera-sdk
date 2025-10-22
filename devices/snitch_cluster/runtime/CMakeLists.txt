@@ -5,15 +5,14 @@
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 ################################################################################
-# Device Libraries
+# Snitch Cluster Runtime Library                                               #
 ################################################################################
-set(DEVICE_MAPPINGS
-    chimera-convolve:snitch_cluster
-    chimera-open:snitch_cluster
-    chimera-host:
+file(GLOB C_SOURCES
+  "putc.c"
+  "init.c"
 )
 
-# Call the macro
-add_chimera_subdirectories(${TARGET_PLATFORM} "Device" "${DEVICE_MAPPINGS}")
+target_sources(runtime_cluster_snitch PRIVATE ${C_SOURCES})
+target_compile_definitions(runtime_cluster_snitch PUBLIC CHIMERA_DEVICE_SNITCH_CLUSTER)
 
-
+target_include_directories(runtime_cluster_snitch PUBLIC ${CMAKE_CURRENT_LIST_DIR})

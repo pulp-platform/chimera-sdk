@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-/** \addtogroup devices_snitchCluster
+/** \addtogroup device_snitchCluster
  *  @{
  */
 
@@ -18,12 +18,11 @@
  *
  * This function will set up the global pointer and thread pointer for the core.
  */
-#define _SETUP_GP_TP() \
+#define _SETUP_GP() \
     asm volatile(".option push\n" \
                  ".option norelax\n" \
                  "la gp, __global_pointer$\n" \
                  ".option pop\n" \
-                 "mv tp, zero\n" \
                  : /* No outputs */ \
                  : /* No inputs */ \
                  : /* No clobbered registers */)
