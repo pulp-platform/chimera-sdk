@@ -5,9 +5,17 @@
 // Moritz Scherer <scheremo@iis.ee.ethz.ch>
 // Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-#include "common.h"
-#include "soc.h"
-#include "driver.h"
+// Include Standard Libraries
+
+// Include Application Headers
+
+// Include Target Specific Headers
+
+// Include Driver Headers
+
+// Include Runtime Headers
+
+// Import HAL Headers
 
 int main() {
     return 0;

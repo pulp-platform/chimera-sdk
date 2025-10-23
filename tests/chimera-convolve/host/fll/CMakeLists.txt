@@ -2,9 +2,11 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 #
+# Moritz Scherer <scheremo@iis.ee.ethz.ch>
+# Philip Wiese <wiesep@iis.ee.ethz.ch>
 # Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-set(TEST_NAME test_host_uartSimple)
+set(TEST_NAME test_host_fll)
 
 ######## HOST Code #############################################################
 file(GLOB_RECURSE TEST_HOST_SRCS

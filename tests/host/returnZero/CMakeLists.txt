@@ -14,19 +14,15 @@ file(GLOB_RECURSE TEST_HOST_SRCS
 )
 
 add_library(${TEST_NAME}_host OBJECT ${TEST_HOST_SRCS})
-target_include_directories(${TEST_NAME}_host PUBLIC 
-    inc 
-    ${PROJECT_SOURCE_DIR}/devices/snitch_cluster
+target_include_directories(${TEST_NAME}_host PUBLIC
+  inc
+  ${PROJECT_SOURCE_DIR}/devices
 )
-
-# VIVIANEP: Include trampoline source to resolve the _trampoline symbol used by the host.
-target_sources(${TEST_NAME}_host PRIVATE ${PROJECT_SOURCE_DIR}/devices/snitch_cluster/trampoline_snitchCluster.c)
 
 # WIESEP: Set the correct ISA and ABI for the host
 target_compile_options(${TEST_NAME}_host PRIVATE -O2)
-target_link_libraries(${TEST_NAME}_host PUBLIC runtime_host hal_host)
+target_link_libraries(${TEST_NAME}_host PUBLIC runtime_host)
 
 ######## TEST Executable #######################################################
 add_chimera_test(${TEST_NAME})
 target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_host)
-

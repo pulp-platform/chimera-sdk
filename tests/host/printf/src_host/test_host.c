@@ -18,9 +18,10 @@
 
 // Include Runtime Headers
 #include "util.h"
-#include "alloc.h"
 
 // Import HAL Headers
+#include "clint.h"
+#include "uart.h"
 
 #if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE) && defined(HARDWARE_BACKEND_ASIC)
 void setGPIO0_UART() {
@@ -39,18 +40,8 @@ int main(void) {
     setGPIO0_UART();
 #endif
 
-    int8_t ret = 0;
+    volatile int a = 42;
+    printf("Chimera is alive! %d\n", a);
 
-    int8_t *bufferA = (int8_t *)memory_island_malloc(42);
-    int8_t *bufferB = (int8_t *)memory_island_malloc(58);
-    memory_island_free(bufferA);
-    int8_t *bufferC = (int8_t *)memory_island_malloc(21);
-
-    printf("Buffer A: %p\n", bufferA);
-    printf("Buffer B: %p\n", bufferB);
-    printf("Buffer C: %p\n", bufferC);
-
-    if (bufferA != bufferC) ret = -1;
-
-    return ret;
+    return 0;
 }

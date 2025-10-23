@@ -66,17 +66,22 @@ function(add_chimera_subdirectories target_platform category mappings)
     endif()
 
     # Extract key and value
-    string(SUBSTRING "${mapping}" 0 ${delim_pos} key)
+    string(SUBSTRING "${mapping}" 0 ${delim_pos} key_raw)
     math(EXPR value_start "${delim_pos} + 1")
-    string(SUBSTRING "${mapping}" ${value_start} -1 value)
+    string(SUBSTRING "${mapping}" ${value_start} -1 value_raw)
+
+    # Normalize whitespace around key/value (handles multi-line values)
+    string(STRIP "${key_raw}"   key)
+    string(STRIP "${value_raw}" value)
+
+    # Accept commas across newlines and optional spaces "a,\n  b,  c" -> "a;b;c"
+    string(REGEX REPLACE "[ \t\r\n]*,[ \t\r\n]*" ";" value "${value}")
 
     if(key STREQUAL "${target_platform}")
       list(APPEND included_folders ${value})
       break()
     endif()
   endforeach()
-
-  string(REPLACE "," ";" included_folders "${included_folders}")
 
   # Align output with padding
   string(LENGTH "[CHIMERA-SDK] Enabled ${category}s" category_prefix_length)

@@ -5,7 +5,7 @@
 # Moritz Scherer <scheremo@iis.ee.ethz.ch>
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-set(TEST_NAME test_snitchCluster_simpleOffload)
+set(TEST_NAME test_snitchCluster_snrt)
 
 ######## HOST Code #############################################################
 file(GLOB_RECURSE TEST_HOST_SRCS
@@ -30,7 +30,6 @@ file(GLOB_RECURSE TEST_SNITCH_SRCS
 add_library(${TEST_NAME}_cluster OBJECT ${TEST_SNITCH_SRCS})
 target_include_directories(${TEST_NAME}_cluster PUBLIC include)
 
-# WIESEP: Set the correct ISA and ABI for the cluster
 target_compile_options(${TEST_NAME}_cluster
   PRIVATE
   -O2

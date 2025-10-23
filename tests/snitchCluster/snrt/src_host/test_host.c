@@ -21,10 +21,10 @@
 
 // Import HAL Headers
 
-#define CLUSTER 0
+#define CLUSTER 4
 #define STACK_ADDRESS (_chimera_clusterBase[CLUSTER] + 0x20000 - 1)
 
-static offloadArgs_t offloadArgs = {.value = 0xdeadbeef};
+extern uintptr_t volatile tohost, fromhost;
 
 #if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE) && defined(HARDWARE_BACKEND_ASIC)
 void setGPIO0_UART() {
@@ -56,13 +56,42 @@ int main(void) {
 
     printf_log("Waiting for cluster to finish...\n");
 
-    offload_snitchCluster(testReturn, &offloadArgs, stack_cluster_ptr, CLUSTER);
+    offload_snitchCluster(testReturn, NULL, stack_cluster_ptr, CLUSTER);
+
+    // Handle tohost/fromhost communication
+    while (snitchCluster_busy(CLUSTER)) {
+        // Wait for tohost to be set by the device
+        if (tohost != 0) {
+            volatile uint32_t syscall_addr = tohost;
+
+            // Acknowledge tohost
+            tohost = 0;
+
+            // printf("Host received tohost: %#x\n", tohost);
+
+            // Cluster does tohost = (uintptr_t)buf->hdr.syscall_mem;
+            uint32_t *syscall_mem = (uint32_t *)syscall_addr;
+
+            // printf("Host handling syscall %u: fd=%#x, buf=%p, len=%#x\n", syscall_mem[0],
+            //        syscall_mem[1], (void *)syscall_mem[2], syscall_mem[3]);
+            if (syscall_mem[0] == 64) { // sys_write
+                fwrite((const void *)syscall_mem[2], 1, syscall_mem[3], (FILE *)syscall_mem[1]);
+                fflush((FILE *)syscall_mem[1]);
+            } else {
+                printf_log("Unknown syscall: %u\n", syscall_mem[0]);
+            }
+
+            // Notify cluster that syscall is done
+            fromhost = syscall_addr;
+        }
+    }
+
     uint32_t retVal = wait_snitchCluster_return(CLUSTER);
+    retVal = retVal >> 1;
 
     set_snitchCluster_clockGating(CLUSTER, 1);
 
-    printf("Returned value: 0x%08x (%d)\n", retVal, retVal);
-    printf("Expected value: 0x%08x\n", (TESTVAL | 0x000000001));
+    printf_log("Returned from cluster: 0x%08x (%d)\n", retVal, retVal);
 
-    return (retVal != (TESTVAL | 0x000000001));
+    return retVal;
 }
