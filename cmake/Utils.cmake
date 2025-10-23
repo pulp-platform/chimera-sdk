@@ -22,13 +22,13 @@ endmacro()
 
 macro(add_target_source name)
   if(NOT ${name} IN_LIST AVAILABLE_TARGETS)
-    message(FATAL_ERROR "Invalid value for TARGET_PLATFORM: Got ${TARGET_PLATFORM}")
+    message(FATAL_ERROR "[CHIMERA-SDK] Invalid value for TARGET_PLATFORM: Got ${TARGET_PLATFORM}")
   endif()
 
   if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${name})
     add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${name})
   else()
-    message(WARNING "Path ${CMAKE_CURRENT_LIST_DIR}/${name} does not exist")
+    message(WARNING "[CHIMERA-SDK] Path ${CMAKE_CURRENT_LIST_DIR}/${name} does not exist")
   endif()
 endmacro()
 
