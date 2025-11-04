@@ -1,8 +1,5 @@
-// Copyright 2022 ETH Zurich and University of Bologna.
-// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-FileCopyrightText: 2022 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
-//
-// Authors: Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
  * \defgroup drivers_clint_32 32-bit CLINT Driver

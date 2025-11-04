@@ -4,10 +4,6 @@ Chimera-SDK is a bare-metal development platform for ASICs based on the [Chimera
 
 Chimera and Chimera-SDK are developed as part of the PULP project, a joint effort between ETH Zurich and the University of Bologna.
 
-## License
-
-Unless specified otherwise in the respective file headers, all code checked into this repository is made available under a permissive license. All software sources are licensed under Apache 2.0 (see LICENSE) or compatible licenses, with the exception of `scripts/run_clang_format.py`, which is licensed under the MIT license.
-
 ## Documentation
 All revelevant documentation can be found in the `docs` folder and is hosted on GitHub Pages.
 Access the documentation on
@@ -52,7 +48,7 @@ make format
 ## License
 All licenses used in this repository are listed under the `LICENSES` folder. Unless specified otherwise in the respective file headers, all code checked into this repository is made available under a permissive license.
 - Most software sources and tool scripts are licensed under the [Apache 2.0 license](https://opensource.org/licenses/Apache-2.0).
-- Some files in the `scripts` directory are licensed under the [MIT license](https://opensource.org/license/mit).
+- Some files are licensed under the [Solderpad v0.51 license](https://solderpad.org/licenses/SHL-0.51/).
 - Markdown, JSON, text files, pictures, PDFs, are licensed under the [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0) license (CC BY 4.0).
 
 To extract license information for all files, you can use the [reuse tool](https://reuse.software/) and by running `reuse spdx` in the root directory of this repository.

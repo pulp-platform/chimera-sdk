@@ -1,8 +1,5 @@
-// Copyright 2024 ETH Zurich and University of Bologna.
-// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
-//
-// Moritz Scherer <scheremo@iis.ee.ethz.ch>
 
 #ifndef _SOC_ADDR_MAP_INCLUDE_GUARD_
 #define _SOC_ADDR_MAP_INCLUDE_GUARD_

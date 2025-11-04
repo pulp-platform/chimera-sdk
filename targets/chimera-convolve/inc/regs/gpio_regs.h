@@ -1,11 +1,5 @@
-// Generated register defines for gpio
-
-// Copyright information found in source file:
-// Copyright lowRISC contributors.
-
-// Licensing information found in source file:
-// Licensed under the Apache License, Version 2.0, see LICENSE for details.
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
+// SPDX-License-Identifier: SHL-0.51
 
 #ifndef _GPIO_REG_DEFS_
 #define _GPIO_REG_DEFS_

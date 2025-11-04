@@ -1,8 +1,5 @@
-# Copyright 2024 ETH Zurich and University of Bologna.
-# Licensed under the Apache License, Version 2.0, see LICENSE for details.
+# Copyright 2024 ETH Zurich and University of Bologna
 # SPDX-License-Identifier: Apache-2.0
-#
-# Philip Wiese <wiesep@iis.ee.ethz.ch>
 
 set(OPENTITAN_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/opentitan_peripherals)
 

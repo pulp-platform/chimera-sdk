@@ -4,6 +4,21 @@
             "name": "cMake",
             "configurationProvider": "ms-vscode.cmake-tools",
             "compileCommands": "${config:cmake.buildDirectory}/compile_commands.json"
+        },
+        {
+            "name": "cMake (Convolve)",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compileCommands": "build-chimera-convolve/compile_commands.json"
+        },
+        {
+            "name": "cMake (Open)",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compileCommands": "build-chimera-open/compile_commands.json"
+        },
+        {
+            "name": "cMake (Host)",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compileCommands": "build-chimera-host/compile_commands.json"
         }
     ],
     "version": 4
