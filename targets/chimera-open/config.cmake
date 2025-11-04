@@ -1,3 +1,6 @@
+# Copyright 2024 ETH Zurich and University of Bologna.
+# SPDX-License-Identifier: Apache-2.0
+
 # WIESEP: It is important to set the ISA and ABI for the host and the cluster snitch
 
 set(ABI_HOST ilp32)

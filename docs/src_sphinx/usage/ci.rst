@@ -1,3 +1,6 @@
+.. Copyright 2025 ETH Zurich and University of Bologna.
+.. SPDX-License-Identifier: CC-BY-ND-4.0
+
 CI System
 =========
 The Chimera SDK continuously tests that all targets can be built and runs some tests on `GVSoC <https://github.com/gvsoc/gvsoc>`_ (and RTL in the near future). Passing the CI is required for your PR to be merged.

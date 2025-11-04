@@ -1,3 +1,7 @@
+# Copyright 2024 ETH Zurich and University of Bologna.
+# Licensed under the Apache License, Version 2.0, see LICENSE for details.
+# SPDX-License-Identifier: Apache-2.0
+
 # Enable verbose output for the linker
 # This passes --verbose to the linker (ld), showing detailed linking information
 add_link_options("-Wl,--verbose")

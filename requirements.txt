@@ -14,3 +14,4 @@ tabulate
 yapf==0.33.0
 meson
 jsonref
+reuse

@@ -1,6 +1,11 @@
 // Generated register defines for chimera_padframe_aon_config
 
+// Copyright information found in source file:
+// Copyright 2020 ETH Zurich and University of Bologna.
+
 // Licensing information found in source file:
+// Licensed under Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-License-Identifier: SHL-0.51
 
 #ifndef _CHIMERA_PADFRAME_AON_CONFIG_REG_DEFS_
 #define _CHIMERA_PADFRAME_AON_CONFIG_REG_DEFS_
