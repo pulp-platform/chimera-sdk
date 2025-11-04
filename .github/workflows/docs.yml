@@ -3,10 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Author: Philip Wiese <wiesep@iis.ee.ethz.ch>
-
+---
 name: Sphinx Documentation
 
-on: [push, pull_request]
+"on": [push, pull_request]
 
 permissions:
   contents: read
@@ -19,44 +19,37 @@ jobs:
       pages: write
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v4.2.2
         with:
           persist-credentials: false
-      -
-        name: Install Dependencies
+      - name: Install Dependencies
         run: |
-              sudo apt-get update && sudo apt-get install -y doxygen
-              python -m pip install --upgrade pip
-              pip install -r requirements-docs.txt
-      -
-        name: Build HTML
-        run : |
+          sudo apt-get update && sudo apt-get install -y doxygen
+          python -m pip install --upgrade pip
+          pip install -r requirements-docs.txt
+      - name: Build HTML
+        run: |
           cd docs
           make html
-      -
-        name: Upload Build Files
+      - name: Upload Build Files
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: build-docs
           path: |
             docs/_build_doxygen*
-      -
-        name: Upload HTML Documentation
+      - name: Upload HTML Documentation
         uses: actions/upload-artifact@v4
         with:
           name: html-docs
           path: docs/_build_sphinx/html
-      -
-        name: Prepare Multipages
+      - name: Prepare Multipages
         uses: rkdarst/gh-pages-multibranch@main
         if: ${{ github.event_name == 'push' }}
         with:
           directory: docs/_build_sphinx/html
-      -
-        name: Deploy
+      - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' }}
         with:
