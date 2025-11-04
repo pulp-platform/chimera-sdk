@@ -110,6 +110,7 @@ struct chi_interface_api {
 
 /**
  * @brief Wrapper functions for interface operations.
+ *
  * These functions call the corresponding function pointers
  * in the chi_interface_api structure.
  *
@@ -120,6 +121,7 @@ int iface_open(const chi_interface_t *iface);
 
 /**
  * @brief Wrapper functions for interface operations.
+ *
  * These functions call the corresponding function pointers
  * in the chi_interface_api structure.
  *
@@ -130,6 +132,7 @@ int iface_close(const chi_interface_t *iface);
 
 /**
  * @brief Wrapper functions for interface operations.
+ *
  * These functions call the corresponding function pointers
  * in the chi_interface_api structure.
  *
@@ -144,6 +147,7 @@ ssize_t iface_read(const chi_interface_t *iface, void *buffer, uint32_t size,
 
 /**
  * @brief Wrapper functions for interface operations.
+ *
  * These functions call the corresponding function pointers
  * in the chi_interface_api structure.
  *
@@ -158,6 +162,7 @@ ssize_t iface_write(const chi_interface_t *iface, const void *buffer, uint32_t s
 
 /**
  * @brief Wrapper function to flush the interface buffers.
+ *
  * This function calls the corresponding function pointer
  * in the chi_interface_api structure.
  *

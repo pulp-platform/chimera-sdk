@@ -14,14 +14,6 @@
 // Include Runtime Headers
 #include "uart.h"
 
-/**
- * \defgroup drivers_uart UART Driver
- * @ingroup drivers
- * @ingroup runtime
- * @brief Generic UART driver implementation for Chimera-SDK.
- * @{
- */
-
 #ifdef HARDWARE_BACKEND_ASIC
 #ifdef CHIMERA_DRIVER_UART
 int uart_putc(char c, FILE *file) {
@@ -51,5 +43,3 @@ int uart_putc(char c, FILE *file) {
     return c;
 }
 #endif // HARDWARE_BACKEND_RTL
-
-/** @} */ // end defgroup drivers_uart

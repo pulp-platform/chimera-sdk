@@ -18,17 +18,6 @@
 #include "uart.h"
 #include "clint.h"
 
-/**
- * \defgroup drivers_uart UART Driver
- * @ingroup drivers
- * @ingroup runtime
- * @brief Generic UART driver implementation for Chimera-SDK.
- * @{
- */
-
-// VIVIANEP: Need to skip doxygen generation for these functions
-// to avoid duplicated defintion errors in the generated documentation
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
 const uart_config_t default_uart_cfg = {.baud_rate = UART_DEFAULT_BAUD_RATE,
                                         .clk_freq_hz = UART_CLK_FREQ_HZ,
                                         .data_bits = UART_DEFAULT_DATA_BITS,
@@ -37,7 +26,6 @@ const uart_config_t default_uart_cfg = {.baud_rate = UART_DEFAULT_BAUD_RATE,
 
 chi_interface_t default_uart_inst = {
     .api = &default_uart_api, .base = (uintptr_t)&__base_uart, .cfg = (void *)&default_uart_cfg};
-/// @endcond
 
 #ifdef HARDWARE_BACKEND_GVSOC
 
@@ -63,7 +51,5 @@ void _uart_deinit(void) {
     default_uart_inst.api->close(&default_uart_inst);
 }
 #endif // HARDWARE_BACKEND_GVSOC
-
-/** @} */ // end defgroup drivers_uart
 
 #endif // CHIMERA_DRIVER_UART

@@ -15,11 +15,6 @@
 // Include Runtime Headers
 #include "alloc.h"
 
-/**
- * \addtogroup runtime_alloc
- * @{
- */
-
 extern void *__l2_heap_start;
 extern void *__l2_heap_end;
 
@@ -67,5 +62,3 @@ void *memory_island_malloc(size_t size) {
 void memory_island_free(void *ptr) {
     region_free(&memory_island_freelist, ptr);
 }
-
-/** @} */ // end addtogroup runtime_alloc

@@ -18,24 +18,10 @@
 // Include Runtime Headers
 #include "clint.h"
 
-/**
- * \defgroup drivers_clint CLINT Driver
- * @ingroup drivers
- * @ingroup runtime
- * @brief Core Local Interruptor (CLINT) driver implementation for Chimera-SDK.
- * @{
- */
-
-// VIVIANEP: Need to skip doxygen generation for these functions
-// to avoid duplicated defintion errors in the generated documentation
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
 chi_interrupt_t default_clint_inst = {
     .api = &default_clint_api,
     .base = (uintptr_t)&__base_clint,
     .cfg = NULL,
 };
-/// @endcond
-
-/** @} */ // end defgroup drivers_clint
 
 #endif // CHIMERA_DRIVER_CLINT

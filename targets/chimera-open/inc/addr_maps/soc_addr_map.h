@@ -48,9 +48,8 @@ static const uint8_t _chimera_hartBase[] = {CLUSTER_0_HART_BASE, CLUSTER_1_HART_
                                             CLUSTER_2_HART_BASE, CLUSTER_3_HART_BASE,
                                             CLUSTER_4_HART_BASE};
 
-static const uint32_t _chimera_clusterBase[] = {CLUSTER_0_BASE, CLUSTER_1_BASE,
-                                               CLUSTER_2_BASE, CLUSTER_3_BASE,
-                                               CLUSTER_4_BASE};
+static const uint32_t _chimera_clusterBase[] = {CLUSTER_0_BASE, CLUSTER_1_BASE, CLUSTER_2_BASE,
+                                                CLUSTER_3_BASE, CLUSTER_4_BASE};
 
 #define _chimera_numClusters 5
 
