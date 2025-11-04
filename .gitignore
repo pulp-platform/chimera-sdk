@@ -14,7 +14,7 @@ venv
 __pycache__
 
 # Documentation
-docs/_build
+docs/_build*
 docs/_autosummary
 
 # Dept Install Dir
