@@ -1,17 +1,5 @@
-#
 # Copyright 2024 ETH Zurich and University of Bologna.
-# Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
-#
-# Philip Wiese <wiesep@iis.ee.ethz.ch>
-# Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
-Crypto
-hjson
-mako
-semantic_version
-tabulate
-yapf==0.33.0
-meson
-jsonref
 reuse
+pre-commit

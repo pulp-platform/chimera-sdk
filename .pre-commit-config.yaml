@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+# SPDX-License-Identifier: Apache-2.0
+
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+---
+exclude: |
+  (?x)^(
+    .*third_party.*
+  )
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        name: Check for added large files
+        args: ['--maxkb=2048']
+      - id: trailing-whitespace
+        name: Check for trailing whitespace
+  - repo: local
+    hooks:
+      - id: reuse
+        name: Check SPDX License Headers
+        entry: scripts/reuse_skip_wrapper.py
+        language: python
+        stages: [pre-commit, pre-merge-commit, pre-push, manual]
+        types: [text]
+        exclude_types: [batch, svg, json, markdown]
+  - repo: https://github.com/google/yapf
+    rev: v0.43.0
+    hooks:
+      - id: yapf
+        name: Autoformat Python Files
+        args: ["--in-place", "--parallel"]
+        stages: [pre-commit, pre-merge-commit, pre-push, manual]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: Autoformat Python Imports
+        args: ["--quiet"]
+        stages: [pre-commit, pre-merge-commit, pre-push, manual]
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.0
+    hooks:
+      - id: autoflake
+        name: Remove Unused Python Imports
+        args:
+          - "--remove-all-unused-imports"
+          - "--ignore-init-module-imports"
+          - "--in-place"
+        stages: [pre-commit, pre-merge-commit, pre-push, manual]
+  - repo: https://github.com/adrienverge/yamllint.git
+    rev: v1.33.0
+    hooks:
+      - id: yamllint
+        name: Lint YAML Files
+        stages: [pre-commit, pre-merge-commit, pre-push, manual]
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v21.1.2
+    hooks:
+      - id: clang-format
+        name: Autoformat C/C++ Files
+        args: ["-i"]
+        stages: [pre-commit, pre-merge-commit, pre-push, manual]
