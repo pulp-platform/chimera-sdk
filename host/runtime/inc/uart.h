@@ -139,6 +139,20 @@ void _uart_deinit(void);
  */
 int uart_putc(char c, FILE *file);
 
+/**
+ * @brief Gets a character from the UART.
+ * @param file Pointer to the FILE structure (unused).
+ * @return The character read as an unsigned char cast to an int or EOF on error.
+ */
+int uart_getc(FILE *file);
+
+/**
+ * @brief Flushes the UART output buffer.
+ * @param file Pointer to the FILE structure (unused).
+ * @return 0 on success, negative value on failure.
+ */
+int uart_flush(FILE *file);
+
 #ifdef __cplusplus
 }
 #endif
