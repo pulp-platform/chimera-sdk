@@ -100,6 +100,11 @@ void clint_spin_ticks(uint32_t ticks) {
 /**
  * @brief Estimates the core frequency based on a reference measurement period.
  *
+ * The relative error of the measurement is approximately ref_time_inv / ref_freq.
+ * Hence, to achieve a certain relative error, ref_time_inv should be chosen as
+ * ref_freq * desired_relative_error.
+ *
+ *
  * @param ref_freq Reference frequency in Hz.
  * @param ref_time_inv Inverse of the measurement period.
  * @return Estimated core frequency in Hz.
@@ -119,7 +124,9 @@ uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
         end = clint_get_mtime();
     } while (clint_mtime_less_than(end, (clint_mtime_t){start.low + num_ticks, start.high}));
 
-    return ((end_mcycle - start_mcycle) * ref_freq) / (end.low - start.low);
+    uint64_t duration = ((uint64_t)end_mcycle - (uint64_t)start_mcycle) * ref_freq;
+    uint64_t ticks = ((uint64_t)end.low - (uint64_t)start.low);
+    return (uint32_t)(duration / ticks);
 }
 
 /**
