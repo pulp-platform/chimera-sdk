@@ -60,7 +60,8 @@ typedef struct putc_buffer {
     char data[PUTC_BUFFER_LEN];
 } putc_buffer_t;
 
-static volatile putc_buffer_t putc_buffer[SNRT_CLUSTER_NUM * SNRT_CLUSTER_CORE_NUM];
+static volatile putc_buffer_t putc_buffer[SNRT_CLUSTER_NUM * SNRT_CLUSTER_CORE_NUM]
+    __attribute__((section(".noinit")));
 
 // Provide an implementation for putchar.
 int snrt_putchar(char c, FILE *file) {
