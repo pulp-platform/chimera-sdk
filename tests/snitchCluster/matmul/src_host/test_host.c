@@ -41,6 +41,9 @@ int main(void) {
     setGPIO0_UART();
 #endif
 
+#if defined(HARDWARE_BACKEND_RTL)
+    uint32_t core_freq = 500000000; // 500 MHz for RTL
+#else
     // 2. Read the RTC frequency from a hardware register
     uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
 
@@ -48,6 +51,7 @@ int main(void) {
     uint32_t core_freq = clint_get_core_freq(rtc_freq, 512);
 
     printf("Chimera running at %d.%d MHz!\n", (core_freq / 1000000), (core_freq % 1000000));
+#endif
 
     void *stack_cluster_ptr[NUM_CLUSTER_CORES];
     generate_snitchCluster_SPs_uniform(CLUSTER, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
