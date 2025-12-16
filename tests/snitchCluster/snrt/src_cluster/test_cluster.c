@@ -37,6 +37,7 @@ static __thread int32_t thread_local_var4 = 4;
  * @warning Stack, thread and global pointer might not yet be set up!
  */
 __attribute__((naked)) void clusterInterruptHandler() {
+    _SET_CLUSTER_BUSY();
     _SETUP_GP();
 
     asm volatile(
