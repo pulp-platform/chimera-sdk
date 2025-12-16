@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+#define MAT_M 32
+#define MAT_N 48
+#define MAT_P 64
+#define MAT_OPS (2ULL * MAT_M * MAT_N * MAT_P) // 2 ops per MAC
+
 int8_t __attribute__((__section__(".cdata"))) testInputVector0[] = {
     82.0,   -56.0,  70.0,   -120.0, -16.0,  35.0,   -29.0,  -64.0,  78.0,   98.0,   82.0,   103.0,
     -106.0, 121.0,  56.0,   33.0,   -76.0,  120.0,  38.0,   84.0,   -91.0,  -119.0, 28.0,   103.0,

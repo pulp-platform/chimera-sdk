@@ -67,9 +67,12 @@ int main(void) {
 
     printf_log("Waiting for cluster to finish...\n");
 
+    argCluster_t arg_struct = {0};
+    argCluster_t *arg = &arg_struct;
+
     // Disable interrupts
     set_mie(0);
-    offload_snitchCluster(testReturn, NULL, stack_cluster_ptr, CLUSTER1);
+    offload_snitchCluster(testReturn, (void *)arg, stack_cluster_ptr, CLUSTER1);
 
     // Enable interrupts
     set_mie(1);
@@ -111,6 +114,10 @@ int main(void) {
     set_snitchCluster_clockGating(CLUSTER1, 1);
 
     printf_log("Returned from cluster: 0x%08x (%d)\n", retVal, retVal);
+    uint32_t ops_per_sec = (arg->ops_per_cycle / 1000) * (core_freq / 1000);
+
+    printf("Op/Cycle: %u.%06u\n", arg->ops_per_cycle / 1000000, arg->ops_per_cycle % 1000000);
+    printf("Op/s: %u.%03u M\n", ops_per_sec / 1000000, ops_per_sec % 1000000);
 
     return retVal;
 }
