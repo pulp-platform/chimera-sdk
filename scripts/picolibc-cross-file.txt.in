@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [binaries]
-c = [ '@CROSS_C_COMPILER@', @CROSS_C_COMPILER_ARGS_LIST@ ]
+c = '@CROSS_C_COMPILER@'
 ar = '@CROSS_AR@'
 strip = '@CROSS_STRIP@'
 
@@ -15,6 +15,3 @@ endian = '@CROSS_ENDIAN@'
 [built-in options]
 c_args = [ @CROSS_C_ARGS_LIST@ ]
 c_link_args = [ @CROSS_C_LINK_ARGS_LIST@ ]
-
-[properties]
-skip_sanity_check = @CROSS_SKIP_SANITY_CHECK@

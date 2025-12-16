@@ -18,7 +18,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(HOST_ARCH "riscv32")
 set(HOST_FAMILY "riscv32")
 set(HOST_ENDIAN "little")
-set(HOST_SYSTEM "none")
+set(HOST_SYSTEM "unknown")
 
 # SCHEREMO: This toolchain file is only used for test compilation!
 set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
