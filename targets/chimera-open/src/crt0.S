@@ -126,7 +126,7 @@ _trap_handler_wrap:
     lw t4, 8(sp)
     lw t5, 4(sp)
     lw t6, 0(sp)
-    addi sp, sp, 128
+    addi sp, sp, 64
     mret
 
 .weak trap_vector
