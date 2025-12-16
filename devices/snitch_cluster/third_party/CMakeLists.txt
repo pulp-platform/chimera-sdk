@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 set(SNITCH_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/snitch-sdk)
+set(ITA_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ita-sdk)
 set(SN_DEPS_DIR "${SNITCH_ROOT_DIR}/deps" CACHE STRING "Directory for external dependencies")
 
 
@@ -26,6 +27,7 @@ file(GLOB_RECURSE C_SOURCES
     "${SNITCH_ROOT_DIR}/omp/src/eu.c"
     "${SNITCH_ROOT_DIR}/omp/src/kmp.c"
     "${SNITCH_ROOT_DIR}/omp/src/omp.c"
+    "${ITA_ROOT_DIR}/src/ITA_utils.c"
 )
 
 
@@ -43,6 +45,7 @@ target_include_directories(runtime_cluster_snitch
     ${SNITCH_ROOT_DIR}/target/common/inc
     ${SNITCH_ROOT_DIR}/core/inc
     ${SNITCH_ROOT_DIR}/omp/inc
+    ${ITA_ROOT_DIR}/inc
 )
 
 target_include_directories(runtime_cluster_snitch
