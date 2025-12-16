@@ -48,6 +48,34 @@ static const uint8_t _chimera_hartBase[] = {CLUSTER_0_HART_BASE, CLUSTER_1_HART_
 static const uint32_t _chimera_clusterBase[] = {CLUSTER_0_BASE, CLUSTER_1_BASE, CLUSTER_2_BASE,
                                                 CLUSTER_3_BASE, CLUSTER_4_BASE};
 
+extern volatile uint32_t __l1_c0_heap_start, __l1_c1_heap_start, __l1_c2_heap_start,
+    __l1_c3_heap_start, __l1_c4_heap_start;
+static const uint32_t _chimera_clusterHeapStart[] = {
+    (uint32_t)&__l1_c0_heap_start, (uint32_t)&__l1_c1_heap_start, (uint32_t)&__l1_c2_heap_start,
+    (uint32_t)&__l1_c3_heap_start, (uint32_t)&__l1_c4_heap_start};
+
+extern volatile uint32_t __l1_c0_start, __l1_c1_start, __l1_c2_start, __l1_c3_start, __l1_c4_start;
+static const uint32_t _chimera_clusterL1Start[] = {
+    (uint32_t)&__l1_c0_start, (uint32_t)&__l1_c1_start, (uint32_t)&__l1_c2_start,
+    (uint32_t)&__l1_c3_start, (uint32_t)&__l1_c4_start};
+
+extern volatile uint32_t __l1_c0_end, __l1_c1_end, __l1_c2_end, __l1_c3_end, __l1_c4_end;
+static const uint32_t _chimera_clusterL1End[] = {(uint32_t)&__l1_c0_end, (uint32_t)&__l1_c1_end,
+                                                 (uint32_t)&__l1_c2_end, (uint32_t)&__l1_c3_end,
+                                                 (uint32_t)&__l1_c4_end};
+
+extern volatile uint32_t __l1_c0_lma_start, __l1_c1_lma_start, __l1_c2_lma_start, __l1_c3_lma_start,
+    __l1_c4_lma_start;
+static const uint32_t _chimera_clusterL1LmaStart[] = {
+    (uint32_t)&__l1_c0_lma_start, (uint32_t)&__l1_c1_lma_start, (uint32_t)&__l1_c2_lma_start,
+    (uint32_t)&__l1_c3_lma_start, (uint32_t)&__l1_c4_lma_start};
+
+extern volatile uint32_t __l1_c0_lma_end, __l1_c1_lma_end, __l1_c2_lma_end, __l1_c3_lma_end,
+    __l1_c4_lma_end;
+static const uint32_t _chimera_clusterL1LmaEnd[] = {
+    (uint32_t)&__l1_c0_lma_end, (uint32_t)&__l1_c1_lma_end, (uint32_t)&__l1_c2_lma_end,
+    (uint32_t)&__l1_c3_lma_end, (uint32_t)&__l1_c4_lma_end};
+
 #define _chimera_numClusters 5
 
 #define CHIMERA_PADFRAME_BASE_ADDRESS 0x30002000
