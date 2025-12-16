@@ -124,6 +124,12 @@ void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime);
  */
 void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks);
 
+/**
+ * @brief Default trap vector handler.
+ *
+ */
+void default_trap_vector(void);
+
 #ifdef __cplusplus
 }
 #endif

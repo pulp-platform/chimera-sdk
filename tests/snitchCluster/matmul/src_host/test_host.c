@@ -16,6 +16,7 @@
 // Include Runtime Headers
 #include "log.h"
 #include "util.h"
+#include "clint.h"
 
 // Import HAL Headers
 
@@ -66,7 +67,12 @@ int main(void) {
 
     printf_log("Waiting for cluster to finish...\n");
 
+    // Disable interrupts
+    set_mie(0);
     offload_snitchCluster(testReturn, NULL, stack_cluster_ptr, CLUSTER);
+
+    // Enable interrupts
+    set_mie(1);
 
     // Handle tohost/fromhost communication
     while (snitchCluster_busy(CLUSTER)) {
@@ -94,6 +100,9 @@ int main(void) {
             // Notify cluster that syscall is done
             fromhost = syscall_addr;
         }
+
+        // Enter low-power mode until next interrupt
+        clint_sleep_ticks(0, 10);
     }
 
     uint32_t retVal = wait_snitchCluster_return(CLUSTER);

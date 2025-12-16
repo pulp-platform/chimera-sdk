@@ -104,6 +104,16 @@ static inline void set_mtie(int enable) {
 }
 
 /**
+ * @brief Gets the status pending interrupts in M-mode.
+ * @return 1 if M-mode pending interrupts are enabled, 0 otherwise.
+ */
+static inline int get_mip() {
+    uint32_t mip;
+    asm volatile("csrr %0, mip" : "=r"(mip)::"memory");
+    return mip;
+}
+
+/**
  * @brief Enables or disables M-mode global interrupts.
  * @param enable Set to 1 to enable, 0 to disable.
  */
