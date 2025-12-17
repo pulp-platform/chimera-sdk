@@ -7,8 +7,8 @@
 #include <stdint.h>
 
 #define CLINT_CTRL_BASE 0x02040000
-
 #define SOC_CTRL_BASE 0x30001000
+#define HYPERBUS_CTRL_BASE 0x30005000
 
 #define CLUSTER_0_BASE 0x40000000
 #define CLUSTER_1_BASE 0x40200000
@@ -75,5 +75,7 @@ extern const uintptr_t _chimera_clusterL1LmaEnd[_chimera_numClusters];
 
 #define FLL_BASE_ADDR 0x30003000
 #define FLL_CTRL_BASE_ADDR 0x30003000
+
+#define HYPERRAM_BASE_ADDR 0x80000000
 
 #endif

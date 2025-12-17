@@ -7,7 +7,6 @@
 #include <stdint.h>
 
 #define CLINT_CTRL_BASE 0x02040000
-
 #define SOC_CTRL_BASE 0x30001000
 #define PADFRAME_GPIO_BASE 0x30002000
 #define PADFRAME_HYPERBUS_BASE 0x30003000
@@ -73,5 +72,7 @@ extern char __l1_c0_lma_end[], __l1_c1_lma_end[], __l1_c2_lma_end[], __l1_c3_lma
 extern const uintptr_t _chimera_clusterL1LmaEnd[_chimera_numClusters];
 
 #define HYPERBUS_ADDR_START 0x50000000
+
+#define HYPERRAM_BASE_ADDR 0x50000000
 
 #endif

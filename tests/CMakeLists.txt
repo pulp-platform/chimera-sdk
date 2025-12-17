@@ -24,9 +24,11 @@ chimera-open:
   host/printf,
   host/returnZero,
   host/uartSimple,
+  host/hyperbus,
   snitchCluster/matmul,
   snitchCluster/snrt,
-  snitchCluster/simpleOffload
+  snitchCluster/simpleOffload,
+  snitchCluster/hyperbus
 ]]
 [[
 chimera-host:

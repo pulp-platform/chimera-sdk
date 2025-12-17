@@ -16,6 +16,7 @@
 // Include Standard Libraries
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
 // Include Target Specific Headers
 #include "soc.h"
