@@ -16,6 +16,7 @@
 #include "regs/gpio_regs.h"
 #include "regs/i2c_regs.h"
 #include "regs/spi_host_regs.h"
+#include "regs/hyperbus_regs.h"
 
 // Include Address Maps
 #include "addr_maps/soc_addr_map.h"

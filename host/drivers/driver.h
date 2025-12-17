@@ -25,4 +25,8 @@
 #include "clint64/clint64.h"
 #endif
 
+#ifdef CHIMERA_DRIVER_HYPERBUS
+#include "hyperbus/hyperbus.h"
+#endif
+
 #endif //_DRIVER_INCLUDE_GUARD_

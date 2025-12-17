@@ -3,3 +3,4 @@
 
 add_subdirectory(fll)
 add_subdirectory(sleep)
+add_subdirectory(hyperbus)
