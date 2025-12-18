@@ -27,6 +27,9 @@
 #ifndef HYPERBUS_H
 #define HYPERBUS_H
 
+#define HYPERBUS_NUM_PHYS 1u
+#define HYPERBUS_NUM_CHIPS 2u
+
 // -----------------------------------------------------------------------------
 // HyperRAM / HyperBus configuration model
 // -----------------------------------------------------------------------------
@@ -45,9 +48,8 @@ typedef struct hyperram_cfg {
     uint32_t t_csh_cycles;          // RTL width [3:0]
 
     // Per-chip address window programming
-    uint32_t num_chips;
-    uint32_t chip_base;  // corresponds to RstChipBase usage
-    uint32_t chip_space; // corresponds to RstChipSpace usage (end noninclusive)
+    uint32_t chip_base[HYPERBUS_NUM_CHIPS];  // corresponds to RstChipBase usage
+    uint32_t chip_space[HYPERBUS_NUM_CHIPS]; // corresponds to RstChipSpace usage (end noninclusive)
 } hyperram_cfg_t;
 
 static inline void hyperbus_set_t_latency_access(void *base, uint32_t val) {
@@ -163,8 +165,10 @@ static inline void hyperbus_set_chip_range(void *base, uint32_t chip, uint32_t s
     hyperbus_set_chip_end(base, chip, end_addr_noninclusive);
 }
 
-int hyperram_configure(void *base, const hyperram_cfg_t *cfg);
-hyperram_cfg_t hyperram_cfg_default(uint32_t chip_base, uint32_t chip_size);
+void hyperram_cfg_default(hyperram_cfg_t *cfg, uint32_t chip_base, uint32_t chip_size);
+hyperram_cfg_t hyperram_cfg_read(void *base);
+int hyperram_cfg_write(void *base, const hyperram_cfg_t *cfg);
+void hyperram_cfg_print(void *base);
 
 #endif // HYPERBUS_H
 

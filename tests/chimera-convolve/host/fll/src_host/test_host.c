@@ -21,29 +21,29 @@
 
 void setGPIO0_UART() {
     // Connect UART port to GPIO 0 Pad
-    chimera_padframe_aon_gpio_0_mux_set(CHIMERA_PADFRAME_AON_GPIO_0_group_UART0_port_TX);
+    padframe_aon_gpio_0_mux_set(CHIMERA_PADFRAME_AON_GPIO_0_group_UART0_port_TX);
 
     // Set GPIO 0 regs to transmit
-    chimera_padframe_aon_gpio_0_cfg_rxe_set(0);  // Disable Pad's Receiver
-    chimera_padframe_aon_gpio_0_cfg_trie_set(0); // Disable the tri-state transmitter
+    padframe_aon_gpio_0_cfg_rxe_set(0);  // Disable Pad's Receiver
+    padframe_aon_gpio_0_cfg_trie_set(0); // Disable the tri-state transmitter
 }
 
 void setGPIO0_GPIO() {
     // Connect GPIO 0 Pad to GPIO 0
-    chimera_padframe_aon_gpio_0_mux_set(CHIMERA_PADFRAME_AON_GPIO_0_group_GPIOA_port_GPIO0);
+    padframe_aon_gpio_0_mux_set(CHIMERA_PADFRAME_AON_GPIO_0_group_GPIOA_port_GPIO0);
 
     // Set GPIO 0 regs to transmit
-    chimera_padframe_aon_gpio_0_cfg_rxe_set(0);  // Disable Pad's Receiver
-    chimera_padframe_aon_gpio_0_cfg_trie_set(0); // Disable the tri-state transmitter
+    padframe_aon_gpio_0_cfg_rxe_set(0);  // Disable Pad's Receiver
+    padframe_aon_gpio_0_cfg_trie_set(0); // Disable the tri-state transmitter
 }
 
 void setGPIO2_GPIO() {
     // Connect GPIO 2 Pad to GPIO 2
-    chimera_padframe_aon_gpio_2_mux_set(CHIMERA_PADFRAME_AON_GPIO_2_group_GPIOA_port_GPIO2);
+    padframe_aon_gpio_2_mux_set(CHIMERA_PADFRAME_AON_GPIO_2_group_GPIOA_port_GPIO2);
 
     // Set GPIO 2 regs to transmit
-    chimera_padframe_aon_gpio_2_cfg_rxe_set(0);  // Disable Pad's Receiver
-    chimera_padframe_aon_gpio_2_cfg_trie_set(0); // Disable the tri-state transmitter
+    padframe_aon_gpio_2_cfg_rxe_set(0);  // Disable Pad's Receiver
+    padframe_aon_gpio_2_cfg_trie_set(0); // Disable the tri-state transmitter
 }
 
 void gpio_masked_bit_write(void *base_addr, uint32_t reg_lower_offset, uint32_t reg_upper_offset,

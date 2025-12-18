@@ -8,11 +8,11 @@
 #include "soc_addr_map.h"
 
 // FLLs registers
-#ifndef FLL_BASE_ADDR
-#error "FLL_BASE_ADDR is not defined. It must be declared in the soc_addr_map.h"
+#ifndef FLL_CTRL_BASE_ADDR
+#error "FLL_CTRL_BASE_ADDR is not defined. It must be declared in the soc_addr_map.h"
 #endif
-#define FLL_SOC_BASE FLL_BASE_ADDR
-#define FLL_CLU_BASE FLL_BASE_ADDR + 16
+#define FLL_SOC_BASE FLL_CTRL_BASE_ADDR
+#define FLL_CLU_BASE FLL_CTRL_BASE_ADDR + 16
 
 #define FLL_STATUS_OFFSET 0x0
 #define FLL_CONF1_OFFSET 0x4

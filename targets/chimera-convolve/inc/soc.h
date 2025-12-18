@@ -6,13 +6,15 @@
 
 // Include Utility Headers
 #include "params.h"
-#include "padframe.h"
+#include "padframe_gpio.h"
+#include "padframe_hyperbus.h"
 
 // Include Register Definitions
 #include "regs/soc_regs.h"
 #include "regs/cheshire_regs.h"
 #include "regs/clint_regs.h"
-#include "regs/padframe_aon_regs.h"
+#include "regs/padframe_gpio_regs.h"
+#include "regs/padframe_hyperbus_regs.h"
 #include "regs/gpio_regs.h"
 #include "regs/i2c_regs.h"
 #include "regs/spi_host_regs.h"

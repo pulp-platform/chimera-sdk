@@ -41,23 +41,23 @@ static const dif_gpio_t gpio = {
 #if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE) && defined(HARDWARE_BACKEND_ASIC)
 void setGPIO0_UART_TX() {
     // Connect UART port to GPIO 0 Pad
-    chimera_padframe_aon_gpio_0_mux_set(CHIMERA_PADFRAME_AON_GPIO_0_group_UART0_port_TX);
+    padframe_aon_gpio_0_mux_set(CHIMERA_PADFRAME_AON_GPIO_0_group_UART0_port_TX);
 
     // Set GPIO 0 regs to transmit
-    chimera_padframe_aon_gpio_0_cfg_rxe_set(0);  // Disable Pad's Receiver
-    chimera_padframe_aon_gpio_0_cfg_trie_set(0); // Disable the tri-state transmitter
+    padframe_aon_gpio_0_cfg_rxe_set(0);  // Disable Pad's Receiver
+    padframe_aon_gpio_0_cfg_trie_set(0); // Disable the tri-state transmitter
 }
 void setGPIO1_UART_RX() {
     // Connect UART port to GPIO 1 Pad
-    chimera_padframe_aon_gpio_1_mux_set(CHIMERA_PADFRAME_AON_GPIO_1_group_UART0_port_RX);
+    padframe_aon_gpio_1_mux_set(CHIMERA_PADFRAME_AON_GPIO_1_group_UART0_port_RX);
 }
 void setGPIO2_GPIO() {
     // Connect GPIO 2 Pad to GPIO 2
-    chimera_padframe_aon_gpio_2_mux_set(CHIMERA_PADFRAME_AON_GPIO_2_group_GPIOA_port_GPIO2);
+    padframe_aon_gpio_2_mux_set(CHIMERA_PADFRAME_AON_GPIO_2_group_GPIOA_port_GPIO2);
 
     // Set GPIO 2 regs to transmit
-    chimera_padframe_aon_gpio_2_cfg_rxe_set(0);  // Disable Pad's Receiver
-    chimera_padframe_aon_gpio_2_cfg_trie_set(0); // Disable the tri-state transmitter
+    padframe_aon_gpio_2_cfg_rxe_set(0);  // Disable Pad's Receiver
+    padframe_aon_gpio_2_cfg_trie_set(0); // Disable the tri-state transmitter
 }
 #endif
 
@@ -70,10 +70,18 @@ int main(void) {
     // Connect UART RX to GPIO 1
     setGPIO1_UART_RX();
 
+    // Configure GPIO 2 as output
     dif_result_t result = dif_gpio_output_set_enabled(&gpio, 2, kDifToggleEnabled);
     if (result != kDifOk) {
         printf_log("Error: Cannot set GPIO 2 as output\n");
         return -1;
+    }
+
+    // Set GPIO 2 high to enable FLL bypass
+    result = dif_gpio_write(&gpio, 2, kDifToggleEnabled);
+    if (result != kDifOk) {
+        printf_log("Error: Cannot enable FLL bypass\n");
+        return 0;
     }
 #endif
 
