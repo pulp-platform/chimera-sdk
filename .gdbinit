@@ -1,6 +1,5 @@
 # ---- Basics ----
 set pagination off
-set confirm off
 set print pretty on
 set disassemble-next-line on
 set target-async on

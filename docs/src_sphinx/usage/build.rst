@@ -64,16 +64,17 @@ The cluster code is compiled into an object library and linked with the necessar
 Unified Binary
 ~~~~~~~~~~~~~~
 
-The current approach compiles all code for both the host and cluster cores into a single library. This requires precise handling to ensure compatibility between the different instruction set architectures (ISAs) and application binary interfaces (ABIs). The ABI has to be identical to ensure correct function calls.
-This requires careful handling to avoid invalid instructions caused by mismatched ISAs between the host and cluster cores.
+.. warning::
+    The current approach compiles all code for both the host and cluster cores into a single library. This requires precise handling to ensure compatibility between the different instruction set architectures (ISAs) and application binary interfaces (ABIs). The ABI has to be identical to ensure correct function calls.
+    This requires careful handling to avoid invalid instructions caused by mismatched ISAs between the host and cluster cores.
 
-To combine host and cluster into one executable:
+    To combine host and cluster into one executable:
 
-.. code-block:: cmake
+    .. code-block:: cmake
 
-    add_chimera_test(${TEST_NAME})
-    target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_host ${TEST_NAME}_cluster)
+        add_chimera_test(${TEST_NAME})
+        target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_host ${TEST_NAME}_cluster)
 
-.. tip::
-    **It is recommended to always check the generated assembly code to ensure that the correct instructions are generated for the target core!**
+    .. tip::
+        **It is recommended to always check the generated assembly code to ensure that the correct instructions are generated for the target core!**
 

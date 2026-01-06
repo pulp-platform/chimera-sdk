@@ -11,7 +11,6 @@ set -e
 
 # Default configuration
 DEFAULT_GVSOC_PATH="/app/install/gvsoc/bin/gvsoc"
-DEFAULT_OPENOCD_PATH="openocd"
 DEFAULT_CMAKE="cmake"
 DEFAULT_TOOLCHAIN_DIR="/app/install/llvm"
 DEFAULT_TARGET="chimera-open"
@@ -20,7 +19,6 @@ DEFAULT_BACKEND="GVSoC"
 # Script configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-BUILD_DIR="${PROJECT_ROOT}/build"
 
 # Color codes for output
 RED='\033[0;31m'
@@ -42,7 +40,6 @@ Run GVSoC tests locally for the Chimera-SDK project.
 
 OPTIONS:
     -g, --gvsoc-path PATH      Path to GVSoC binary (default: $DEFAULT_GVSOC_PATH)
-    -o, --openocd-path PATH    Path to OpenOCD binary (default: $DEFAULT_OPENOCD_PATH)
     -t, --target TARGET        Target platform to build and test (default: $DEFAULT_TARGET)
                                Available targets: chimera-open, chimera-host, chimera-convolve
     -c, --cmake PATH           Path to CMake binary (default: $DEFAULT_CMAKE)
@@ -95,6 +92,15 @@ print_info() { print_status "$BLUE" "INFO: $1"; }
 print_success() { print_status "$GREEN" "SUCCESS: $1"; }
 print_warning() { print_status "$YELLOW" "WARNING: $1"; }
 print_error() { print_status "$RED" "ERROR: $1"; }
+
+# Ensure flags that need a value actually get one
+require_value() {
+	local flag=$1
+	if [[ $# -lt 2 || -z $2 || $2 == -* ]]; then
+		print_error "Missing value for $flag"
+		exit 1
+	fi
+}
 
 # Function to check if command exists
 command_exists() {
@@ -280,9 +286,8 @@ run_tests() {
     local target=$1
     local backend=$2
     local gvsoc_path=$3
-    local openocd_path=$4
-    local verbose=$5
-    shift 5
+    local verbose=$4
+    shift 4
     local tests=("$@")
 
     # If no specific tests provided, use all tests for the target
@@ -350,7 +355,6 @@ run_tests() {
 
 # Parse command line arguments
 GVSOC_PATH="$DEFAULT_GVSOC_PATH"
-OPENOCD_PATH="$DEFAULT_OPENOCD_PATH"
 TARGET="$DEFAULT_TARGET"
 CMAKE_CMD="$DEFAULT_CMAKE"
 TOOLCHAIN_DIR="$DEFAULT_TOOLCHAIN_DIR"
@@ -364,69 +368,80 @@ BACKEND="$DEFAULT_BACKEND"
 TESTS=()
 
 while [[ $# -gt 0 ]]; do
-    case $1 in
-        -g|--gvsoc-path)
-            GVSOC_PATH="$2"
-            shift 2
-            ;;
-        -o|--openocd-path)
-            OPENOCD_PATH="$2"
-            shift 2
-            ;;
-        -t|--target)
-            TARGET="$2"
-            shift 2
-            ;;
-        -c|--cmake)
-            CMAKE_CMD="$2"
-            shift 2
-            ;;
-        -T|--toolchain-dir)
-            TOOLCHAIN_DIR="$2"
-            shift 2
-            ;;
-        -b|--build-only)
-            BUILD_ONLY="true"
-            shift
-            ;;
-        -e |--backend)
-            BACKEND="$2"
-            shift 2
-            ;;
-        -r|--run-only)
-            RUN_ONLY="true"
-            shift
-            ;;
-        -l|--list-tests)
-            LIST_TESTS="true"
-            shift
-            ;;
-        -L|--list-targets)
-            LIST_TARGETS="true"
-            shift
-            ;;
-        -j|--jobs)
-            JOBS="$2"
-            shift 2
-            ;;
-        -v|--verbose)
-            VERBOSE="true"
-            shift
-            ;;
-        -h|--help)
-            print_usage
-            exit 0
-            ;;
-        -*)
-            print_error "Unknown option: $1"
-            print_usage
-            exit 1
-            ;;
-        *)
-            TESTS+=("$1")
-            shift
-            ;;
-    esac
+	case $1 in
+	-g | --gvsoc-path)
+		require_value "$1" "$2"
+		GVSOC_PATH="$2"
+		shift 2
+		;;
+	-G | --gdb-path)
+		require_value "$1" "$2"
+		GDB_PATH="$2"
+		shift 2
+		;;
+	-t | --target)
+		require_value "$1" "$2"
+		TARGET="$2"
+		shift 2
+		;;
+	-c | --cmake)
+		require_value "$1" "$2"
+		CMAKE_CMD="$2"
+		shift 2
+		;;
+	-T | --toolchain-dir)
+		require_value "$1" "$2"
+		TOOLCHAIN_DIR="$2"
+		shift 2
+		;;
+	-b | --build-only)
+		BUILD_ONLY="true"
+		shift
+		;;
+	-e | --backend)
+		require_value "$1" "$2"
+		BACKEND="$2"
+		shift 2
+		;;
+	-r | --run-only)
+		RUN_ONLY="true"
+		shift
+		;;
+	-l | --list-tests)
+		LIST_TESTS="true"
+		shift
+		;;
+	-L | --list-targets)
+		LIST_TARGETS="true"
+		shift
+		;;
+	-j | --jobs)
+		require_value "$1" "$2"
+		JOBS="$2"
+		shift 2
+		;;
+	-v | --verbose)
+		VERBOSE=1
+		shift
+		;;
+	-vv | --very-verbose)
+		VERBOSE=2
+		shift
+		;;
+	-h | --help)
+		print_usage
+		exit 0
+		;;
+	-*)
+		print_error "Unknown option: $1"
+		print_usage
+		exit 1
+		;;
+	*)
+		TESTS+=("$1")
+		shift
+		;;
+	esac
 done
 
 # Check if CMAKE command exists
@@ -449,7 +464,9 @@ BUILD_DIR="${PROJECT_ROOT}/build-${TARGET}"
 
 validate_target "$TARGET"
 
-extract_tests "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR"
+if [[ $RUN_ONLY == "false" ]]; then
+	extract_tests "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR"
+fi
 
 if [[ $BUILD_ONLY == "true" && $RUN_ONLY == "true" ]]; then
     print_error "Cannot specify both --build-only and --run-only"
@@ -476,5 +493,5 @@ if [[ $BUILD_ONLY == "false" ]]; then
         print_error "Unsupported backend: $BACKEND. Currently only GVSoC is supported."
         exit 1
     fi
-    run_tests "$TARGET" "$BACKEND" "$GVSOC_PATH" "$OPENOCD_PATH" "$VERBOSE" "${TESTS[@]}"
+    run_tests "$TARGET" "$BACKEND" "$GVSOC_PATH" "$VERBOSE" "${TESTS[@]}"
 fi

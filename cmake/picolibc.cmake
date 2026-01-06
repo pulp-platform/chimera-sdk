@@ -6,8 +6,6 @@
 
 include(ExternalProject)
 
-# message(STATUS "[CHIMERA-SDK] Setting up picolibc")
-
 set(CROSS_C_COMPILER "${CMAKE_C_COMPILER}")
 set(CROSS_C_COMPILER_ARGS "-target ${CROSS_COMPILE_HOST} -nostdlib" CACHE STRING "Compiler arguments (Host)")
 # VIVIANEP: These flags are only for building Picolibc; adding them globally breaks
@@ -88,8 +86,6 @@ add_dependencies(picolibc_host picolibc)
 ################################################################################
 # Snitch Picolibc Library
 ################################################################################
-# Check if ISA_CLUSTER_SNITCH is set
-
 if(${ISA_CLUSTER_SNITCH} STREQUAL "NONE")
     return()
 else()
