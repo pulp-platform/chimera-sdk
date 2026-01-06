@@ -26,10 +26,21 @@
 // Import HAL Headers
 #include "interface_api.h"
 
-#define CLUSTER 4
-#define STACK_ADDRESS (_chimera_clusterBase[CLUSTER] + 0x20000 - 1)
-static uint32_t stack_size[CLUSTER_4_NUMCORES] = {0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
-                                                  0x1000, 0x1000, 0x1000, 0x4000};
+#define STACK_ADDRESS_0 (_chimera_clusterBase[0] + 0x20000 - 1)
+static uint32_t stack_size_0[CLUSTER_0_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_1 (_chimera_clusterBase[1] + 0x20000 - 1)
+static uint32_t stack_size_1[CLUSTER_1_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_2 (_chimera_clusterBase[2] + 0x20000 - 1)
+static uint32_t stack_size_2[CLUSTER_2_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_3 (_chimera_clusterBase[3] + 0x20000 - 1)
+static uint32_t stack_size_3[CLUSTER_3_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_4 (_chimera_clusterBase[4] + 0x20000 - 1)
+static uint32_t stack_size_4[CLUSTER_4_NUMCORES] = {0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
+                                                    0x1000, 0x1000, 0x1000, 0x4000};
 
 // Timeout for cluster execution (in RTC ticks)
 #define CLUSTER_TIMEOUT_MS 10000
@@ -99,9 +110,10 @@ int main(void) {
         .default_frequency_mhz = 200, // Frequency in MHz in automatic mode
         .default_repetitions = 1,     // Number of repetitions in automatic mode
         .timeout = CLUSTER_TIMEOUT_MS,
-        .clusterId = CLUSTER,
-        .stack_start = (void *)STACK_ADDRESS,
-        .stack_sizes = stack_size,
+        .clusters = 1,
+        .clusterIds = {4},
+        .stack_start = {(void *)STACK_ADDRESS_4},
+        .stack_sizes = {stack_size_4},
         .function_test = (void *)fll_matmul_test,
         .function_interrupt = (void *)clusterInterruptHandler,
         .args = &test_args,

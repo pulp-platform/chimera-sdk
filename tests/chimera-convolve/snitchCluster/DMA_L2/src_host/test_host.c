@@ -27,13 +27,24 @@
 // Import HAL Headers
 #include "interface_api.h"
 
-#define CLUSTER 4
-#define STACK_ADDRESS (_chimera_clusterBase[CLUSTER] + 0x20000 - 1)
-static uint32_t stack_size[CLUSTER_4_NUMCORES] = {0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
-                                                  0x1000, 0x1000, 0x1000, 0x4000};
+#define STACK_ADDRESS_0 (_chimera_clusterBase[0] + 0x20000 - 1)
+static uint32_t stack_size_0[CLUSTER_0_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_1 (_chimera_clusterBase[1] + 0x20000 - 1)
+static uint32_t stack_size_1[CLUSTER_1_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_2 (_chimera_clusterBase[2] + 0x20000 - 1)
+static uint32_t stack_size_2[CLUSTER_2_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_3 (_chimera_clusterBase[3] + 0x20000 - 1)
+static uint32_t stack_size_3[CLUSTER_3_NUMCORES] = {0x1000, 0x4000};
+
+#define STACK_ADDRESS_4 (_chimera_clusterBase[4] + 0x20000 - 1)
+static uint32_t stack_size_4[CLUSTER_4_NUMCORES] = {0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
+                                                    0x1000, 0x1000, 0x1000, 0x4000};
 
 // Timeout for cluster execution (in RTC ticks)
-#define CLUSTER_TIMEOUT_MS 5000
+#define CLUSTER_TIMEOUT_MS 10000
 
 static const dif_gpio_t gpio = {
     .base_addr = (volatile void *)&__base_gpio,
@@ -86,15 +97,9 @@ int main(void) {
     }
 #endif
 
-    test_cluster_result_t test_result = {0};
-
-    dma_l2_test_args_t args = {0};
-
-    test_cluster_args_t test_args = {
-        .repetitions = 1,
-        .result = &test_result,
-        .args = &args,
-    };
+    test_cluster_result_t test_result[_chimera_numClusters] = {0};
+    dma_l2_test_args_t args[_chimera_numClusters] = {0};
+    test_cluster_args_t test_args[_chimera_numClusters];
 
     test_cluster_cfg_t test_cfg = {
         .name = "DMA L2 Test",
@@ -102,13 +107,21 @@ int main(void) {
         .default_frequency_mhz = 200, // Frequency in MHz in automatic mode
         .default_repetitions = 1,     // Number of repetitions in automatic mode
         .timeout = CLUSTER_TIMEOUT_MS,
-        .clusterId = CLUSTER,
-        .stack_start = (void *)STACK_ADDRESS,
-        .stack_sizes = stack_size,
+        .clusters = 5,
+        .clusterIds = {0, 1, 2, 3, 4},
+        .stack_start = {(void *)STACK_ADDRESS_0, (void *)STACK_ADDRESS_1, (void *)STACK_ADDRESS_2,
+                        (void *)STACK_ADDRESS_3, (void *)STACK_ADDRESS_4},
+        .stack_sizes = {stack_size_0, stack_size_1, stack_size_2, stack_size_3, stack_size_4},
         .function_test = (void *)dma_l2_test,
         .function_interrupt = (void *)clusterInterruptHandler,
-        .args = &test_args,
     };
+
+    for (int i = 0; i < _chimera_numClusters; i++) {
+        test_args[i].repetitions = 1;
+        test_args[i].result = &test_result[i];
+        test_args[i].args = &args[i];
+        test_cfg.args[i] = &test_args[i];
+    }
 
     /*
      * Check SCRATCH0 register to override test mode
@@ -138,15 +151,18 @@ int main(void) {
     // SCRATCH3: Repetitions
     // SCRATCH4: DMA Direction (0: Read L2, 1: Write L2)
     // SCRATCH5: Size in bytes
-    args.direction = scratch[4] == 0 ? DMA_READ_L2 : DMA_WRITE_L2;
-    args.size_bytes = scratch[5] == 0 ? 1024 : (size_t)scratch[5];
-
-    args.pointer_l2 = (void *)memory_island_malloc(args.size_bytes * sizeof(int8_t));
-
-    if (args.direction == DMA_READ_L2) {
-        // Initialize L2 buffer with some data for read test
-        for (size_t i = 0; i < args.size_bytes; i++) {
-            ((uint8_t *)args.pointer_l2)[i] = (uint8_t)(i & 0xFF);
+    for (int id = 0; id < test_cfg.clusters; id++) {
+        test_cluster_args_t *arg = test_cfg.args[id];
+        dma_l2_test_args_t *dma_arg = (dma_l2_test_args_t *)arg->args;
+        arg->repetitions = scratch[3] == 0 ? 1 : (int32_t)scratch[3];
+        dma_arg->direction = scratch[4] == 0 ? DMA_READ_L2 : DMA_WRITE_L2;
+        dma_arg->size_bytes = scratch[5] == 0 ? 1024 : (size_t)scratch[5];
+        dma_arg->pointer_l2 = (void *)memory_island_malloc(dma_arg->size_bytes * sizeof(int8_t));
+        if (dma_arg->direction == DMA_READ_L2) {
+            // Initialize L2 buffer with some data for read test
+            for (size_t i = 0; i < dma_arg->size_bytes; i++) {
+                ((uint8_t *)dma_arg->pointer_l2)[i] = (uint8_t)(i & 0xFF);
+            }
         }
     }
 
