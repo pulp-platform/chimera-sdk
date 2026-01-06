@@ -62,8 +62,13 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
     do {
         if (test_cfg->mode == TEST_MODE_DUTCTL) {
             // In DUTCTL mode, run once with default parameters
-            test_cfg->args->repetitions = scratch[1]; // e.g. 1
-            printf("@dutctl:dutmeas:cfg_repetitions:%d\r\n", test_cfg->args->repetitions);
+            for (int id = 0; id < test_cfg->clusters; id++) {
+                uint8_t clusterId = test_cfg->clusterIds[id];
+                test_cluster_args_t *arg = test_cfg->args[id];
+                arg->repetitions = scratch[1];
+                printf("@dutctl:dutmeas:cfg_repetitions_%d:%d\r\n", clusterId,
+                       test_cfg->args[id]->repetitions);
+            }
         } else if (test_cfg->mode == TEST_MODE_INTERACTIVE) {
             printf_log("Enter number of repetitions (default 1): ");
             fflush(stdout);
@@ -78,11 +83,17 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
                 repetitions = atoi(input_buffer);
             }
             printf("%d\n", repetitions);
-            test_cfg->args->repetitions = repetitions;
+            for (int id = 0; id < test_cfg->clusters; id++) {
+                test_cluster_args_t *arg = test_cfg->args[id];
+                arg->repetitions = repetitions;
+            }
         } else {
             // In other modes, use default of 1
             printf_log("Using repetitions = %d\n", test_cfg->default_repetitions);
-            test_cfg->args->repetitions = test_cfg->default_repetitions;
+            for (int id = 0; id < test_cfg->clusters; id++) {
+                test_cluster_args_t *arg = test_cfg->args[id];
+                arg->repetitions = test_cfg->default_repetitions;
+            }
         }
 
         if (test_cfg->mode == TEST_MODE_DUTCTL) {
@@ -150,28 +161,27 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
         uint32_t actual_freq = core_freq;
         printf_log("Note: FLL configuration only available on ASIC target\n");
 #endif
-
         // Setup cluster
-        if (test_cfg->mode != TEST_MODE_DUTCTL) {
-            printf_log("----------------------------------------\n");
-            printf_log("Setting up cluster %d...\n", test_cfg->clusterId);
-            printf_log("----------------------------------------\n");
-        }
-
-        test_cluster_args_t *arg = test_cfg->args;
-
-        void *stack_cluster_ptr[NUM_CLUSTER_CORES];
-        generate_snitchCluster_SPs(test_cfg->clusterId, test_cfg->stack_start,
-                                   test_cfg->stack_sizes, stack_cluster_ptr);
-
         setup_snitchCluster_interruptHandler(test_cfg->function_interrupt);
+        void *stack_cluster_ptr[test_cfg->clusters][NUM_CLUSTER_CORES];
+        for (int id = 0; id < test_cfg->clusters; id++) {
+            uint8_t clusterId = test_cfg->clusterIds[id];
+            if (test_cfg->mode != TEST_MODE_DUTCTL) {
+                printf_log("----------------------------------------\n");
+                printf_log("Setting up cluster %d...\n", clusterId);
+                printf_log("----------------------------------------\n");
+            }
 
-        set_snitchCluster_clockGating(test_cfg->clusterId, 0);
+            generate_snitchCluster_SPs(clusterId, test_cfg->stack_start[id],
+                                       test_cfg->stack_sizes[id], stack_cluster_ptr[id]);
 
-        set_snitchCluster_reset(test_cfg->clusterId, 1);
-        for (volatile int i = 0; i < 10; i++);
-        set_snitchCluster_reset(test_cfg->clusterId, 0);
-        for (volatile int i = 0; i < 1000; i++);
+            set_snitchCluster_clockGating(clusterId, 0);
+
+            set_snitchCluster_reset(clusterId, 1);
+            for (volatile int i = 0; i < 10; i++);
+            set_snitchCluster_reset(clusterId, 0);
+            for (volatile int i = 0; i < 1000; i++);
+        }
 
         // Record start time
         clint_mtime_t start_time = clint_get_mtime();
@@ -190,14 +200,22 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
         // Disable interrupts
         set_mie(0);
 
-        offload_snitchCluster(test_cfg->function_test, (void *)arg, stack_cluster_ptr,
-                              test_cfg->clusterId);
+        for (int id = 0; id < test_cfg->clusters; id++) {
+            test_cluster_args_t *arg = test_cfg->args[id];
+            offload_snitchCluster(test_cfg->function_test, (void *)arg, stack_cluster_ptr[id],
+                                  test_cfg->clusterIds[id]);
+        }
         // Enable interrupts
         set_mie(1);
 
         // Handle tohost/fromhost communication with timeout
         int timed_out = 0;
-        while (snitchCluster_busy(test_cfg->clusterId)) {
+        int done = 0;
+        while (done != test_cfg->clusters && !timed_out) {
+            done = 0;
+            for (int id = 0; id < test_cfg->clusters; id++) {
+                done += snitchCluster_busy(test_cfg->clusterIds[id]) ? 0 : 1;
+            }
             // Check for timeout
             clint_mtime_t current_time = clint_get_mtime();
             if (clint_mtime_less_than(deadline, current_time)) {
@@ -233,47 +251,53 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
             clint_sleep_ticks(0, 10);
         }
 
-        retVal = 0;
-        if (!timed_out) {
-            retVal = wait_snitchCluster_return(test_cfg->clusterId);
-            retVal = retVal >> 1;
-        }
+        for (int id = 0; id < test_cfg->clusters; id++) {
+            uint8_t clusterId = test_cfg->clusterIds[id];
+            test_cluster_args_t *arg = test_cfg->args[id];
+            retVal = 0;
+            if (!timed_out) {
+                retVal = wait_snitchCluster_return(test_cfg->clusterIds[id]);
+                retVal = retVal >> 1;
+            }
 
-        set_snitchCluster_clockGating(test_cfg->clusterId, 1);
+            set_snitchCluster_clockGating(test_cfg->clusterIds[id], 1);
 
-        // Calculate and display metrics
-        if (test_cfg->mode != TEST_MODE_DUTCTL) {
-            printf_log("----------------------------------------\n");
-            printf_log("Execution Results\n");
-            printf_log("----------------------------------------\n");
-            printf_log("Return value: 0x%08x (%d errors)\n", retVal, retVal);
-        }
+            // Calculate and display metrics
+            if (test_cfg->mode != TEST_MODE_DUTCTL) {
+                printf_log("----------------------------------------\n");
+                printf_log("Execution Results from cluster %d\n", clusterId);
+                printf_log("----------------------------------------\n");
+                printf_log("Return value: 0x%08x (%d errors)\n", retVal, retVal);
+            }
 
-        if (!timed_out) {
-            // Calculate operations per second
-            // Ops in Op/cycle * 1e6
-            // Frequency in Hz
-            // Ops per cycle in  Op / cycle * 1e6 * 1e-3 * Hz * 1e-3 = Op/s
-            uint32_t kops_per_sec = ((arg->result)->ops_per_cycle / 10000) * (actual_freq / 100000);
+            if (!timed_out) {
+                // Calculate operations per second
+                // Ops in Op/cycle * 1e6
+                // Frequency in Hz
+                // Ops per cycle in  Op / cycle * 1e6 * 1e-3 * Hz * 1e-3 = Op/s
+                uint32_t kops_per_sec =
+                    ((arg->result)->ops_per_cycle / 10000) * (actual_freq / 100000);
 
-            printf(" arg->ops_per_cycle = %u\n", (arg->result)->ops_per_cycle);
-            printf(" actual_freq = %u\n", actual_freq);
-            printf(" kops_per_sec = %u\n", kops_per_sec);
+                // printf(" arg->ops_per_cycle = %u\n", (arg->result)->ops_per_cycle);
+                // printf(" actual_freq = %u\n", actual_freq);
+                // printf(" kops_per_sec = %u\n", kops_per_sec);
 
-            if (test_cfg->mode == TEST_MODE_DUTCTL) {
-                printf("@dutctl:dutmeas:meas_ops_per_cycle:%u.%06u\n",
-                       (arg->result)->ops_per_cycle / 1000000,
-                       (arg->result)->ops_per_cycle % 1000000);
-                // MOp/s
-                printf("@dutctl:dutmeas:meas_ops_per_second:%u.%03u\n", kops_per_sec / 1000,
-                       kops_per_sec % 1000);
-                printf("@dutctl:dutmeas:meas_runtime_cycles:%u\n", (arg->result)->runtime_cycles);
-                printf("@dutctl:dutmeas:meas_errors:%u\n", (arg->result)->errors);
-            } else {
-                printf_log("Op/Cycle: %u.%06u\n", (arg->result)->ops_per_cycle / 1000000,
+                if (test_cfg->mode == TEST_MODE_DUTCTL) {
+                    printf("@dutctl:dutmeas:meas_ops_per_cycle_%d:%u.%06u\n", clusterId,
+                           (arg->result)->ops_per_cycle / 1000000,
                            (arg->result)->ops_per_cycle % 1000000);
-                printf_log("Op/s: %u.%03u M\n", kops_per_sec / 1000, kops_per_sec % 1000);
-                printf_log("Runtime Cycles: %u\n", (arg->result)->runtime_cycles);
+                    // MOp/s
+                    printf("@dutctl:dutmeas:meas_ops_per_second_%d:%u.%03u\n", clusterId,
+                           kops_per_sec / 1000, kops_per_sec % 1000);
+                    printf("@dutctl:dutmeas:meas_runtime_cycles_%d:%u\n", clusterId,
+                           (arg->result)->runtime_cycles);
+                    printf("@dutctl:dutmeas:meas_errors_%d:%u\n", clusterId, (arg->result)->errors);
+                } else {
+                    printf_log("Op/Cycle: %u.%06u\n", (arg->result)->ops_per_cycle / 1000000,
+                               (arg->result)->ops_per_cycle % 1000000);
+                    printf_log("Op/s: %u.%03u M\n", kops_per_sec / 1000, kops_per_sec % 1000);
+                    printf_log("Runtime Cycles: %u\n", (arg->result)->runtime_cycles);
+                }
             }
         }
 

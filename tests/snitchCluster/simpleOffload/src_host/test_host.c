@@ -18,8 +18,8 @@
 
 // Import HAL Headers
 
-#define CLUSTER 0
-#define STACK_ADDRESS (_chimera_clusterBase[CLUSTER] + 0x20000 - 1)
+#define CLUSTER1 0
+#define STACK_ADDRESS (_chimera_clusterBase[CLUSTER1] + 0x20000 - 1)
 
 static offloadArgs_t offloadArgs = {.value = 0xdeadbeef};
 
@@ -41,22 +41,22 @@ int main(void) {
 #endif
 
     void *stack_cluster_ptr[NUM_CLUSTER_CORES];
-    generate_snitchCluster_SPs_uniform(CLUSTER, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
+    generate_snitchCluster_SPs_uniform(CLUSTER1, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
 
     setup_snitchCluster_interruptHandler(clusterInterruptHandler);
 
-    set_snitchCluster_clockGating(CLUSTER, 0);
+    set_snitchCluster_clockGating(CLUSTER1, 0);
 
-    set_snitchCluster_reset(CLUSTER, 1);
+    set_snitchCluster_reset(CLUSTER1, 1);
     for (volatile int i = 0; i < 10; i++);
-    set_snitchCluster_reset(CLUSTER, 0);
+    set_snitchCluster_reset(CLUSTER1, 0);
 
     printf_log("Waiting for cluster to finish...\n");
 
-    offload_snitchCluster(testReturn, &offloadArgs, stack_cluster_ptr, CLUSTER);
-    uint32_t retVal = wait_snitchCluster_return(CLUSTER);
+    offload_snitchCluster(testReturn, &offloadArgs, stack_cluster_ptr, CLUSTER1);
+    uint32_t retVal = wait_snitchCluster_return(CLUSTER1);
 
-    set_snitchCluster_clockGating(CLUSTER, 1);
+    set_snitchCluster_clockGating(CLUSTER1, 1);
 
     printf("Returned value: 0x%08x (%d)\n", retVal, retVal);
     printf("Expected value: 0x%08x\n", (TESTVAL | 0x000000001));

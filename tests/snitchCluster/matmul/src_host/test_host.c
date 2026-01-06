@@ -20,8 +20,8 @@
 
 // Import HAL Headers
 
-#define CLUSTER 4
-#define STACK_ADDRESS (_chimera_clusterBase[CLUSTER] + 0x20000 - 1)
+#define CLUSTER1 4
+#define STACK_ADDRESS (_chimera_clusterBase[CLUSTER1] + 0x20000 - 1)
 
 extern uintptr_t volatile tohost, fromhost;
 
@@ -55,27 +55,27 @@ int main(void) {
 #endif
 
     void *stack_cluster_ptr[NUM_CLUSTER_CORES];
-    generate_snitchCluster_SPs_uniform(CLUSTER, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
+    generate_snitchCluster_SPs_uniform(CLUSTER1, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
 
     setup_snitchCluster_interruptHandler(clusterInterruptHandler);
 
-    set_snitchCluster_clockGating(CLUSTER, 0);
+    set_snitchCluster_clockGating(CLUSTER1, 0);
 
-    set_snitchCluster_reset(CLUSTER, 1);
+    set_snitchCluster_reset(CLUSTER1, 1);
     for (volatile int i = 0; i < 10; i++);
-    set_snitchCluster_reset(CLUSTER, 0);
+    set_snitchCluster_reset(CLUSTER1, 0);
 
     printf_log("Waiting for cluster to finish...\n");
 
     // Disable interrupts
     set_mie(0);
-    offload_snitchCluster(testReturn, NULL, stack_cluster_ptr, CLUSTER);
+    offload_snitchCluster(testReturn, NULL, stack_cluster_ptr, CLUSTER1);
 
     // Enable interrupts
     set_mie(1);
 
     // Handle tohost/fromhost communication
-    while (snitchCluster_busy(CLUSTER)) {
+    while (snitchCluster_busy(CLUSTER1)) {
         // Wait for tohost to be set by the device
         if (tohost != 0) {
             volatile uint32_t syscall_addr = tohost;
@@ -105,10 +105,10 @@ int main(void) {
         clint_sleep_ticks(0, 10);
     }
 
-    uint32_t retVal = wait_snitchCluster_return(CLUSTER);
+    uint32_t retVal = wait_snitchCluster_return(CLUSTER1);
     retVal = retVal >> 1;
 
-    set_snitchCluster_clockGating(CLUSTER, 1);
+    set_snitchCluster_clockGating(CLUSTER1, 1);
 
     printf_log("Returned from cluster: 0x%08x (%d)\n", retVal, retVal);
 
