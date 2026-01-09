@@ -8,7 +8,7 @@
 #include <stdint.h>
 
 // Include Application Headers
-#include "ITA_dims.h"
+#include "ITA_mem.h"
 #include "ITA_types.h"
 
 // Include Target Specific Headers

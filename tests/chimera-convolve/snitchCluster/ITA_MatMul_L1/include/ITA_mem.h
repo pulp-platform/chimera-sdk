@@ -7,7 +7,11 @@
 #include <stdint.h>
 
 #include "ITA_types.h"
-#include "ITA_dims.h"
+// #include "ITA_dims_64x512x64.h"
+// #include "ITA_dims_128x512x64.h"
+#include "ITA_dims_192x512x64.h"
+// #include "ITA_dims_256x512x64.h"
+// #include "ITA_dims_512x512x64.h"
 
 // clang-format off
 extern const int8_t input_q[SEQUENCE_LENGTH*EMBEDDING_SPACE];

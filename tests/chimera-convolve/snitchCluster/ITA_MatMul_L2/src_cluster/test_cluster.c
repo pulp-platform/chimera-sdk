@@ -12,7 +12,6 @@
 #include "test_host.h"
 
 #include "ITA_mem.h"
-#include "ITA_dims.h"
 #include "ITA_types.h"
 #include "ITA_utils.h"
 #include "ITA_ctrl.h"
