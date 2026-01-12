@@ -122,6 +122,15 @@ int32_t ita_matmul_l1_test(void *args) {
         start_instructions = snrt_minstret();
 
         for (int i = 0; i < test_args->repetitions; i++) {
+            if (i == test_args->repetitions - 1) {
+                // Do one more iteration after clearning the output
+                // to make sure the results are still correct
+                snrt_dma_start_1d((void *)output_0_buff, (void *)snrt_zero_memory_ptr(),
+                                  SEQUENCE_LENGTH * PROJECTION_SPACE);
+
+                snrt_dma_wait_all();
+            }
+
             ita_soft_clear_keep_regs();
             ita_acquire_job();
 

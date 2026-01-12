@@ -146,6 +146,13 @@ int32_t ita_sha_l2_test(void *args) {
         start_instructions = snrt_minstret();
 
         for (int i = 0; i < test_args->repetitions; i++) {
+            if (i == test_args->repetitions - 1) {
+                // Clear output buffers in L2 before last iteration to avoid false positives
+                snrt_dma_start_1d((void *)interm_output, (void *)snrt_zero_memory_ptr(),
+                                  SEQUENCE_LENGTH * EMBEDDING_SPACE);
+                snrt_dma_wait_all();
+            }
+
             ita_soft_clear_keep_regs();
             ita_acquire_job();
 
