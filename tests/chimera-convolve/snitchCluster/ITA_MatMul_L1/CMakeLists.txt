@@ -22,8 +22,8 @@ target_link_libraries(${TEST_NAME}_host PUBLIC hal_host runtime_host picolibc_ho
 file(GLOB_RECURSE TEST_SNITCH_SRCS
   "src_cluster/test_cluster.c"
   # "src_cluster/ITA_mem_64x512x64.c"
-  # "src_cluster/ITA_mem_128x512x64.c"
-  "src_cluster/ITA_mem_192x512x64.c"
+  "src_cluster/ITA_mem_128x512x64.c"
+  # "src_cluster/ITA_mem_192x512x64.c"
   # "src_cluster/ITA_mem_256x512x64.c"
   # "src_cluster/ITA_mem_512x512x64.c"
 )

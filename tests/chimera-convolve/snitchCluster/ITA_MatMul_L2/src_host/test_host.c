@@ -42,11 +42,11 @@ static uint32_t stack_size_2[CLUSTER_2_NUMCORES] = {0x1000, 0x4000};
 static uint32_t stack_size_3[CLUSTER_3_NUMCORES] = {0x1000, 0x4000};
 
 #define STACK_ADDRESS_4 (_chimera_clusterBase[4] + 0x20000 - 1)
-static uint32_t stack_size_4[CLUSTER_4_NUMCORES] = {0x1000, 0x1000, 0x1000, 0x1000, 0x1000,
-                                                    0x1000, 0x1000, 0x1000, 0x4000};
+static uint32_t stack_size_4[CLUSTER_4_NUMCORES] = {0x800, 0x800, 0x800, 0x800, 0x800,
+                                                    0x800, 0x800, 0x800, 0x4000};
 
 // Timeout for cluster execution (in RTC ticks)
-#define CLUSTER_TIMEOUT_MS 10000
+#define CLUSTER_TIMEOUT_MS 5000
 
 static const dif_gpio_t gpio = {
     .base_addr = (volatile void *)&__base_gpio,
