@@ -106,7 +106,7 @@ int main(void) {
         .name = "L2 ITA SHA Test",
         .mode = TEST_MODE_AUTOMATIC,
         .default_frequency_mhz = 200, // Frequency in MHz in automatic mode
-        .default_repetitions = 1,     // Number of repetitions in automatic mode
+        .default_repetitions = 100,   // Number of repetitions in automatic mode
         .timeout = CLUSTER_TIMEOUT_MS,
         .clusters = 1,
         .clusterIds = {4},
@@ -127,7 +127,8 @@ int main(void) {
         args[id].interm_Pk = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
         args[id].interm_Pv = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
         args[id].interm_qk = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * SEQUENCE_LENGTH);
-        args[id].interm_attention = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
+        args[id].interm_attention =
+            (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
         args[id].interm_output = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * EMBEDDING_SPACE);
     }
 

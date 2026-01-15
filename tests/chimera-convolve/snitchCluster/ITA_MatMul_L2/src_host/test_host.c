@@ -124,8 +124,8 @@ int main(void) {
     }
 
     for (int id = 0; id < test_cfg.clusters; id++) {
-        args[id].output_L2 = (int8_t *)memory_island_malloc(
-            SEQUENCE_LENGTH * PROJECTION_SPACE * sizeof(int8_t));
+        args[id].output_L2 =
+            (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE * sizeof(int8_t));
     }
 
     /*

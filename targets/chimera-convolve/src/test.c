@@ -49,12 +49,12 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
         (volatile uint32_t *)(&__base_regs + CHESHIRE_SCRATCH_0_REG_OFFSET);
 
     if (test_cfg->mode != TEST_MODE_DUTCTL) {
-        printf("\n\n");
-        printf_log("========================================\n");
-        printf_log("Chimera %s Test \n", test_cfg->name);
-        printf_log("========================================\n");
-        printf_log("Initial frequency: %u.%03u MHz\n", (core_freq / 1000000),
-                   (core_freq % 1000000));
+        // printf("\n\n");
+        // printf_log("========================================\n");
+        // printf_log("Chimera %s Test \n", test_cfg->name);
+        // printf_log("========================================\n");
+        // printf_log("Initial frequency: %u.%03u MHz\n", (core_freq / 1000000),
+        //            (core_freq % 1000000));
     }
 
     // Buffer to hold run again
@@ -89,7 +89,7 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
             }
         } else {
             // In other modes, use default of 1
-            printf_log("Using repetitions = %d\n", test_cfg->default_repetitions);
+            // printf_log("Using repetitions = %d\n", test_cfg->default_repetitions);
             for (int id = 0; id < test_cfg->clusters; id++) {
                 test_cluster_args_t *arg = test_cfg->args[id];
                 arg->repetitions = test_cfg->default_repetitions;
@@ -159,7 +159,7 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
 
 #else
         uint32_t actual_freq = core_freq;
-        printf_log("Note: FLL configuration only available on ASIC target\n");
+        // printf_log("Note: FLL configuration only available on ASIC target\n");
 #endif
         // Setup cluster
         setup_snitchCluster_interruptHandler(test_cfg->function_interrupt);
@@ -167,9 +167,9 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
         for (int id = 0; id < test_cfg->clusters; id++) {
             uint8_t clusterId = test_cfg->clusterIds[id];
             if (test_cfg->mode != TEST_MODE_DUTCTL) {
-                printf_log("----------------------------------------\n");
-                printf_log("Setting up cluster %d...\n", clusterId);
-                printf_log("----------------------------------------\n");
+                // printf_log("----------------------------------------\n");
+                // printf_log("Setting up cluster %d...\n", clusterId);
+                // printf_log("----------------------------------------\n");
             }
 
             generate_snitchCluster_SPs(clusterId, test_cfg->stack_start[id],
