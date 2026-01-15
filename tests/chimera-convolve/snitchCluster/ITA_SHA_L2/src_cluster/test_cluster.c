@@ -64,7 +64,6 @@ __attribute__((naked)) void clusterInterruptHandler() {
  *
  * @return int Return 0 if the test was successful, -1 otherwise.
  */
-int total_errors = 0;
 int32_t ita_sha_l2_test(void *args) {
     int32_t tot_err = 0;
 
@@ -324,18 +323,18 @@ int32_t ita_sha_l2_test(void *args) {
 #ifdef DEBUG
         printf("Starting ITA Checking...\n");
 #endif
-        total_errors += check(1, (uint8_t *)interm_Pq, (uint8_t *)golden_interm_Pq,
-                              SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
-        total_errors += check(2, (uint8_t *)interm_Pk, (uint8_t *)golden_interm_Pk,
-                              SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
-        total_errors += check(3, (uint8_t *)interm_Pv, (uint8_t *)golden_interm_Pv,
-                              SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
-        total_errors += check(4, (uint8_t *)interm_qk, (uint8_t *)golden_interm_attention,
-                              SEQUENCE_LENGTH * SEQUENCE_LENGTH, l1_arena_start, 16 * 4096);
-        total_errors += check(5, (uint8_t *)interm_attention, (uint8_t *)golden_interm_head_output,
-                              SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
-        total_errors += check(6, (uint8_t *)interm_output, (uint8_t *)golden_output,
-                              SEQUENCE_LENGTH * EMBEDDING_SPACE, l1_arena_start, 16 * 4096);
+        tot_err += check(1, (uint8_t *)interm_Pq, (uint8_t *)golden_interm_Pq,
+                         SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
+        tot_err += check(2, (uint8_t *)interm_Pk, (uint8_t *)golden_interm_Pk,
+                         SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
+        tot_err += check(3, (uint8_t *)interm_Pv, (uint8_t *)golden_interm_Pv,
+                         SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
+        tot_err += check(4, (uint8_t *)interm_qk, (uint8_t *)golden_interm_attention,
+                         SEQUENCE_LENGTH * SEQUENCE_LENGTH, l1_arena_start, 16 * 4096);
+        tot_err += check(5, (uint8_t *)interm_attention, (uint8_t *)golden_interm_head_output,
+                         SEQUENCE_LENGTH * PROJECTION_SPACE, l1_arena_start, 16 * 4096);
+        tot_err += check(6, (uint8_t *)interm_output, (uint8_t *)golden_output,
+                         SEQUENCE_LENGTH * EMBEDDING_SPACE, l1_arena_start, 16 * 4096);
 
         if (tot_err != 0) {
             printf("Test failed with %d errors\r\n", tot_err);
@@ -348,5 +347,5 @@ int32_t ita_sha_l2_test(void *args) {
 
     snrt_cluster_hw_barrier();
 
-    return total_errors << 1;
+    return tot_err << 1;
 }

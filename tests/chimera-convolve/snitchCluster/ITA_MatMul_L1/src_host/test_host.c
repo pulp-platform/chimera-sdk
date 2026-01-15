@@ -96,13 +96,8 @@ int main(void) {
     }
 #endif
 
-    test_cluster_result_t test_result = {0};
-
-    test_cluster_args_t test_args = {
-        .repetitions = 1,
-        .result = &test_result,
-        .args = NULL,
-    };
+    test_cluster_result_t test_result[_chimera_numClusters] = {0};
+    test_cluster_args_t test_args[_chimera_numClusters];
 
     test_cluster_cfg_t test_cfg = {
         .name = "L1 ITA MatMul Test",
@@ -116,8 +111,12 @@ int main(void) {
         .stack_sizes = {stack_size_4},
         .function_test = (void *)ita_matmul_l1_test,
         .function_interrupt = (void *)clusterInterruptHandler,
-        .args = &test_args,
     };
+
+    for (int i = 0; i < _chimera_numClusters; i++) {
+        test_args[i].result = &test_result[i];
+        test_cfg.args[i] = &test_args[i];
+    }
 
     /*
      * Check SCRATCH0 register to override test mode

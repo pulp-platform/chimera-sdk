@@ -99,18 +99,9 @@ int main(void) {
     }
 #endif
 
-    test_cluster_result_t test_result = {0};
-
-    ita_matmul_l2_test_args_t args = {0};
-
-    args.output_L2 =
-        (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE * sizeof(int8_t));
-
-    test_cluster_args_t test_args = {
-        .repetitions = 1,
-        .result = &test_result,
-        .args = (void *)&args,
-    };
+    test_cluster_result_t test_result[_chimera_numClusters] = {0};
+    ita_matmul_l2_test_args_t args[_chimera_numClusters] = {0};
+    test_cluster_args_t test_args[_chimera_numClusters];
 
     test_cluster_cfg_t test_cfg = {
         .name = "L2 ITA MatMul Test",
@@ -124,8 +115,18 @@ int main(void) {
         .stack_sizes = {stack_size_4},
         .function_test = (void *)ita_matmul_l2_test,
         .function_interrupt = (void *)clusterInterruptHandler,
-        .args = &test_args,
     };
+
+    for (int i = 0; i < _chimera_numClusters; i++) {
+        test_cfg.args[i] = &test_args[i];
+        test_args[i].args = &args[i];
+        test_args[i].result = &test_result[i];
+    }
+
+    for (int id = 0; id < test_cfg.clusters; id++) {
+        args[id].output_L2 = (int8_t *)memory_island_malloc(
+            SEQUENCE_LENGTH * PROJECTION_SPACE * sizeof(int8_t));
+    }
 
     /*
      * Check SCRATCH0 register to override test mode
