@@ -22,13 +22,13 @@ endmacro()
 
 macro(add_target_source name)
   if(NOT ${name} IN_LIST AVAILABLE_TARGETS)
-    message(FATAL_ERROR "Invalid value for TARGET_PLATFORM: Got ${TARGET_PLATFORM}")
+    message(FATAL_ERROR "[CHIMERA-SDK] Invalid value for TARGET_PLATFORM: Got ${TARGET_PLATFORM}")
   endif()
 
   if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/${name})
     add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/${name})
   else()
-    message(WARNING "Path ${CMAKE_CURRENT_LIST_DIR}/${name} does not exist")
+    message(WARNING "[CHIMERA-SDK] Path ${CMAKE_CURRENT_LIST_DIR}/${name} does not exist")
   endif()
 endmacro()
 
@@ -66,17 +66,22 @@ function(add_chimera_subdirectories target_platform category mappings)
     endif()
 
     # Extract key and value
-    string(SUBSTRING "${mapping}" 0 ${delim_pos} key)
+    string(SUBSTRING "${mapping}" 0 ${delim_pos} key_raw)
     math(EXPR value_start "${delim_pos} + 1")
-    string(SUBSTRING "${mapping}" ${value_start} -1 value)
+    string(SUBSTRING "${mapping}" ${value_start} -1 value_raw)
+
+    # Normalize whitespace around key/value (handles multi-line values)
+    string(STRIP "${key_raw}"   key)
+    string(STRIP "${value_raw}" value)
+
+    # Accept commas across newlines and optional spaces "a,\n  b,  c" -> "a;b;c"
+    string(REGEX REPLACE "[ \t\r\n]*,[ \t\r\n]*" ";" value "${value}")
 
     if(key STREQUAL "${target_platform}")
       list(APPEND included_folders ${value})
       break()
     endif()
   endforeach()
-
-  string(REPLACE "," ";" included_folders "${included_folders}")
 
   # Align output with padding
   string(LENGTH "[CHIMERA-SDK] Enabled ${category}s" category_prefix_length)

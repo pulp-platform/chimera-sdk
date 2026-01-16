@@ -24,8 +24,8 @@ set(CMAKE_STRIP ${TOOLCHAIN_DIR}/bin/${LLVM_TAG}-strip)
 set(CMAKE_C_ABI_COMPILED "False")
 
 # Enable WHOLE_ARCHIVE feature
-set(CMAKE_LINK_LIBRARY_USING_WHOLE_ARCHIVE 
-"-Wl,--whole-archive <LIBRARY> -Wl,--no-whole-archive"
+set(CMAKE_LINK_LIBRARY_USING_WHOLE_ARCHIVE
+    "-Wl,--whole-archive <LIBRARY> -Wl,--no-whole-archive"
 )
 set(CMAKE_LINK_LIBRARY_USING_WHOLE_ARCHIVE_SUPPORTED True)
 
@@ -45,36 +45,28 @@ string(REGEX MATCH "^[0-9]+" LLVM_VERSION_MAJOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_MINOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
 
-if (LLVM_VERSION_MAJOR LESS 16)
-    message(STATUS "Disable linker relaxation for LLVM < 16")
+if(LLVM_VERSION_MAJOR LESS 16)
+    message(STATUS "[CHIMERA-SDK] Disable linker relaxation for LLVM < 16")
     set(CMAKE_ALT_C_OPTIONS "-mno-relax")
     set(CMAKE_ALT_LINK_OPTIONS "-Wl,--no-relax")
     # WIESEP: Disable linker relaxation for LLVM 12
     add_compile_options("${CMAKE_ALT_C_OPTIONS}")
     add_link_options("${CMAKE_ALT_LINK_OPTIONS}")
+    add_link_options("-Wno-unused-command-line-argument")
 endif()
 
 # Define global flags
 set(CROSS_COMPILE_HOST "riscv32-unknown-elf")
 add_compile_options("--target=${CROSS_COMPILE_HOST}")
 
-# ————————————————————————————————————————————————————————————————
-# Ensure we pull in real 64-bit div/mod helpers on 32-bit RISC-V hosts
-# ————————————————————————————————————————————————————————————————
-if (HOST_ARCH STREQUAL "riscv32" AND ABI STREQUAL "ilp32")
-  message(STATUS "[CHIMERA-SDK] Linking compiler-rt builtins for RV32HOST")
-  # Prefer compiler-rt rather than libgcc
-  add_link_options("-rtlib=compiler-rt")
-  add_link_options("-nostdlib")
+add_compile_options(-ggdb -gdwarf-4 -gstrict-dwarf)
 
-  include_directories(${CMAKE_BINARY_DIR}/picolibc-install-${ISA_HOST}-${ABI}/include)
+message(STATUS "[CHIMERA-SDK] Linking compiler-rt builtins for RV32HOST")
+# Prefer compiler-rt rather than libgcc
+add_link_options("-rtlib=compiler-rt")
+add_link_options("-nostdlib")
 
-  # Point at the compiler-rt builtins
-  link_directories(
-    ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib/baremetal/rv32imc
-  )
+include_directories(${CMAKE_BINARY_DIR}/picolibc-install/include)
 
-  # Globally add the real builtins if RV32
-  add_link_options("-lclang_rt.builtins-riscv32")
-endif()
-# ————————————————————————————————————————————————————————————————
+# Globally add the real builtins if RV32
+add_link_options("-lclang_rt.builtins-riscv32")

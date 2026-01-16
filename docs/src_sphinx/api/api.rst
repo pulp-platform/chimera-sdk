@@ -12,6 +12,7 @@ Finally, the CMake API provides a set of CMake functions and macros that can be 
 
    api_hal/api_hal
    api_ll/api_ll
+   api_device/api_device
    api_cmake/api_cmake
 
 

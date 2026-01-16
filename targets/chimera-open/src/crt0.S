@@ -72,7 +72,6 @@ _fp_init:
     mv t0, a0 // Preserve the output of the main
     call _uart_deinit
     mv a0, t0
-    j _exit
 
 // If main returns, we end up here
 .global _exit
@@ -87,6 +86,7 @@ _exit:
     la t1, __base_regs
     sw t0, 8(t1)     // regs.SCRATCH[2]
     // Hand over to whatever called us, passing return
+    ebreak
     ret
 
 // This wraps the C trap handler to save the (integer-only) caller-save
@@ -135,3 +135,7 @@ _trap_handler_wrap:
 .weak trap_vector
 trap_vector:
     j trap_vector
+
+.pushsection .htif,"aw",@progbits;
+.align 6; .global tohost; tohost: .dword 0;
+.align 6; .global fromhost; fromhost: .dword 0;

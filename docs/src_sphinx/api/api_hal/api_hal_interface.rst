@@ -9,12 +9,3 @@ A communication interface is represented by `chi_interface_t` and exposes
     :members:
     :protected-members:
     :project: chimera_hal
-
-UART (HAL)
-==========
-
-.. doxygengroup:: hal_uart
-    :content-only:
-    :members:
-    :protected-members:
-    :project: chimera_hal

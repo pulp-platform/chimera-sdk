@@ -1,5 +1,5 @@
-High‑Level API Reference (HAL)
-*********************************
+Host High‑Level API Reference (HAL)
+***********************************
 
 The High‑Level API provides a hardware abstraction layer (HAL) for the Chimera‑SDK.
 

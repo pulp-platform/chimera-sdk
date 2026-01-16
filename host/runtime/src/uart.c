@@ -1,0 +1,55 @@
+// Copyright 2024 ETH Zurich and University of Bologna.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Viviane Potocnik <vivianep@iis.ee.ethz.ch>
+
+#ifdef CHIMERA_DRIVER_UART
+
+// Include Standard Libraries
+
+// Include Target Specific Headers
+#include "soc.h"
+
+// Include Driver Headers
+
+// Include Runtime Headers
+#include "util.h"
+#include "uart.h"
+#include "clint.h"
+
+const uart_config_t default_uart_cfg = {.baud_rate = UART_DEFAULT_BAUD_RATE,
+                                        .clk_freq_hz = UART_CLK_FREQ_HZ,
+                                        .data_bits = UART_DEFAULT_DATA_BITS,
+                                        .parity = UART_DEFAULT_PARITY,
+                                        .stop_bits = UART_DEFAULT_STOP_BITS};
+
+chi_interface_t default_uart_inst = {
+    .api = &default_uart_api, .base = (uintptr_t)&__base_uart, .cfg = (void *)&default_uart_cfg};
+
+#ifdef HARDWARE_BACKEND_GVSOC
+
+void _uart_init(void) {
+}
+void _uart_deinit(void) {
+}
+#else  // HARDWARE_BACKEND_GVSOC
+void _uart_init(void) {
+    static uart_config_t uart_cfg;
+    uart_cfg = default_uart_cfg;
+
+    uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
+    uint32_t reset_freq = clint_get_core_freq(rtc_freq, 512);
+    uart_cfg.clk_freq_hz = reset_freq;
+
+    default_uart_inst.cfg = &uart_cfg;
+
+    default_uart_inst.api->open(&default_uart_inst);
+}
+
+void _uart_deinit(void) {
+    default_uart_inst.api->close(&default_uart_inst);
+}
+#endif // HARDWARE_BACKEND_GVSOC
+
+#endif // CHIMERA_DRIVER_UART

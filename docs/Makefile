@@ -18,10 +18,11 @@ help:
 
 .PHONY: help Makefile doxygen
 
-doxygen: 
+doxygen:
 	@echo "Building Doxygen documentation"
-	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_HAL.in 
-	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_LL.in
+	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_HOST_HAL.in
+	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_HOST_LL.in
+	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_DEVICES.in
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

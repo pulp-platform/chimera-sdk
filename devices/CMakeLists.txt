@@ -4,7 +4,9 @@
 #
 # Philip Wiese <wiesep@iis.ee.ethz.ch>
 
-# Define mappings for devices
+################################################################################
+# Device Libraries
+################################################################################
 set(DEVICE_MAPPINGS
     chimera-convolve:snitch_cluster
     chimera-open:snitch_cluster
@@ -13,3 +15,5 @@ set(DEVICE_MAPPINGS
 
 # Call the macro
 add_chimera_subdirectories(${TARGET_PLATFORM} "Device" "${DEVICE_MAPPINGS}")
+
+
