@@ -77,9 +77,8 @@ int32_t ita_sha_l2_test(void *args) {
 
     /********** Cluster Initialization **********/
     if (snrt_is_dm_core()) {
-        // printf("Starting ITA SHA execution (S=%ux, E=%u P=%u) for %d iterations\n",
-        // SEQUENCE_LENGTH,
-        //        EMBEDDING_SPACE, PROJECTION_SPACE, test_args->repetitions);
+        printf("Starting ITA SHA execution (S=%u, E=%u P=%u) for %d iterations\n", SEQUENCE_LENGTH,
+               EMBEDDING_SPACE, PROJECTION_SPACE, test_args->repetitions);
 
         // printf("Core %d: Setting up ITA Test...\n", snrt_cluster_core_idx());
         const int8_t *interm_Pq = user_args->interm_Pq;
@@ -142,19 +141,19 @@ int32_t ita_sha_l2_test(void *args) {
         snrt_dma_wait_all();
 
         // Initialize golden results pointer
-        snrt_dma_start_1d((void *)interm_Pq, (void *)golden_interm_Pq,
-                          SEQUENCE_LENGTH * PROJECTION_SPACE);
-        snrt_dma_start_1d((void *)interm_Pk, (void *)golden_interm_Pk,
-                          SEQUENCE_LENGTH * PROJECTION_SPACE);
-        snrt_dma_start_1d((void *)interm_Pv, (void *)golden_interm_Pv,
-                          SEQUENCE_LENGTH * PROJECTION_SPACE);
-        snrt_dma_start_1d((void *)interm_qk, (void *)golden_interm_attention,
-                          SEQUENCE_LENGTH * SEQUENCE_LENGTH);
-        snrt_dma_start_1d((void *)interm_attention, (void *)golden_interm_head_output,
-                          SEQUENCE_LENGTH * SEQUENCE_LENGTH);
-        snrt_dma_start_1d((void *)interm_output, (void *)golden_output,
-                          SEQUENCE_LENGTH * EMBEDDING_SPACE);
-        snrt_dma_wait_all();
+        // snrt_dma_start_1d((void *)interm_Pq, (void *)golden_interm_Pq,
+        //                   SEQUENCE_LENGTH * PROJECTION_SPACE);
+        // snrt_dma_start_1d((void *)interm_Pk, (void *)golden_interm_Pk,
+        //                   SEQUENCE_LENGTH * PROJECTION_SPACE);
+        // snrt_dma_start_1d((void *)interm_Pv, (void *)golden_interm_Pv,
+        //                   SEQUENCE_LENGTH * PROJECTION_SPACE);
+        // snrt_dma_start_1d((void *)interm_qk, (void *)golden_interm_attention,
+        //                   SEQUENCE_LENGTH * SEQUENCE_LENGTH);
+        // snrt_dma_start_1d((void *)interm_attention, (void *)golden_interm_head_output,
+        //                   SEQUENCE_LENGTH * SEQUENCE_LENGTH);
+        // snrt_dma_start_1d((void *)interm_output, (void *)golden_output,
+        //                   SEQUENCE_LENGTH * EMBEDDING_SPACE);
+        // snrt_dma_wait_all();
 
         // Properly reset ITA
         ita_soft_clear();
@@ -173,6 +172,7 @@ int32_t ita_sha_l2_test(void *args) {
                                  requant_add[0][0], requant_add[0][1]);
             ita_commit();
         }
+        printf("ITA contexts initialized.\n");
 
         uint32_t start_cycles = 0, end_cycles = 0;
         uint32_t start_instructions = 0, end_instructions = 0;

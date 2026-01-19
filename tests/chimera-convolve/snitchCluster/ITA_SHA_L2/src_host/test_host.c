@@ -27,6 +27,13 @@
 // Import HAL Headers
 #include "interface_api.h"
 
+extern const int8_t golden_interm_Pq[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
+extern const int8_t golden_interm_Pk[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
+extern const int8_t golden_interm_Pv[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
+extern const int8_t golden_interm_attention[1][SEQUENCE_LENGTH * SEQUENCE_LENGTH];
+extern const int8_t golden_interm_head_output[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
+extern const int8_t golden_output[1][SEQUENCE_LENGTH * EMBEDDING_SPACE];
+
 #define STACK_ADDRESS_0 (_chimera_clusterBase[0] + 0x20000 - 1)
 static uint32_t stack_size_0[CLUSTER_0_NUMCORES] = {0x1000, 0x4000};
 
@@ -122,13 +129,18 @@ int main(void) {
     }
 
     for (int id = 0; id < test_cfg.clusters; id++) {
-        args[id].interm_Pq = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
-        args[id].interm_Pk = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
-        args[id].interm_Pv = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
-        args[id].interm_qk = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * SEQUENCE_LENGTH);
-        args[id].interm_attention =
-            (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
-        args[id].interm_output = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * EMBEDDING_SPACE);
+        // args[id].interm_Pq = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
+        // args[id].interm_Pk = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
+        // args[id].interm_Pv = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
+        // args[id].interm_qk = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * SEQUENCE_LENGTH);
+        // args[id].interm_attention =
+        //     (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
+        args[id].interm_Pq = (int8_t *)golden_interm_Pq;
+        args[id].interm_Pk = (int8_t *)golden_interm_Pk;
+        args[id].interm_Pv = (int8_t *)golden_interm_Pv;
+        args[id].interm_qk = (int8_t *)golden_interm_attention;
+        args[id].interm_attention = (int8_t *)golden_interm_head_output;
+        args[id].interm_output = (int8_t *)golden_output;
     }
 
     /*

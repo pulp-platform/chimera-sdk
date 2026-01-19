@@ -49,12 +49,12 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
         (volatile uint32_t *)(&__base_regs + CHESHIRE_SCRATCH_0_REG_OFFSET);
 
     if (test_cfg->mode != TEST_MODE_DUTCTL) {
-        // printf("\n\n");
-        // printf_log("========================================\n");
-        // printf_log("Chimera %s Test \n", test_cfg->name);
-        // printf_log("========================================\n");
-        // printf_log("Initial frequency: %u.%03u MHz\n", (core_freq / 1000000),
-        //            (core_freq % 1000000));
+        printf("\n\n");
+        printf_log("========================================\n");
+        printf_log("Chimera %s Test \n", test_cfg->name);
+        printf_log("========================================\n");
+        printf_log("Initial frequency: %u.%03u MHz\n", (core_freq / 1000000),
+                   (core_freq % 1000000));
     }
 
     // Buffer to hold run again
