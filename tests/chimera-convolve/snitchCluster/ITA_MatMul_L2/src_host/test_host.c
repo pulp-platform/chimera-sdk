@@ -9,8 +9,6 @@
 // Include Application Headers
 #include "test_cluster.h"
 #include "test_host.h"
-// #include "ITA_dims_64x512x64.h"
-#include "ITA_dims_512x512x64.h"
 
 // Include Target Specific Headers
 #include "soc.h"
