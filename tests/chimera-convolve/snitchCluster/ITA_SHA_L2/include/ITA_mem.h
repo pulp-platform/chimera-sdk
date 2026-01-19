@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #include "ITA_types.h"
-#include "ITA_dims.h"
+#include "test_cluster.h"
 
 // clang-format off
 extern const int8_t input_q[SEQUENCE_LENGTH*EMBEDDING_SPACE];

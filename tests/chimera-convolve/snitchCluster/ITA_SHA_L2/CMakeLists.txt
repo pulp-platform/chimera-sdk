@@ -20,7 +20,10 @@ target_link_libraries(${TEST_NAME}_host PUBLIC hal_host runtime_host picolibc_ho
 
 ######## CLUSTER Code ##########################################################
 file(GLOB_RECURSE TEST_SNITCH_SRCS
-  "src_cluster/*.c"
+  "src_cluster/test_cluster.c"
+  # "src_cluster/ITA_mem_S64_E128_P64.c"
+  "src_cluster/ITA_mem_S128_E128_P64.c"
+  # "src_cluster/ITA_mem_S256_E384_P64.c"
 )
 
 add_library(${TEST_NAME}_cluster OBJECT ${TEST_SNITCH_SRCS})
