@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
-// SPDX-License-Identifier: SHL-0.51
+// SPDX-FileCopyrightText: 2024 Copyright lowRISC contributors
+// SPDX-License-Identifier: Apache-2.0
 
 #ifndef _GPIO_REG_DEFS_
 #define _GPIO_REG_DEFS_
