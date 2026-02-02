@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
+# SPDX-License-Identifier: Apache-2.0
+
 *~
 .ninja*
 **/build*/
@@ -11,7 +14,7 @@ venv
 __pycache__
 
 # Documentation
-docs/_build
+docs/_build*
 docs/_autosummary
 
 # Dept Install Dir

@@ -1,8 +1,5 @@
-// Copyright 2024 ETH Zurich and University of Bologna.
-// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
-//
-// Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 
 /**
  * \defgroup drivers_uart_apb UART APB Driver

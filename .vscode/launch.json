@@ -1,48 +1,49 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Debug Docker",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/bin/test_host_fll", // Update to your target binary
-      "miDebuggerServerAddress": "host.docker.internal:3333",
-      "miDebuggerPath": "gdb-multiarch",
-      "cwd": "${workspaceFolder}",
-      "setupCommands": [
+    "version": "0.2.0",
+    "configurations": [
         {
-          "description": "Enable pretty-printing for gdb",
-          "text": "set print pretty on",
-          "ignoreFailures": true
+            "name": "Debug Docker",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/bin/test_host_uartSimple",
+            // Update to your target binary
+            "miDebuggerServerAddress": "host.docker.internal:3333",
+            "miDebuggerPath": "gdb-multiarch",
+            "cwd": "${workspaceFolder}",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "set print pretty on",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Enable disassembly of next line",
+                    "text": "set disassemble-next-line on",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set target architecture to riscv:rv32",
+                    "text": "set architecture riscv:rv32",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Disable pagination",
+                    "text": "set pagination off",
+                    "ignoreFailures": true
+                }
+            ],
+            "postRemoteConnectCommands": [
+                {
+                    "description": "Reset and reload",
+                    "text": "monitor reset halt",
+                    "ignoreFailures": false
+                },
+                {
+                    "description": "Load binary",
+                    "text": "load",
+                    "ignoreFailures": false
+                }
+            ],
         },
-        {
-          "description": "Enable disassembly of next line",
-          "text": "set disassemble-next-line on",
-          "ignoreFailures": true
-        },
-        {
-          "description": "Set target architecture to riscv:rv32",
-          "text": "set architecture riscv:rv32",
-          "ignoreFailures": true
-        },
-        {
-          "description": "Disable pagination",
-          "text": "set pagination off",
-          "ignoreFailures": true
-        }
-      ],
-      "postRemoteConnectCommands": [
-        {
-          "description": "Reset and reload",
-          "text": "monitor reset halt",
-          "ignoreFailures": false
-        },
-        {
-          "description": "Load binary",
-          "text": "load",
-          "ignoreFailures": false
-        }
-      ],
-    },
-  ]
+    ]
 }

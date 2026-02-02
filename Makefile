@@ -1,10 +1,5 @@
-# Copyright 2025 ETH Zurich and University of Bologna.
-# Licensed under the Apache License, Version 2.0, see LICENSE for details.
+# SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 # SPDX-License-Identifier: Apache-2.0
-
-# Authors:
-# - Philip Wiese <wiesep@iis.ee.ethz.ch>
-# - Victor Jung <jungvi@iis.ee.ethz.ch>
 
 ROOT_DIR := $(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
@@ -33,8 +28,7 @@ help:
 
 format:
 	@echo "Formatting code..."
-	@python scripts/run_clang_format.py -ir tests/ devices/ host/ targets/ -e "*/third_party/*" --clang-format-executable=$(CLANG_FORMAT_EXECUTABLE)
-	@yapf -rip -e "install/" -e "toolchain/" .
+	@pre-commit run --all-files
 
 export-symbols:
 	@echo "Please export the following symbols:"

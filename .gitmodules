@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
+# SPDX-License-Identifier: Apache-2.0
+
 [submodule "host/third_party/opentitan_peripherals"]
 	path = host/third_party/opentitan/opentitan_peripherals
 	url = https://github.com/pulp-platform/opentitan_peripherals.git

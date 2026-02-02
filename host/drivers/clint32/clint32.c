@@ -1,8 +1,5 @@
-// Copyright 2025 ETH Zurich and University of Bologna.
-// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
-//
-// Viviane Potocnik <vivianep@iis.ee.ethz.ch>
 //
 // This file provides the strong (driver-specific) implementations for the
 // CLINT functions using a 32-bit representation (a struct with 'low' and 'high').

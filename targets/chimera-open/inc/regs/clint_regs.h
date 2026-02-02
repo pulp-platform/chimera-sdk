@@ -1,11 +1,5 @@
-// Generated register defines for cheshire
-
-// Copyright information found in source file:
-// Copyright 2020 ETH Zurich and University of Bologna.
-
-// Licensing information found in source file:
-// Licensed under the Apache License, Version 2.0, see LICENSE for details.
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-FileCopyrightText: 2020 ETH Zurich and University of Bologna
+// SPDX-License-Identifier: SHL-0.51
 
 /**
  * @defgroup targets_chimera_host Chimera-Host Target

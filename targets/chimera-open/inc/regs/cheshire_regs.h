@@ -1,10 +1,4 @@
-// Generated register defines for cheshire
-
-// Copyright information found in source file:
-// Copyright 2022 ETH Zurich and University of Bologna.
-
-// Licensing information found in source file:
-// Licensed under Solderpad Hardware License, Version 0.51, see LICENSE for details.
+// SPDX-FileCopyrightText: 2022 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: SHL-0.51
 
 /**
