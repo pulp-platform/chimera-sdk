@@ -58,10 +58,10 @@ target_compile_options(${TEST_NAME}_cluster
   -fdata-sections
 )
 
-# target_link_options(${TEST_NAME}
-#   PUBLIC
-#   -Wl,--print-memory-usage
-#   -Wl,--print-gc-sections
-#   -Wl,--gc-sections
-# )
+target_link_options(${TEST_NAME}
+  PUBLIC
+  # -Wl,--print-memory-usage
+  -Wl,--print-gc-sections
+  -Wl,--gc-sections
+)
 

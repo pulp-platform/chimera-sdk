@@ -6,7 +6,13 @@ macro(add_chimera_executable name)
   add_custom_command(
     TARGET ${name}
     POST_BUILD
-    COMMAND ${CMAKE_OBJDUMP} -dhS $<TARGET_FILE:${name}> > $<TARGET_FILE:${name}>.s)
+    COMMAND ${CMAKE_OBJDUMP} -dhS $<TARGET_FILE:${name}> > $<TARGET_FILE:${name}>.s
+    COMMAND ${CMAKE_NM} -S $<TARGET_FILE:${name}> > $<TARGET_FILE:${name}>.map
+  )
+  set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES
+    $<TARGET_FILE:${name}>.s
+    $<TARGET_FILE:${name}>.map
+  )
 endmacro()
 
 ## TODO: Add vsim target or some such
@@ -205,7 +211,13 @@ macro(disassemble_target target)
   add_custom_command(
     TARGET ${target}
     POST_BUILD
-    COMMAND ${CMAKE_OBJDUMP} -dhS $<TARGET_FILE:${target}> > $<TARGET_FILE:${target}>.s)
+    COMMAND ${CMAKE_OBJDUMP} -dhS $<TARGET_FILE:${target}> > $<TARGET_FILE:${target}>.s
+    COMMAND ${CMAKE_NM} -S $<TARGET_FILE:${target}> > $<TARGET_FILE:${target}>.map
+    )
+  set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_CLEAN_FILES
+    $<TARGET_FILE:${target}>.s
+    $<TARGET_FILE:${target}>.map
+  )
 endmacro()
 
 #[=======================================================================[.rst:

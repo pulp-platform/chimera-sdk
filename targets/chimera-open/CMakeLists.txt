@@ -7,7 +7,7 @@
 add_library(runtime_host STATIC)
 
 target_link_directories(runtime_host PUBLIC
-  ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION}/lib/baremetal/${COMPILERRT_HOST}
+  ${TOOLCHAIN_DIR}/lib/clang/${LLVM_VERSION_MAJOR}/lib/baremetal/${COMPILERRT_HOST}
 )
 
 # WIESEP: Make sure picolibc exists before building the host runtime for the header files

@@ -3,14 +3,29 @@
 
 ROOT_DIR := $(patsubst %/,%, $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
-INSTALL_DIR ?= ${ROOT_DIR}/install
+INSTALL_DIR ?= /app/install
 TOOLCHAIN_DIR := ${ROOT_DIR}/toolchain
 
-LLVM_INSTALL_DIR ?= ${INSTALL_DIR}/llvm
-LLVM_CLANG_RT_RISCV_RV32IMC ?= ${LLVM_INSTALL_DIR}/lib/clang/15.0.0/lib/baremetal/rv32imc/libclang_rt.builtins-riscv32.a
-GVSOC_INSTALL_DIR ?= ${INSTALL_DIR}/gvsoc
+GVSOC_INSTALL_DIR := ${INSTALL_DIR}/gvsoc
 
-LLVM_COMMIT_HASH ?= 1ccb97ef1789b8c574e3fcab0de674e11b189b96
+# LLVM 21.1.8
+# LLVM_DIR := llvm-21.1.8
+# LLVM_INSTALL_DIR := ${INSTALL_DIR}/${LLVM_DIR}
+# LLVM_GIT_URL := https://github.com/llvm/llvm-project.git
+# LLVM_COMMIT_HASH ?= 2078da43e25a4623cab2d0d60decddf709aaea28
+
+# LLVM 18.1.4-pulp
+LLVM_DIR := llvm-18.1.4-pulp
+LLVM_INSTALL_DIR := ${INSTALL_DIR}/${LLVM_DIR}
+LLVM_GIT_URL := git@iis-git.ee.ethz.ch:iis-compilers/llvm-project.git
+LLVM_COMMIT_HASH ?= ac3041771cba42a1a5e4c62d52dca046d95a0e9c
+
+# LLVM 15.0.0-pulp
+# LLVM_DIR := llvm-15.0.0-pulp
+# LLVM_INSTALL_DIR := ${INSTALL_DIR}/${LLVM_DIR}
+# LLVM_GIT_URL := https://github.com/pulp-platform/llvm-project.git
+# LLVM_COMMIT_HASH ?= 1ccb97ef1789b8c574e3fcab0de674e11b189b96
+
 GVSOC_COMMIT_HASH ?= 68e835cd52c55e0fd467a1863b4701cf90478dc6
 
 CLANG_FORMAT_EXECUTABLE ?= clang-format
@@ -34,6 +49,10 @@ export-symbols:
 	@echo "Please export the following symbols:"
 	@echo "GVSOC_HOME=${GVSOC_INSTALL_DIR}/gvsoc"
 
+# -----------------------------------------------------------------------------
+# GVSoC build
+# -----------------------------------------------------------------------------
+
 ${TOOLCHAIN_DIR}/gvosc:
 	mkdir -p ${TOOLCHAIN_DIR} && cd ${TOOLCHAIN_DIR} && \
 	git clone https://github.com/Xeratec/gvsoc.git && \
@@ -47,56 +66,64 @@ ${GVSOC_INSTALL_DIR}: ${TOOLCHAIN_DIR}/gvosc
 
 gvsoc: ${GVSOC_INSTALL_DIR}
 
-${TOOLCHAIN_DIR}/llvm-project:
+# -----------------------------------------------------------------------------
+# LLVM/Clang/LLD build (Ninja)
+# -----------------------------------------------------------------------------
+${TOOLCHAIN_DIR}/${LLVM_DIR}:
 	mkdir -p ${TOOLCHAIN_DIR} && \
 	cd ${TOOLCHAIN_DIR} && \
-	git clone https://github.com/pulp-platform/llvm-project.git \
-	 -b main && \
-	cd ${TOOLCHAIN_DIR}/llvm-project && git checkout ${LLVM_COMMIT_HASH} && \
+	git clone ${LLVM_GIT_URL} -b main ${LLVM_DIR} && \
+	cd ${TOOLCHAIN_DIR}/${LLVM_DIR} && git checkout ${LLVM_COMMIT_HASH} && \
 	git submodule update --init --recursive
 
-${LLVM_INSTALL_DIR}: ${TOOLCHAIN_DIR}/llvm-project
-	cd ${TOOLCHAIN_DIR}/llvm-project && \
-	mkdir -p build && cd build && \
-	${CMAKE} -G Ninja \
-	-DCMAKE_INSTALL_PREFIX=${LLVM_INSTALL_DIR} \
-	-DLLVM_ENABLE_PROJECTS="clang;lld" \
-	-DLLVM_TARGETS_TO_BUILD="ARM;RISCV;host" \
-	-DLLVM_BUILD_DOCS="0" \
-	-DLLVM_ENABLE_BINDINGS="0" \
-	-DLLVM_ENABLE_TERMINFO="0" \
-	-DLLVM_OPTIMIZED_TABLEGEN=ON \
-	-DLLVM_PARALLEL_LINK_JOBS=2 \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_C_COMPILER_LAUNCHER=ccache \
-	-DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-	../llvm && \
-	${CMAKE} --build . -j && \
-	${CMAKE} --install .
 
-llvm: ${LLVM_INSTALL_DIR}
+LLVM_BUILD_DIR := $(TOOLCHAIN_DIR)/$(LLVM_DIR)/build-llvm
+LLVM_STAMP     := $(LLVM_INSTALL_DIR)/.llvm-installed
 
+# Use a stamp (or you can use $(LLVM_INSTALL_DIR)/bin/clang) so rebuilds trigger correctly.
+$(LLVM_STAMP): $(TOOLCHAIN_DIR)/$(LLVM_DIR)
+	@set -e; \
+	cd $(TOOLCHAIN_DIR)/$(LLVM_DIR); \
+	mkdir -p $(LLVM_BUILD_DIR); \
+	cd $(LLVM_BUILD_DIR); \
+	$(CMAKE) -G Ninja \
+	  -DCMAKE_INSTALL_PREFIX=$(LLVM_INSTALL_DIR) \
+	  -DLLVM_ENABLE_PROJECTS="clang;lld" \
+	  -DLLVM_TARGETS_TO_BUILD="RISCV;host" \
+	  -DLLVM_BUILD_DOCS=OFF \
+	  -DLLVM_ENABLE_BINDINGS=OFF \
+	  -DLLVM_ENABLE_TERMINFO=OFF \
+	  -DLLVM_OPTIMIZED_TABLEGEN=ON \
+	  -DLLVM_PARALLEL_LINK_JOBS=2 \
+	  -DCMAKE_BUILD_TYPE=Release \
+	  -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+	  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+	  ../llvm; \
+	$(CMAKE) --build . -j; \
+	$(CMAKE) --install .; \
+	touch $(LLVM_STAMP)
 
-${LLVM_CLANG_RT_RISCV_RV32IMC}: ${TOOLCHAIN_DIR}/llvm-project
-	mkdir -p ${TOOLCHAIN_DIR} && \
-	cd ${TOOLCHAIN_DIR}/llvm-project && mkdir -p build-compiler-rt-riscv-rv32imc \
-	&& cd build-compiler-rt-riscv-rv32imc; \
-	${CMAKE} ../compiler-rt \
-	-DCMAKE_C_COMPILER_WORKS=1 \
-	-DCMAKE_CXX_COMPILER_WORKS=1 \
-	-DCMAKE_AR=${LLVM_INSTALL_DIR}/bin/llvm-ar \
-	-DCMAKE_INSTALL_PREFIX=${LLVM_INSTALL_DIR}/lib/clang/15.0.0 \
-	-DCMAKE_ASM_COMPILER_TARGET="riscv32-unknown-elf" \
-	-DCMAKE_C_COMPILER=${LLVM_INSTALL_DIR}/bin/clang \
-	-DCMAKE_ASM_COMPILER=${LLVM_INSTALL_DIR}/bin/clang \
-	-DCMAKE_C_FLAGS="-mno-relax -march=rv32imc" \
-	-DCMAKE_SYSTEM_NAME=baremetal \
-	-DCMAKE_HOST_SYSTEM_NAME=baremetal \
-	-DCMAKE_C_COMPILER_TARGET="riscv32-unknown-elf" \
-	-DCMAKE_CXX_COMPILER_TARGET="riscv32-unknown-elf" \
-	-DCMAKE_SIZEOF_VOID_P=4 \
-	-DCMAKE_NM=${LLVM_INSTALL_DIR}/bin/llvm-nm \
-	-DCMAKE_RANLIB=${LLVM_INSTALL_DIR}/bin/llvm-ranlib \
+llvm: $(LLVM_STAMP)
+
+# Compute Clang resource dir dynamically (avoids hardcoding "21").
+# NOTE: This is evaluated when referenced; it requires clang to be installed.
+CLANG_RESOURCE_DIR = $(shell $(LLVM_INSTALL_DIR)/bin/clang -print-resource-dir)
+
+# -----------------------------------------------------------------------------
+# compiler-rt builtins (baremetal multilib variants)
+# -----------------------------------------------------------------------------
+
+CRT_COMMON_CMAKE_FLAGS = \
+	-DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+	-DCMAKE_SYSTEM_NAME=Generic \
+	-DCMAKE_AR=$(LLVM_INSTALL_DIR)/bin/llvm-ar \
+	-DCMAKE_NM=$(LLVM_INSTALL_DIR)/bin/llvm-nm \
+	-DCMAKE_RANLIB=$(LLVM_INSTALL_DIR)/bin/llvm-ranlib \
+	-DCMAKE_LINKER=$(LLVM_INSTALL_DIR)/bin/ld.lld \
+	-DCMAKE_C_COMPILER=$(LLVM_INSTALL_DIR)/bin/clang \
+	-DCMAKE_ASM_COMPILER=$(LLVM_INSTALL_DIR)/bin/clang \
+	-DCMAKE_CXX_COMPILER=$(LLVM_INSTALL_DIR)/bin/clang \
+	-DLLVM_CONFIG_PATH=$(LLVM_INSTALL_DIR)/bin/llvm-config \
 	-DCOMPILER_RT_BUILD_BUILTINS=ON \
 	-DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
 	-DCOMPILER_RT_BUILD_MEMPROF=OFF \
@@ -104,13 +131,57 @@ ${LLVM_CLANG_RT_RISCV_RV32IMC}: ${TOOLCHAIN_DIR}/llvm-project
 	-DCOMPILER_RT_BUILD_SANITIZERS=OFF \
 	-DCOMPILER_RT_BUILD_XRAY=OFF \
 	-DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
-	-DCOMPILER_RT_BAREMETAL_BUILD=ON \
-	-DCOMPILER_RT_OS_DIR="baremetal/rv32imc" \
-	-DLLVM_CONFIG_PATH=${LLVM_INSTALL_DIR}/bin/llvm-config && \
-	${CMAKE} --build . -j && \
-	${CMAKE} --install .
+	-DCOMPILER_RT_BAREMETAL_BUILD=ON
 
-llvm-compiler-rt-riscv: ${LLVM_CLANG_RT_RISCV_RV32IMC}
+# Macro to generate one compiler-rt builtins build+install target.
+# Args:
+#  1: name (install subdir + build dir suffix), e.g. rv32imc
+#  2: cmake processor (CMAKE_SYSTEM_PROCESSOR), e.g. riscv32
+#  3: triple, e.g. riscv32-unknown-elf
+#  4: -march value, e.g. rv32imc
+#  5: -mabi value, e.g. ilp32
+#  6: sizeof void* (4 or 8)
+define MAKE_CRT_BUILTINS_TARGET
 
+CRT_STAMP_$(1) := $(LLVM_INSTALL_DIR)/.compiler-rt-builtins-$(1)-installed
+CRT_BUILD_DIR_$(1) := $(TOOLCHAIN_DIR)/$(LLVM_DIR)/build-compiler-rt-$(1)
+
+$$(CRT_STAMP_$(1)): $(TOOLCHAIN_DIR)/$(LLVM_DIR) $(LLVM_STAMP)
+	@set -e; \
+	mkdir -p $$(CRT_BUILD_DIR_$(1)); \
+	cd $$(CRT_BUILD_DIR_$(1)); \
+	$(CMAKE) $(TOOLCHAIN_DIR)/$(LLVM_DIR)/compiler-rt \
+	  $(CRT_COMMON_CMAKE_FLAGS) \
+	  -DCMAKE_SYSTEM_PROCESSOR=$(2) \
+	  -DCMAKE_ASM_COMPILER_TARGET="$(3)" \
+	  -DCMAKE_C_COMPILER_TARGET="$(3)" \
+	  -DCMAKE_CXX_COMPILER_TARGET="$(3)" \
+	  -DCMAKE_SIZEOF_VOID_P=$(6) \
+	  -DCMAKE_INSTALL_PREFIX="$$(CLANG_RESOURCE_DIR)" \
+	  -DCOMPILER_RT_OS_DIR="baremetal/$(1)" \
+	  -DCMAKE_C_FLAGS="-march=$(4) -mabi=$(5)"; \
+	$(CMAKE) --build . -j; \
+	$(CMAKE) --install .; \
+	touch $$@
+
+.PHONY: compiler-rt-$(1)
+compiler-rt-$(1): $$(CRT_STAMP_$(1))
+
+endef
+
+# ---- Define your multilib variants here ----
+# CVA6 Variants
+$(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32imc,riscv32,riscv32-unknown-elf,rv32imc,ilp32,4))
+$(eval $(call MAKE_CRT_BUILTINS_TARGET,rv64imc,riscv64,riscv64-unknown-elf,rv64imc,lp64,8))
+$(eval $(call MAKE_CRT_BUILTINS_TARGET,rv64imafdc,riscv64,riscv64-unknown-elf,rv64imafdc,lp64d,8))
+
+# Snitch Cluster Variants
+$(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32ima,riscv32,riscv32-unknown-elf,rv32ima,ilp32,4))
+$(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32imafd,riscv32,riscv32-unknown-elf,rv32imafd,ilp32,4))
+# $(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32ima_xdma,riscv32,riscv32-unknown-elf,rv32ima_xdma,ilp32,4))
+
+# Convenience aggregate target
+.PHONY: compiler-rt-riscv-multilib
+compiler-rt-riscv-multilib: compiler-rt-rv32imc compiler-rt-rv32ima compiler-rt-rv64imc compiler-rt-rv32imafd compiler-rt-rv64imafdc #compiler-rt-rv32ima_xdma
 
 .PHONY: format help export-symbols

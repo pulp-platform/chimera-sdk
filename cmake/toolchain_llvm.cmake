@@ -41,6 +41,7 @@ string(REGEX MATCH "^[0-9]+" LLVM_VERSION_MAJOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_MINOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
 
+message(STATUS "[CHIMERA-SDK] Detected LLVM version : ${LLVM_VERSION}")
 if(LLVM_VERSION_MAJOR LESS 16)
     message(STATUS "[CHIMERA-SDK] Disable linker relaxation for LLVM < 16")
     set(CMAKE_ALT_C_OPTIONS "-mno-relax")
@@ -57,7 +58,7 @@ add_compile_options("--target=${CROSS_COMPILE_HOST}")
 
 add_compile_options(-ggdb -gdwarf-4 -gstrict-dwarf)
 
-message(STATUS "[CHIMERA-SDK] Linking compiler-rt builtins for RV32HOST")
+# message(STATUS "[CHIMERA-SDK] Linking compiler-rt builtins for RV32HOST")
 # Prefer compiler-rt rather than libgcc
 add_link_options("-rtlib=compiler-rt")
 add_link_options("-nostdlib")
