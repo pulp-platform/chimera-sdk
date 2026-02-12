@@ -110,7 +110,7 @@ command_exists() {
 
 # Function to extract target
 extract_targets() {
-    # Extract available targets from targets foolder
+    # Extract available targets from targets folder
     AVAILABLE_TARGETS=()
     for dir in "$PROJECT_ROOT/targets/"*; do
         if [[ -d "$dir" ]]; then
@@ -138,13 +138,14 @@ extract_tests() {
     local backend=$2
     local cmake_cmd=$3
     local toolchain_dir=$4
+	local build_dir=$5
 
     # Configure build to get CMake targets
     local cmake_args=(
         "-DTARGET_PLATFORM=$target"
         "-DTOOLCHAIN_DIR=$toolchain_dir"
         "-DHARDWARE_BACKEND=$backend"
-        "-B" "$BUILD_DIR"
+        "-B" "$build_dir"
     )
 
     if ! $cmake_cmd "${cmake_args[@]}" >/dev/null; then
@@ -154,7 +155,7 @@ extract_tests() {
 
     # Query CMake for executable targets
     local targets
-    targets=$($cmake_cmd --build "$BUILD_DIR" --target help 2>/dev/null | grep -E "^\.\.\. (test_|.*test)" | sed 's/\.\.\. //' | grep -v -E "_(host|cluster)$" || true)
+    targets=$($cmake_cmd --build "$build_dir" --target help 2>/dev/null | grep -E "^\.\.\. (test_|.*test)" | sed 's/\.\.\. //' | grep -v -E "_(host|cluster)$" || true)
 
     # Populate TARGET_TESTS associative array
     TARGET_TESTS["$target"]=""
@@ -194,6 +195,7 @@ build_project() {
     local toolchain_dir=$4
     local jobs=$5
     local verbose=$6
+	local build_dir=$7
 
     print_info "Building target: $target"
 
@@ -202,7 +204,7 @@ build_project() {
         "-DTARGET_PLATFORM=$target"
         "-DTOOLCHAIN_DIR=$toolchain_dir"
         "-DHARDWARE_BACKEND=$backend"
-        "-B" "$BUILD_DIR"
+        "-B" "$build_dir"
     )
 
     if [[ $verbose -gt 1 ]]; then
@@ -223,7 +225,7 @@ build_project() {
     fi
 
     # Build
-    local build_args=("--build" "$BUILD_DIR")
+    local build_args=("--build" "$build_dir")
     if [[ -n $jobs ]]; then
         build_args+=("-j" "$jobs")
     else
@@ -256,8 +258,9 @@ run_gvsoc_test() {
     local target=$2
     local gvsoc_path=$3
     local verbose=$4
+	local build_dir=$5
 
-    local binary_path="$BUILD_DIR/bin/$test_name"
+    local binary_path="$build_dir/bin/$test_name"
 
     # Check if binary exists
     if [[ ! -f "$binary_path" ]]; then
@@ -296,7 +299,6 @@ run_gvsoc_test() {
         print_warning "GVSoC output:"
         echo "$output"
         print_error "Test timed out after ${GLOBAL_TIMEOUT}s: $test_name"
-        rm -f "$gdb_script"
         return 1
     fi
 
@@ -329,8 +331,9 @@ run_asic_test() {
     local target=$2
     local gdb_path=$3
     local verbose=$4
+	local build_dir=$5
 
-    local binary_path="$BUILD_DIR/bin/$test_name"
+    local binary_path="$build_dir/bin/$test_name"
     local gdb_port="3333"
     local gdb_host="host.docker.internal"
 
@@ -423,7 +426,8 @@ run_tests() {
     local gvsoc_path=$3
     local gdb_path=$4
     local verbose=$5
-    shift 5
+    local build_dir=$6
+    shift 6
     local tests=("$@")
 
     # If no specific tests provided, use all tests for the target
@@ -470,7 +474,7 @@ run_tests() {
             exit 1
         fi
         set +e
-        if $test_command "$test" "$target" "$runner_path" "$verbose"; then
+        if $test_command "$test" "$target" "$runner_path" "$verbose" "$build_dir"; then
             ((passed++))
         else
             ((failed++))
@@ -592,6 +596,11 @@ if ! command_exists "$CMAKE_CMD"; then
     exit 1
 fi
 
+if [[ $BUILD_ONLY == "true" && $RUN_ONLY == "true" ]]; then
+    print_error "Cannot specify both --build-only and --run-only"
+    exit 1
+fi
+
 # Validate arguments
 extract_targets
 
@@ -605,14 +614,7 @@ BUILD_DIR="${PROJECT_ROOT}/build-${TARGET}"
 
 validate_target "$TARGET"
 
-if [[ $RUN_ONLY == "false" ]]; then
-    extract_tests "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR"
-fi
-
-if [[ $BUILD_ONLY == "true" && $RUN_ONLY == "true" ]]; then
-    print_error "Cannot specify both --build-only and --run-only"
-    exit 1
-fi
+extract_tests "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR" "$BUILD_DIR"
 
 # Handle list tests
 if [[ $LIST_TESTS == "true" ]]; then
@@ -625,7 +627,7 @@ cd "$PROJECT_ROOT"
 
 # Main execution
 if [[ $RUN_ONLY == "false" ]]; then
-    build_project "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR" "$JOBS" "$VERBOSE"
+    build_project "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR" "$JOBS" "$VERBOSE" "$BUILD_DIR"
 fi
 
 # WIESEP: Currently only GVSoC and ASIC are supported as backend
@@ -634,5 +636,5 @@ if [[ $BUILD_ONLY == "false" ]]; then
         print_error "Unsupported backend: $BACKEND. Currently only GVSoC and ASIC are supported."
         exit 1
     fi
-    run_tests "$TARGET" "$BACKEND" "$GVSOC_PATH" "$GDB_PATH" "$VERBOSE" "${TESTS[@]}"
+    run_tests "$TARGET" "$BACKEND" "$GVSOC_PATH" "$GDB_PATH" "$VERBOSE" "$BUILD_DIR" "${TESTS[@]}"
 fi

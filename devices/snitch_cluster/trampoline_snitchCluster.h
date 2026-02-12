@@ -57,8 +57,8 @@
  * @note This is a naked-friendly macro intended to be used inside an asm volatile block.
  */
 #define _SET_CLUSTER_BUSY() \
-    asm volatile(__CLUSTER_ID_ASM "7: slli t1, t1, 2\n" /* t1 = cluster_id * 4 */ \
-                                  "add t1, %0, t1\n"    /* t1 = base + cluster_id*4 */ \
+    asm volatile(__CLUSTER_ID_ASM "slli t1, t1, 2\n" /* t1 = cluster_id * 4 */ \
+                                  "add t1, %0, t1\n" /* t1 = base + cluster_id*4 */ \
                                   "li t2, 1\n" \
                                   "sw t2, 0(t1)\n" \
                  : /* no outputs */ \
@@ -69,7 +69,7 @@
                                    CLUSTER_2_NUMCORES)), \
                    "r"((uintptr_t)(HOST_NUMCORES + CLUSTER_0_NUMCORES + CLUSTER_1_NUMCORES + \
                                    CLUSTER_2_NUMCORES + CLUSTER_3_NUMCORES)) \
-                 : "t0", "t1", "t2", "memory");
+                 : "t0", "t1", "t2", "t3", "memory");
 
 /**
  * @brief Compute cluster id from `mhartid` and clear busy.
@@ -77,8 +77,8 @@
  * @note This is a naked-friendly macro intended to be used inside an asm volatile block.
  */
 #define _CLEAR_CLUSTER_BUSY() \
-    asm volatile(__CLUSTER_ID_ASM "7: slli t1, t1, 2\n" /* t1 = cluster_id * 4 */ \
-                                  "add t1, %0, t1\n"    /* t1 = base + cluster_id*4 */ \
+    asm volatile(__CLUSTER_ID_ASM "slli t1, t1, 2\n" /* t1 = cluster_id * 4 */ \
+                                  "add t1, %0, t1\n" /* t1 = base + cluster_id*4 */ \
                                   "li t2, 0\n" \
                                   "sw t2, 0(t1)\n" \
                  : /* no outputs */ \
@@ -89,7 +89,7 @@
                                    CLUSTER_2_NUMCORES)), \
                    "r"((uintptr_t)(HOST_NUMCORES + CLUSTER_0_NUMCORES + CLUSTER_1_NUMCORES + \
                                    CLUSTER_2_NUMCORES + CLUSTER_3_NUMCORES)) \
-                 : "t0", "t1", "t2", "memory");
+                 : "t0", "t1", "t2", "t3", "memory");
 
 /** @} */
 
