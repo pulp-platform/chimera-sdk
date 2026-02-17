@@ -447,7 +447,7 @@ run_tests() {
     done
 
     # Check if GVSoC binary exists
-    if [[ ! -f "$gvsoc_path" ]]; then
+    if [[ ! -f "$gvsoc_path" && "$backend" == "GVSoC" ]]; then
         print_error "GVSoC binary not found: $gvsoc_path"
         print_info "Please install GVSoC or provide the correct path with --gvsoc-path"
         exit 1
