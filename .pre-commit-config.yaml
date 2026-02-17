@@ -65,3 +65,7 @@ repos:
         name: Autoformat C/C++ Files
         args: ["-i"]
         stages: [pre-commit, pre-merge-commit, pre-push, manual]
+  - repo: https://github.com/scop/pre-commit-shfmt
+    rev: v3.12.0-2
+    hooks:
+      - id: shfmt
