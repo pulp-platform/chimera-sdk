@@ -138,7 +138,7 @@ extract_tests() {
     local backend=$2
     local cmake_cmd=$3
     local toolchain_dir=$4
-	local build_dir=$5
+    local build_dir=$5
 
     # Configure build to get CMake targets
     local cmake_args=(
@@ -195,7 +195,7 @@ build_project() {
     local toolchain_dir=$4
     local jobs=$5
     local verbose=$6
-	local build_dir=$7
+    local build_dir=$7
 
     print_info "Building target: $target"
 
@@ -258,7 +258,7 @@ run_gvsoc_test() {
     local target=$2
     local gvsoc_path=$3
     local verbose=$4
-	local build_dir=$5
+    local build_dir=$5
 
     local binary_path="$build_dir/bin/$test_name"
 
@@ -331,7 +331,7 @@ run_asic_test() {
     local target=$2
     local gdb_path=$3
     local verbose=$4
-	local build_dir=$5
+    local build_dir=$5
 
     local binary_path="$build_dir/bin/$test_name"
     local gdb_port="3333"
@@ -447,7 +447,7 @@ run_tests() {
     done
 
     # Check if GVSoC binary exists
-    if [[ ! -f "$gvsoc_path" ]]; then
+    if [[ ! -f "$gvsoc_path" && "$backend" == "GVSoC" ]]; then
         print_error "GVSoC binary not found: $gvsoc_path"
         print_info "Please install GVSoC or provide the correct path with --gvsoc-path"
         exit 1
