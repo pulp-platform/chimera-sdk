@@ -14,13 +14,13 @@ from textwrap import dedent
 import numpy as np
 
 # Tensor dimensions (mirrors ITA_dims.h)
-INPUT_H = 15
+INPUT_H = (15 + 8)
 INPUT_W = INPUT_H
-INPUT_C = 1
+INPUT_C = 8
 
 KERNEL_H = 8
 KERNEL_W = KERNEL_H
-KERNEL_C = 2
+KERNEL_C = 64
 OUTPUT_C = KERNEL_C
 
 OUTPUT_H = INPUT_H - KERNEL_H + 1
@@ -154,7 +154,47 @@ def build_c_body(inp: np.ndarray, ker: np.ndarray, out: np.ndarray) -> str:
         """).strip() + "\n"
 
 
+def build_mem_h_body(inp_size: int, ker_size: int, golden_size: int) -> str:
+    return dedent(f"""
+        // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+        // SPDX-License-Identifier: Apache-2.0
+
+        #ifndef _ITA_MEM_INCLUDE_GUARD_
+        #define _ITA_MEM_INCLUDE_GUARD_
+
+        #include <stdint.h>
+
+        #include "ITA_types.h"
+        #include "ITA_dims.h"
+
+        // clang-format off
+        extern const int8_t input[{inp_size}];
+        extern const int8_t kernel[{ker_size}];
+        extern const int8_t golden[{golden_size}];
+        extern const uint32_t requant_eps_mult[1][2];
+        extern const uint32_t requant_right_shift[1][2];
+        extern const int32_t requant_add[1][2];
+
+        // clang-format on
+
+        #endif
+        """).strip() + "\n"
+
+
 def build_h_body() -> str:
+    # IM2COL MatMul dimensions: (M x K) * (K x N) = (M x N)
+    # M = spatial positions (OUTPUT_H * OUTPUT_W)
+    # K = patch size (KERNEL_H * KERNEL_W * INPUT_C)
+    # N = output channels (OUTPUT_C)
+    seq_len = OUTPUT_H * OUTPUT_W  # M dimension
+    emb_space = KERNEL_H * KERNEL_W * INPUT_C  # K dimension
+    proj_space = OUTPUT_C  # N dimension
+
+    # Calculate number of tiles (ceiling division to handle partial tiles)
+    n_tile_seq = (seq_len + 63) // 64  # Tiles in M dimension
+    n_tile_emb = (emb_space + 63) // 64  # Tiles in K dimension
+    n_tile_proj = (proj_space + 63) // 64  # Tiles in N dimension
+
     return dedent(f"""
         // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
         // SPDX-License-Identifier: Apache-2.0
@@ -174,9 +214,9 @@ def build_h_body() -> str:
         #define OUTPUT_W (INPUT_W - KERNEL_W + 1)
         #define OUTPUT_C KERNEL_C
 
-        #define N_TILE_SEQUENCE_LENGTH {max(1, (OUTPUT_H * OUTPUT_W) // 64)}
-        #define N_TILE_EMBEDDING_SPACE {max(1, (KERNEL_H * KERNEL_W * INPUT_C) // 64)}
-        #define N_TILE_PROJECTION_SPACE {max(1, (OUTPUT_C) // 64)}
+        #define N_TILE_SEQUENCE_LENGTH {n_tile_seq}
+        #define N_TILE_EMBEDDING_SPACE {n_tile_emb}
+        #define N_TILE_PROJECTION_SPACE {n_tile_proj}
 
         // IM2COL Convolution is MxK * KxN = MxN
         #define IM2COL_N (OUTPUT_H * OUTPUT_W)
@@ -220,6 +260,13 @@ def main() -> None:
         default = default_output_dims,
         help = f"Path to write the generated dimensions header file (default: {default_output_dims})",
     )
+    default_output_mem_h = Path(__file__).parent / "include" / "ITA_mem.h"
+    parser.add_argument(
+        "--output-mem-h",
+        type = Path,
+        default = default_output_mem_h,
+        help = f"Path to write the generated memory header file (default: {default_output_mem_h})",
+    )
     args = parser.parse_args()
 
     inp = gen_input()
@@ -236,17 +283,31 @@ def main() -> None:
     im2col_n = KERNEL_H * KERNEL_W * INPUT_C
     im2col_m = OUTPUT_H * OUTPUT_W
 
-    assert im2col_m % 64 == 0, f"IM2COL_M must be multiple of 64 (but is {im2col_m})"
-    assert im2col_n % 64 == 0, f"IM2COL_N must be multiple of 64 (but is {im2col_n})"
+    # Zero-pad the golden output to match tile boundaries
+    # The output is in CHW format, need to pad to (OUTPUT_C, padded_H*W)
+    n_tile_seq = (im2col_m + 63) // 64
+    padded_seq_len = n_tile_seq * 64
+
+    if padded_seq_len > im2col_m:
+        # Need to pad the spatial dimensions
+        # Reshape from (C, H, W) to (C, H*W), pad, then keep as 1D for storage
+        out_rq_flat = out_rq.reshape(OUTPUT_C, OUTPUT_H * OUTPUT_W)
+        out_rq_padded = np.zeros((OUTPUT_C, padded_seq_len), dtype = np.int8)
+        out_rq_padded[:, :OUTPUT_H * OUTPUT_W] = out_rq_flat
+        out_rq = out_rq_padded.reshape(OUTPUT_C, -1)
 
     print(f"Generated input with shape {inp.shape}")
-    print("IM2COL transformed input shape:", (im2col_m, im2col_n))
+    print(f"IM2COL transformed input shape: ({im2col_m}, {im2col_n})")
+    print(f"Padded output shape: {out_rq.shape} (spatial dim padded to {padded_seq_len})")
 
     body_mem = build_c_body(inp, ker_broadcasted, out_rq)
     args.output_mem.write_text(body_mem)
 
     body_dims = build_h_body()
     args.output_dims.write_text(body_dims)
+
+    body_mem_h = build_mem_h_body(inp.size, ker_broadcasted.size, out_rq.size)
+    args.output_mem_h.write_text(body_mem_h)
     # print(
     #     f"Wrote {args.output_mem} with input {inp.size}, kernel {ker.size}, golden {out.size} entries"
     # )

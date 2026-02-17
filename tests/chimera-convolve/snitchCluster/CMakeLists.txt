@@ -9,4 +9,7 @@ add_subdirectory(ITA_Conv_L1)
 add_subdirectory(ITA_SHA_L2)
 add_subdirectory(wfi)
 add_subdirectory(sleep)
-
+add_subdirectory(iNoNorm_L1)
+add_subdirectory(iLayerNorm_L1)
+add_subdirectory(LayerScale_L1)
+add_subdirectory(Add_L1)
