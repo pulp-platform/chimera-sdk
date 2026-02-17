@@ -129,7 +129,7 @@ void clint_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
  * @param tgt_mtime Target CLINT time value.
  */
 void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
-    if (clint_get_mtime() < tgt_mtime) return;
+    if (clint_get_mtime() >= tgt_mtime) return;
     clint_set_mtimecmpx(timer_idx, tgt_mtime);
     fence();
     set_mtie(1);

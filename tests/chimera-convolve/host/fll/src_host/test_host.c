@@ -82,7 +82,7 @@ int main(void) {
     // Read the RTC frequency from a hardware register
     uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
 
-    // Calculate the desired core frequency from the RTC frequency
+    // Calculate the desired core frequency from the RTC frequency with 1.56% error
     uint32_t core_freq = clint_get_core_freq(rtc_freq, 512);
 
     printf("Chimera running at %d.%d MHz!\n", (core_freq / 1000000), (core_freq % 1000000));
@@ -103,8 +103,8 @@ int main(void) {
     // Disable FLL bypass
     gpioWrite(2, 0);
 
-    // Calculate the desired core frequency from the RTC frequency
-    uint32_t core_freq_fll = clint_get_core_freq(rtc_freq, 16384);
+    // Calculate the desired core frequency from the RTC frequency with 1.56% error
+    uint32_t core_freq_fll = clint_get_core_freq(rtc_freq, 512);
 
     // Update the UART config with the calculated frequency
     uart_cfg.clk_freq_hz = core_freq_fll;

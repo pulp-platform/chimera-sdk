@@ -213,6 +213,14 @@ static inline void *gprw(void *gp) {
  * @param b Second value.
  * @return The smaller of the two values.
  */
-#define MIN(a, b) (((a) <= (b)) ? (a) : (b))
+
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+/**
+ * @brief Returns the maximum of two values.
+ * @param a First value.
+ * @param b Second value.
+ * @return The larger of the two values.
+ */
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 
 /** @} */

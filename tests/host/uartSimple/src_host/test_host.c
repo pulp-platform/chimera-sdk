@@ -48,7 +48,7 @@ int main(void) {
     // 2. Read the RTC frequency from a hardware register
     uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
 
-    // 3. Calculate the desired core frequency from the RTC frequency
+    // 3. Calculate the desired core frequency from the RTC frequency with 1.56% error
     uint32_t reset_freq = clint_get_core_freq(rtc_freq, 512);
 
     // 4. Update the UART config with the calculated frequency

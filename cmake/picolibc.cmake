@@ -4,11 +4,8 @@
 include(ExternalProject)
 
 set(CROSS_C_COMPILER "${CMAKE_C_COMPILER}")
-set(CROSS_C_COMPILER_ARGS "-target ${CROSS_COMPILE_HOST} -nostdlib" CACHE STRING "Compiler arguments (Host)")
-# VIVIANEP: These flags are only for building Picolibc; adding them globally breaks
-#           app builds (e.g., missing <sys/types.h>) or causes issues in freestanding mode.
-set(CROSS_C_ARGS "-ggdb -gdwarf-4 -gstrict-dwarf -Werror=double-promotion -Wno-unsupported-floating-point-opt -fshort-enums ${CMAKE_ALT_C_OPTIONS}")
-set(CROSS_C_LINK_ARGS "-Wl,-z,noexecstack")
+set(CROSS_C_ARGS "--target=${CROSS_COMPILE_HOST} -nostdlib -ggdb -gdwarf-4 -gstrict-dwarf ${CMAKE_ALT_C_OPTIONS}")
+set(CROSS_C_LINK_ARGS "--target=${CROSS_COMPILE_HOST} -nostdlib -fno-common -Wl,-z,noexecstack -fuse-ld=lld")
 
 set(CROSS_AR "${CMAKE_AR}")
 set(CROSS_STRIP "${CMAKE_STRIP}")
@@ -17,8 +14,6 @@ set(CROSS_CPU "${HOST_ARCH}")
 set(CROSS_CPU_FAMILY "${HOST_FAMILY}")
 set(CROSS_ENDIAN "${HOST_ENDIAN}")
 set(CROSS_SYSTEM "${HOST_SYSTEM}")
-
-set(CROSS_SKIP_SANITY_CHECK "true")
 
 # Prepare Meson arrays
 function(prepare_meson_array output_var input_string)
@@ -31,7 +26,6 @@ function(prepare_meson_array output_var input_string)
     set(${output_var} "${result}" PARENT_SCOPE)
 endfunction()
 
-prepare_meson_array(CROSS_C_COMPILER_ARGS_LIST "${CROSS_C_COMPILER_ARGS}")
 prepare_meson_array(CROSS_C_ARGS_LIST "${CROSS_C_ARGS}")
 prepare_meson_array(CROSS_C_LINK_ARGS_LIST "${CROSS_C_LINK_ARGS}")
 

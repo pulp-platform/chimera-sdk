@@ -25,7 +25,11 @@ chi_interface_t default_uart_inst = {
     .api = &default_uart_api, .base = (uintptr_t)&__base_uart, .cfg = (void *)&default_uart_cfg};
 
 #ifdef HARDWARE_BACKEND_GVSOC
-
+void _uart_init(void) {
+}
+void _uart_deinit(void) {
+}
+#elif HARDWARE_BACKEND_RTL
 void _uart_init(void) {
 }
 void _uart_deinit(void) {

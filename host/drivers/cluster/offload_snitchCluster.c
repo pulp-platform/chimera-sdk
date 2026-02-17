@@ -77,13 +77,6 @@ static void *_generate_trampoline(uint32_t hartID, void (*function)(void *), voi
     _trampoline_args[trampoline_idx] = args;
     _trampoline_stack[trampoline_idx] = stack;
 
-// Store captured arguments in a persistent context if needed
-#ifdef TRACE
-    printf("  Function  : %p @ %p\n", function, &_trampoline_function[trampoline_idx]);
-    printf("  Args      : %p @ %p\n", args, &_trampoline_args[trampoline_idx]);
-    printf("  Stack     : %p @ %p\n", stack, &_trampoline_stack[trampoline_idx]);
-    printf("  Trampoline: %p\n", _trampoline);
-#endif
     return _trampoline;
 }
 
@@ -158,7 +151,7 @@ void *generate_snitchCluster_SPs_uniform(uint8_t clusterId, void *sp, uint32_t s
         // Align to 16 Byte boundaries
         sp = (void *)((uintptr_t)sp & ~(uintptr_t)0xFUL);
 #ifdef TRACE
-        printf("Cluster %d Core %d stack @ %p with size: %d \n", clusterId, core_id, sp,
+        printf("[TRACE] Cluster %d Core %d stack @ %p with size: %d \n", clusterId, core_id, sp,
                stack_size);
 #endif
         // set stack pointer
@@ -213,7 +206,8 @@ void offload_snitchCluster(void *function, void *args, void **stack_ptr, uint8_t
     uint32_t hartId = _get_hart_id(clusterId, 0);
 
 #ifdef TRACE
-    printf("Offloading to all cores in cluster %d starting at hartid %d\n", clusterId, hartId);
+    printf("[TRACE] Offloading to all cores in cluster %d starting at hartid %d\n", clusterId,
+           hartId);
 #endif
 
     // Check if the cluster is busy
@@ -226,8 +220,21 @@ void offload_snitchCluster(void *function, void *args, void **stack_ptr, uint8_t
         *interruptTarget = 1;
     }
 
-    // Prevent race contidtion by waiting for all cores to clear the busy flag
-    for (volatile int i = 0; i < 1000; i++);
+#ifdef TRACE
+    printf("[TRACE] Trampoline Function: %p\n", _trampoline);
+    for (uint32_t i = 0; i < _chimera_numCores[clusterId]; i++) {
+        uint32_t trampoline_idx = hartId - CLUSTER_HART_BASE + i;
+        printf("[TRACE] Function [%02d:%02d] : %p @ %p\n", clusterId, i, function,
+               &_trampoline_function[trampoline_idx]);
+        printf("[TRACE] Args     [%02d:%02d] : %p @ %p\n", clusterId, i, args,
+               &_trampoline_args[trampoline_idx]);
+        printf("[TRACE] Stack    [%02d:%02d] : %p @ %p\n", clusterId, i, stack_ptr[i],
+               &_trampoline_stack[trampoline_idx]);
+    }
+#endif
+
+    // Prevent race contidtion by waiting for all cores to set the busy flag
+    for (volatile int i = 0; i < 10; i++);
 }
 
 /**

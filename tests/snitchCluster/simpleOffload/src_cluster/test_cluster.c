@@ -24,6 +24,7 @@
  * @warning Stack, thread and global pointer might not yet be set up!
  */
 __attribute__((naked)) void clusterInterruptHandler() {
+    _SET_CLUSTER_BUSY();
     _SETUP_GP();
 
     asm volatile(

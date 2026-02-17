@@ -21,3 +21,5 @@ add_compile_options(
 # (or run `cmake --build . --verbose=1` / set VERBOSE=1)
 # set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
+add_compile_options("-DTRACE")
+
