@@ -84,9 +84,9 @@ int32_t testReturn(void *args) {
     *reg32((void *)SOC_CTRL_BASE, CHIMERA_SNITCH_INTR_HANDLER_ADDR_REG_OFFSET) =
         (uint32_t)clusterDefaultHandler;
 
-    extern char __tbss_start, __tbss_end, __tdata_start, __tdata_end;
-    extern volatile uint32_t __cbss_start, __cbss_end, __cdata_start, __cdata_end;
-    extern char __cdata_lma_start, __cdata_lma_end;
+    extern char __tbss_start[], __tbss_end[], __tdata_start[], __tdata_end[];
+    extern char __cbss_start[], __cbss_end[], __cdata_start[], __cdata_end[];
+    extern char __cdata_lma_start[], __cdata_lma_end[];
 
     snrt_init();
 

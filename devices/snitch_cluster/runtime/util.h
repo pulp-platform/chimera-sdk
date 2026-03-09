@@ -23,8 +23,8 @@
  * @param offset Register offset.
  * @return Pointer to the 8-bit register.
  */
-static inline volatile uint8_t *reg8(uint32_t base, int offset) {
-    return (volatile uint8_t *)(uintptr_t)(base + offset);
+static inline volatile uint8_t *reg8(uintptr_t base, int offset) {
+    return (volatile uint8_t *)((uintptr_t)base + (intptr_t)offset);
 }
 
 /**
@@ -33,7 +33,7 @@ static inline volatile uint8_t *reg8(uint32_t base, int offset) {
  * @param offset Register offset.
  * @param val Value to write.
  */
-static inline void reg8_write(uint32_t base, int offset, uint8_t val) {
+static inline void reg8_write(uintptr_t base, int offset, uint8_t val) {
     *reg8(base, offset) = val;
 }
 
@@ -43,7 +43,7 @@ static inline void reg8_write(uint32_t base, int offset, uint8_t val) {
  * @param offset Register offset.
  * @return Value read from the register.
  */
-static inline uint8_t reg8_read(uint32_t base, int offset) {
+static inline uint8_t reg8_read(uintptr_t base, int offset) {
     return *reg8(base, offset);
 }
 
@@ -54,7 +54,7 @@ static inline uint8_t reg8_read(uint32_t base, int offset) {
  * @return Pointer to the 32-bit register.
  */
 static inline volatile uint32_t *reg32(void *base, int offs) {
-    return (volatile uint32_t *)(base + offs);
+    return (volatile uint32_t *)((uintptr_t)base + (intptr_t)offs);
 }
 
 /** @} */
@@ -122,8 +122,11 @@ static inline void set_mie(int enable) {
  */
 
 /**
- * @brief Gets the number of cycles since system reset.
- * @return 32-bit cycle count.
+ * @brief Gets the lower 32 bits of the cycle counter since system reset.
+ * @return 32-bit cycle count (wraps every ~4 billion cycles).
+ * @note Only the lower 32 bits are returned. If callers rely on monotonic
+ *       time across wrap boundaries, a 64-bit hi/lo read sequence should
+ *       be used instead (read mcycleh, mcycle, mcycleh again to detect carry).
  */
 static inline uint32_t get_mcycle() {
     uint32_t mcycle;
