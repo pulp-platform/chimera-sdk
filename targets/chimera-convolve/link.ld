@@ -11,7 +11,7 @@ SECTIONS {
     *(.text.*)
   } > memisl
 
-  .misc : ALIGN(16) {
+  .misc : ALIGN(32) {
     *(.rodata)
     *(.rodata.*)
     *(.data)
@@ -87,26 +87,26 @@ SECTIONS {
    * L1 TCDM.  Must not exceed the l1_alias window (= L1 size per cluster). */
   __cls_reserved_size = SIZEOF(.cdata) + SIZEOF(.cbss);
 
-  .bulk : ALIGN(16) {
+  .bulk : ALIGN(32) {
     *(.bulk)
     *(.bulk.*)
   } > memisl
 
-  .l1_c0_cls  (NOLOAD): ALIGN(16) {
+  .l1_c0_cls  (NOLOAD): ALIGN(32) {
     . += __cls_reserved_size;
   } > l1_c0
 
-  .l1_c1_cls  (NOLOAD): ALIGN(16) {
+  .l1_c1_cls  (NOLOAD): ALIGN(32) {
     . += __cls_reserved_size;
   } > l1_c1
 
-  .l1_c2_cls  (NOLOAD): ALIGN(16) {
+  .l1_c2_cls  (NOLOAD): ALIGN(32) {
     . += __cls_reserved_size;
   } > l1_c2
-  .l1_c3_cls  (NOLOAD): ALIGN(16) {
+  .l1_c3_cls  (NOLOAD): ALIGN(32) {
     . += __cls_reserved_size;
   } > l1_c3
-  .l1_c4_cls  (NOLOAD): ALIGN(16) {
+  .l1_c4_cls  (NOLOAD): ALIGN(32) {
     . += __cls_reserved_size;
   } > l1_c4
 
@@ -122,72 +122,72 @@ SECTIONS {
    * evaluates LOADADDR/SIZEOF when the section actually has input sections.
    * PROVIDE(...= 0) outside gives a safe fallback: the runtime sees
    * lma_end - lma_start = 0 and skips the DMA for empty sections. */
-  .l1_c0 : ALIGN(16) {
+  .l1_c0 : ALIGN(32) {
     __l1_c0_start = .;
     __l1_c0_lma_start = LOADADDR(.l1_c0);
     KEEP(*(.l1_c0 .l1_c0.*))
     __l1_c0_end = .;
     __l1_c0_lma_end = LOADADDR(.l1_c0) + SIZEOF(.l1_c0);
-    . = ALIGN(16);
+    . = ALIGN(32);
     __l1_c0_heap_start = .;
     __l1_c0_heap_end = ORIGIN(l1_c0) + LENGTH(l1_c0);
   } > l1_c0 AT > memisl
   PROVIDE(__l1_c0_lma_start = 0);
   PROVIDE(__l1_c0_lma_end = 0);
 
-  .l1_c1 : ALIGN(16) {
+  .l1_c1 : ALIGN(32) {
     __l1_c1_start = .;
     __l1_c1_lma_start = LOADADDR(.l1_c1);
     KEEP(*(.l1_c1 .l1_c1.*))
     __l1_c1_end = .;
     __l1_c1_lma_end = LOADADDR(.l1_c1) + SIZEOF(.l1_c1);
-    . = ALIGN(16);
+    . = ALIGN(32);
     __l1_c1_heap_start = .;
     __l1_c1_heap_end = ORIGIN(l1_c1) + LENGTH(l1_c1);
   } > l1_c1 AT > memisl
   PROVIDE(__l1_c1_lma_start = 0);
   PROVIDE(__l1_c1_lma_end = 0);
 
-  .l1_c2 : ALIGN(16) {
+  .l1_c2 : ALIGN(32) {
     __l1_c2_start = .;
     __l1_c2_lma_start = LOADADDR(.l1_c2);
     KEEP(*(.l1_c2 .l1_c2.*))
     __l1_c2_end = .;
     __l1_c2_lma_end = LOADADDR(.l1_c2) + SIZEOF(.l1_c2);
-    . = ALIGN(16);
+    . = ALIGN(32);
     __l1_c2_heap_start = .;
     __l1_c2_heap_end = ORIGIN(l1_c2) + LENGTH(l1_c2);
   } > l1_c2 AT > memisl
   PROVIDE(__l1_c2_lma_start = 0);
   PROVIDE(__l1_c2_lma_end = 0);
 
-  .l1_c3 : ALIGN(16) {
+  .l1_c3 : ALIGN(32) {
     __l1_c3_start = .;
     __l1_c3_lma_start = LOADADDR(.l1_c3);
     KEEP(*(.l1_c3 .l1_c3.*))
     __l1_c3_end = .;
     __l1_c3_lma_end = LOADADDR(.l1_c3) + SIZEOF(.l1_c3);
-    . = ALIGN(16);
+    . = ALIGN(32);
     __l1_c3_heap_start = .;
     __l1_c3_heap_end = ORIGIN(l1_c3) + LENGTH(l1_c3);
   } > l1_c3 AT > memisl
   PROVIDE(__l1_c3_lma_start = 0);
   PROVIDE(__l1_c3_lma_end = 0);
 
-  .l1_c4 : ALIGN(16) {
+  .l1_c4 : ALIGN(32) {
     __l1_c4_start = .;
     __l1_c4_lma_start = LOADADDR(.l1_c4);
     KEEP(*(.l1_c4 .l1_c4.*))
     __l1_c4_end = .;
     __l1_c4_lma_end = LOADADDR(.l1_c4) + SIZEOF(.l1_c4);
-    . = ALIGN(16);
+    . = ALIGN(32);
     __l1_c4_heap_start = .;
     __l1_c4_heap_end = ORIGIN(l1_c4) + LENGTH(l1_c4);
   } > l1_c4 AT > memisl
   PROVIDE(__l1_c4_lma_start = 0);
   PROVIDE(__l1_c4_lma_end = 0);
 
-  .l2_heap : ALIGN(16) {
+  .l2_heap : ALIGN(32) {
     __l2_heap_start = .;
     __l2_heap_end = ORIGIN(memisl) + LENGTH(memisl);
   } > memisl
@@ -199,7 +199,7 @@ SECTIONS {
     __dram_end = .;
   } > dram
 
-  .l3_heap : ALIGN(16) {
+  .l3_heap : ALIGN(32) {
     __l3_heap_start = .;
     __l3_heap_end = ORIGIN(dram) + LENGTH(dram);
   } > dram

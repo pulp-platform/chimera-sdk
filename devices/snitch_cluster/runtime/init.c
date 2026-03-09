@@ -36,16 +36,11 @@ void snrt_init() {
     uintptr_t tls_ptr;
     asm volatile("mv %0, tp" : "=r"(tls_ptr) : :);
 
-    /* __tdata_start/__tdata_end mark the TLS template image (LMA) stored in
-     * memisl. Sizes are computed by subtracting addresses as uintptr_t to
-     * avoid signed/unsigned arithmetic surprises. */
     size_t size_tdata = (uintptr_t)__tdata_end - (uintptr_t)__tdata_start;
     memcpy((void *)tls_ptr, (void *)__tdata_start, size_tdata);
 
     // Clear the tbss section
     size_t size_tbss = (uintptr_t)__tbss_end - (uintptr_t)__tbss_start;
-    /* Compute the tbss offset from the TLS template image symbols rather than
-     * assuming .tbss follows .tdata with no inter-section padding. */
     uintptr_t tbss_off = (uintptr_t)__tbss_start - (uintptr_t)__tdata_start;
     memset((void *)(tls_ptr + tbss_off), 0, size_tbss);
 
