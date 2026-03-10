@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 # SPDX-License-Identifier: Apache-2.0
 
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.22)
 
 # VIVIANEP: We need the C11 standard (or later) for building
 #           the OpenTitan peripheral drivers

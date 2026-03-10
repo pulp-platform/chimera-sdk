@@ -9,6 +9,8 @@
 
 #include "snrt.h"
 
+#include "soc.h"
+
 volatile uint32_t *_snrt_printf_mutex_ptr;
 
 void snrt_printf_init() {
@@ -76,6 +78,9 @@ int snrt_putchar(char c, FILE *file) {
 
         snrt_mutex_ttas_acquire(_snrt_printf_mutex_ptr);
         tohost = (uintptr_t)buf->hdr.syscall_mem;
+
+        // Trigger MSIP (machine software interrupt) on host (core 0)
+        *reg32(&__base_clint, CLINT_MSIP_REG_OFFSET) = 1;
         while (fromhost == 0);
         fromhost = 0;
         buf->hdr.size = 0;

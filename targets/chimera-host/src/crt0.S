@@ -130,4 +130,4 @@ _trap_handler_wrap:
 
 .weak trap_vector
 trap_vector:
-    j trap_vector
+    j default_trap_vector
