@@ -10,7 +10,7 @@ SECTIONS {
     *(.text.*)
   } > memisl
 
-  .misc : ALIGN(16) {
+  .misc : ALIGN(32) {
     *(.rodata)
     *(.rodata.*)
     *(.data)
@@ -32,12 +32,12 @@ SECTIONS {
   . = ALIGN(32);
   __bss_end = .;
 
-  .bulk : ALIGN(16) {
+  .bulk : ALIGN(32) {
     *(.bulk)
     *(.bulk.*)
   } > memisl
 
-  .l2_heap : ALIGN(16) {
+  .l2_heap : ALIGN(32) {
     __l2_heap_start = .;
     __l2_heap_end = ORIGIN(memisl) + LENGTH(memisl);
   } > memisl
@@ -49,7 +49,7 @@ SECTIONS {
     __dram_end = .;
   } > dram
 
-  .l3_heap : ALIGN(16) {
+  .l3_heap : ALIGN(32) {
     __l3_heap_start = .;
     __l3_heap_end = ORIGIN(dram) + LENGTH(dram);
   } > dram

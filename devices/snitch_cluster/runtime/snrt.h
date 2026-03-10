@@ -23,6 +23,7 @@ int snrt_printf(const char *fmt, ...);
 #define printf snrt_printf_log
 
 #include "config.h"
+#include "util.h"
 
 // Forward declarations
 #include "alloc_decls.h"
@@ -55,3 +56,27 @@ int snrt_printf(const char *fmt, ...);
 #include "team.h"
 #include "types.h"
 #include "start.h"
+
+// Utility macros
+/**
+ * Places a zero-initialized declaration into the L1 memory of each cluster.
+ * Every cluster receives its own copy.
+ */
+#if defined(__clang__)
+#define SNRT_CLUSTER_L1_ZERO(decl) \
+    _Pragma("clang section bss = \".cbss\"") decl; \
+    _Pragma("clang section bss = \"\"")
+#else
+#define SNRT_CLUSTER_L1_ZERO(decl) decl __attribute__((section(".cbss,\"aw\",@nobits#")))
+#endif
+
+/**
+ * Places an initialized declaration into the L1 memory of each cluster.
+ * Each cluster receives its own copy.
+ */
+#define SNRT_CLUSTER_L1_COPY(decl) decl __attribute__((section(".cdata")))
+
+/**
+ * Places a initialized declaration into the L1 memory of a specific cluster.
+ */
+#define SNRT_CLUSTER_L1(decl, cluster_id) decl __attribute__((section(".l1_c" #cluster_id)))

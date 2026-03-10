@@ -118,20 +118,20 @@ void MatMul_unrolled_2x2_parallel_s8_rv32im(int8_t const *__restrict__ pSrcA,
  * These are assigned on the DM (data-mover) core and then used by compute
  * cores.
  */
-int8_t __attribute__((__section__(".cbss"))) * DeeployNetwork_input_0;
-int8_t __attribute__((__section__(".cbss"))) * DeeployNetwork_input_1;
-int32_t __attribute__((__section__(".cbss"))) * DeeployNetwork_output_0;
+SNRT_CLUSTER_L1_ZERO(int8_t *DeeployNetwork_input_0);
+SNRT_CLUSTER_L1_ZERO(int8_t *DeeployNetwork_input_1);
+SNRT_CLUSTER_L1_ZERO(int32_t *DeeployNetwork_output_0);
 
 /*
  * Accumulator for ops-per-cycle computed by each compute core and atomically
  * added to this shared float in .cdata.
  */
-static __attribute__((__section__(".cdata"))) float ops_per_cycle = 0.0f;
+SNRT_CLUSTER_L1_COPY(static float ops_per_cycle) = 0.0f;
 
 /**
+ *
  * @brief Main function of the cluster test.
  *
- * @return int Return 0 if the test was successful, -1 otherwise.
  */
 int32_t testReturn(void *args) {
 

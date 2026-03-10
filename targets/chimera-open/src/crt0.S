@@ -133,6 +133,8 @@ _trap_handler_wrap:
 trap_vector:
     j trap_vector
 
+.section .cbss, "aw", @nobits
+
 .pushsection .htif,"aw",@progbits;
 .align 6; .global tohost; tohost: .dword 0;
 .align 6; .global fromhost; fromhost: .dword 0;

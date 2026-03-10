@@ -6,7 +6,7 @@
 ENTRY(_start)
 
 MEMORY {
-  l1 (rwx)      : ORIGIN = 0x18000000, LENGTH = 128K
+  l1_alias (rwx): ORIGIN = 0x18000000, LENGTH = 128K
   l1_c0 (rwx)   : ORIGIN = 0x40000000, LENGTH = 128K
   l1_c1 (rwx)   : ORIGIN = 0x40200000, LENGTH = 128K
   l1_c2 (rwx)   : ORIGIN = 0x40400000, LENGTH = 128K
@@ -27,6 +27,8 @@ SECTIONS {
   /* By default, keep the calling context (boot ROM) stack pointer */
   __global_pointer$ = ADDR(.misc) + SIZEOF(.misc) / 2;
   __stack_pointer$  = __stack_start - 8;
+
+  __base_l1_alias = ORIGIN(l1_alias);
 
   /* Further addresses */
   __base_dma      = 0x01000000;

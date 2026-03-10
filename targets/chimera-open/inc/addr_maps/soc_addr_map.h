@@ -38,6 +38,8 @@
 
 #define CLUSTER_HART_BASE CLUSTER_0_HART_BASE
 
+#define _chimera_numClusters 5
+
 static const uint8_t _chimera_numCores[] = {CLUSTER_0_NUMCORES, CLUSTER_1_NUMCORES,
                                             CLUSTER_2_NUMCORES, CLUSTER_3_NUMCORES,
                                             CLUSTER_4_NUMCORES};
@@ -45,12 +47,31 @@ static const uint8_t _chimera_hartBase[] = {CLUSTER_0_HART_BASE, CLUSTER_1_HART_
                                             CLUSTER_2_HART_BASE, CLUSTER_3_HART_BASE,
                                             CLUSTER_4_HART_BASE};
 
-static const uint32_t _chimera_clusterBase[] = {CLUSTER_0_BASE, CLUSTER_1_BASE, CLUSTER_2_BASE,
-                                                CLUSTER_3_BASE, CLUSTER_4_BASE};
+extern const uintptr_t _chimera_clusterBase[_chimera_numClusters];
 
-#define _chimera_numClusters 5
+extern char __l1_c0_heap_start[], __l1_c1_heap_start[], __l1_c2_heap_start[], __l1_c3_heap_start[],
+    __l1_c4_heap_start[];
+extern const uintptr_t _chimera_clusterHeapStart[_chimera_numClusters];
 
+extern char __l1_c0_start[], __l1_c1_start[], __l1_c2_start[], __l1_c3_start[], __l1_c4_start[];
+extern const uintptr_t _chimera_clusterL1Start[_chimera_numClusters];
+
+extern char __l1_c0_end[], __l1_c1_end[], __l1_c2_end[], __l1_c3_end[], __l1_c4_end[];
+extern const uintptr_t _chimera_clusterL1End[_chimera_numClusters];
+
+extern char __l1_c0_lma_start[], __l1_c1_lma_start[], __l1_c2_lma_start[], __l1_c3_lma_start[],
+    __l1_c4_lma_start[];
+extern const uintptr_t _chimera_clusterL1LmaStart[_chimera_numClusters];
+
+extern char __l1_c0_lma_end[], __l1_c1_lma_end[], __l1_c2_lma_end[], __l1_c3_lma_end[],
+    __l1_c4_lma_end[];
+extern const uintptr_t _chimera_clusterL1LmaEnd[_chimera_numClusters];
+
+#ifdef CHIMERA_PADFRAME_BASE_ADDRESS
+#undef CHIMERA_PADFRAME_BASE_ADDRESS
+#endif
 #define CHIMERA_PADFRAME_BASE_ADDRESS 0x30002000
+
 #define FLL_BASE_ADDR 0x30003000
 
 #endif

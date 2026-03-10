@@ -18,18 +18,26 @@
 // Include Runtime Headers
 #include "snrt.h"
 
-#define __cluster_data __attribute__((__section__(".cdata")))
-#define __cluster_bss __attribute__((__section__(".cbss")))
-
-static __cluster_data int8_t cluster_local_var1 = 1;
-static __cluster_bss int8_t cluster_local_var2[64];
-static __cluster_data int8_t cluster_local_var3 = 3;
-static __cluster_data int8_t cluster_local_var4 = 4;
+SNRT_CLUSTER_L1_COPY(static volatile int8_t cluster_local_var1) = 1;
+SNRT_CLUSTER_L1_ZERO(static volatile int cluster_local_var2[64]);
 
 static __thread int32_t thread_local_var1 = 1;
 static __thread int32_t thread_local_var2[64];
-static __thread int32_t thread_local_var3 = 3;
-static __thread int32_t thread_local_var4 = 4;
+
+SNRT_CLUSTER_L1(static int32_t cluster0_private_var1, 0) = 0x1;
+SNRT_CLUSTER_L1(static int32_t cluster0_private_var2[8], 0);
+
+SNRT_CLUSTER_L1(static int32_t cluster1_private_var1, 1) = 0x11;
+SNRT_CLUSTER_L1(static int32_t cluster1_private_var2[16], 1);
+
+SNRT_CLUSTER_L1(static int32_t cluster2_private_var1, 2) = 0x21;
+SNRT_CLUSTER_L1(static int32_t cluster2_private_var2[24], 2);
+
+SNRT_CLUSTER_L1(static int32_t cluster3_private_var1, 3) = 0x31;
+SNRT_CLUSTER_L1(static int32_t cluster3_private_var2[32], 3);
+
+SNRT_CLUSTER_L1(static int32_t cluster4_private_var1, 4) = 0x41;
+SNRT_CLUSTER_L1(static int32_t cluster4_private_var2[40], 4);
 
 /**
  * @brief Interrupt handler for the cluster, which clears the interrupt flag for the current hart.
@@ -59,63 +67,87 @@ __attribute__((naked)) void clusterInterruptHandler() {
     );
 }
 
+void clusterDefaultHandler() {
+    *reg32(&__base_clint, CLINT_MSIP_REG_OFFSET) = 0;
+
+    while (1) {
+    };
+}
+
 /**
  * @brief Main function of the cluster test.
  *
  * @return int Return 0 if the test was successful, -1 otherwise.
  */
 int32_t testReturn(void *args) {
-    extern char __tbss_start, __tbss_end, __tdata_start, __tdata_end;
-    extern volatile uint32_t __cbss_start, __cbss_end, __cdata_start, __cdata_end;
-    extern char __cdata_lma_start, __cdata_lma_end;
+
+    *reg32((void *)SOC_CTRL_BASE, CHIMERA_SNITCH_INTR_HANDLER_ADDR_REG_OFFSET) =
+        (uint32_t)clusterDefaultHandler;
+
+    extern char __tbss_start[], __tbss_end[], __tdata_start[], __tdata_end[];
+    extern char __cbss_start[], __cbss_end[], __cdata_start[], __cdata_end[];
+    extern char __cdata_lma_start[], __cdata_lma_end[];
 
     snrt_init();
 
     if (snrt_is_dm_core()) {
-        size_t size_tdata = (size_t)(&__tdata_end) - (size_t)(&__tdata_start);
-        size_t size_ctbss = (size_t)(&__tbss_end) - (size_t)(&__tbss_start);
-        size_t size_cdata = (size_t)(&__cdata_end) - (size_t)(&__cdata_start);
-        size_t size_cbss = (size_t)(&__cbss_end) - (size_t)(&__cbss_start);
+        printf("Cluster Local Data 1 @ %p = %#x\n", &cluster_local_var1, cluster_local_var1);
+        printf("Cluster Local Data 2 @ %p = %#x\n", &cluster_local_var2, cluster_local_var2[0]);
+        cluster_local_var2[0] = snrt_cluster_idx();
+        printf("Cluster Local Data 2 @ %p = %#x\n", &cluster_local_var2, cluster_local_var2[0]);
 
-        printf("Size of .tbss  : %6d bytes (%p - %p)\n", size_ctbss, &__tbss_start, &__tbss_end);
-        printf("Size of .tdata : %6d bytes (%p - %p)\n", size_tdata, &__tdata_start, &__tdata_end);
-        printf("Size of .cdata : %6d bytes (%p - %p)\n", size_cdata, &__cdata_start, &__cdata_end);
-        printf("Size of .cbss  : %6d bytes (%p - %p)\n", size_cbss, &__cbss_start, &__cbss_end);
-
-        printf("Cluster Local Data @ %p = %#x\n", &cluster_local_var1, cluster_local_var1);
-        printf("Cluster Local Data @ %p = %#x\n", &cluster_local_var2, cluster_local_var2[0]);
-        printf("Cluster Local Data @ %p = %#x\n", &cluster_local_var3, cluster_local_var3);
-        printf("Cluster Local Data @ %p = %#x\n", &cluster_local_var4, cluster_local_var4);
+        if (snrt_cluster_idx() == 0) {
+            printf("Cluster 0 Private Data 1 @ %p = %#x\n", &cluster0_private_var1,
+                   cluster0_private_var1);
+            printf("Cluster 0 Private Data 2 @ %p = %#x\n", &cluster0_private_var2,
+                   cluster0_private_var2[0]);
+            cluster0_private_var2[0] = snrt_cluster_idx();
+            printf("Cluster 0 Private Data 2 @ %p = %#x\n", &cluster0_private_var2,
+                   cluster0_private_var2[0]);
+        } else if (snrt_cluster_idx() == 1) {
+            printf("Cluster 1 Private Data 1 @ %p = %#x\n", &cluster1_private_var1,
+                   cluster1_private_var1);
+            printf("Cluster 1 Private Data 2 @ %p = %#x\n", &cluster1_private_var2,
+                   cluster1_private_var2[0]);
+            cluster1_private_var2[0] = snrt_cluster_idx();
+            printf("Cluster 1 Private Data 2 @ %p = %#x\n", &cluster1_private_var2,
+                   cluster1_private_var2[0]);
+        } else if (snrt_cluster_idx() == 2) {
+            printf("Cluster 2 Private Data 1 @ %p = %#x\n", &cluster2_private_var1,
+                   cluster2_private_var1);
+            printf("Cluster 2 Private Data 2 @ %p = %#x\n", &cluster2_private_var2,
+                   cluster2_private_var2[0]);
+            cluster2_private_var2[0] = snrt_cluster_idx();
+            printf("Cluster 2 Private Data 2 @ %p = %#x\n", &cluster2_private_var2,
+                   cluster2_private_var2[0]);
+        } else if (snrt_cluster_idx() == 3) {
+            printf("Cluster 3 Private Data 1 @ %p = %#x\n", &cluster3_private_var1,
+                   cluster3_private_var1);
+            printf("Cluster 3 Private Data 2 @ %p = %#x\n", &cluster3_private_var2,
+                   cluster3_private_var2[0]);
+            cluster3_private_var2[0] = snrt_cluster_idx();
+            printf("Cluster 3 Private Data 2 @ %p = %#x\n", &cluster3_private_var2,
+                   cluster3_private_var2[0]);
+        } else if (snrt_cluster_idx() == 4) {
+            printf("Cluster 4 Private Data 1 @ %p = %#x\n", &cluster4_private_var1,
+                   cluster4_private_var1);
+            printf("Cluster 4 Private Data 2 @ %p = %#x\n", &cluster4_private_var2,
+                   cluster4_private_var2[0]);
+            cluster4_private_var2[0] = snrt_cluster_idx();
+            printf("Cluster 4 Private Data 2 @ %p = %#x\n", &cluster4_private_var2,
+                   cluster4_private_var2[0]);
+        }
     }
 
     snrt_cluster_hw_barrier();
 
-    printf("Cluster Local Storage @ %p = %#x\n", &_cls_ptr, cls());
-
-    printf("Var 1 @ %p = %#x\n", &thread_local_var1, thread_local_var1);
-    printf("Var 2 @ %p = %#x\n", &thread_local_var2, thread_local_var2[0]);
-    printf("Var 3 @ %p = %#x\n", &thread_local_var3, thread_local_var3);
-    printf("Var 4 @ %p = %#x\n", &thread_local_var4, thread_local_var4);
-
-    if (snrt_is_dm_core()) {
-        printf("L1 Allocator @ %p:\n", snrt_l1_allocator());
-        printf("  base @ %p = %#x\n", &snrt_l1_allocator()->base, snrt_l1_allocator()->base);
-        printf("  end  @ %p = %#x\n", &snrt_l1_allocator()->end, snrt_l1_allocator()->end);
-        printf("  next @ %p = %#x\n", &snrt_l1_allocator()->next, snrt_l1_allocator()->next);
-
-        printf("L3 Allocator @ %p:\n", snrt_l3_allocator());
-        printf("  base @ %p = %#x\n", &snrt_l3_allocator()->base, snrt_l3_allocator()->base);
-        printf("  end  @ %p = %#x\n", &snrt_l3_allocator()->end, snrt_l3_allocator()->end);
-        printf("  next @ %p = %#x\n", &snrt_l3_allocator()->next, snrt_l3_allocator()->next);
-    }
-
-    snrt_cluster_hw_barrier();
-
-    if (snrt_is_dm_core()) {
-        snrt_dma_start_1d((void *)(&__cdata_start), (void *)(&__cdata_lma_start), 64);
-        snrt_dma_start_1d((void *)(&__cbss_start), (void *)(snrt_zero_memory_ptr()), 64);
-        snrt_dma_wait_all();
-    }
+    printf("Core %d Local Data 1 @ %p = %#x\n", snrt_cluster_core_idx(), &thread_local_var1,
+           thread_local_var1);
+    printf("Core %d Local Data 2 @ %p = %#x\n", snrt_cluster_core_idx(), &thread_local_var2,
+           thread_local_var2[0]);
+    thread_local_var2[0] = snrt_cluster_core_idx();
+    printf("Core %d Local Data 2 @ %p = %#x\n", snrt_cluster_core_idx(), &thread_local_var2,
+           thread_local_var2[0]);
 
     snrt_cluster_hw_barrier();
     return 0;

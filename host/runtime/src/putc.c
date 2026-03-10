@@ -52,7 +52,7 @@ int uart_flush(FILE *file) {
 #elif HARDWARE_BACKEND_RTL
 int uart_putc(char c, FILE *file) {
     (void)c;
-    *(volatile uint32_t *)(long)(0x300010F0) = c;
+    *(volatile uint32_t *)(long)(0x30004FFC) = c;
     return c;
 }
 int uart_getc(FILE *file) {
