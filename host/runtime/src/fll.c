@@ -47,13 +47,15 @@ int calculate_fll_params(uint32_t target_freq, uint32_t rtc_freq, uint32_t *mult
     *div = e + 1u; // because Dout = 2^(div-1)
     *mult = m;
 
-    // // Optional quick check:
-    // uint32_t fout = (rtc_freq * (*mult)) / (1u << (*div - 1));
-    // // printf_log("target=%u, div=%u, dout=%u, mult=%u, fout=%u\n", target_freq, *div, dout,
-    // *mult, fout); printf_log("Calculated FLL params: mult=%u, div=%u => fout=%u Hz (error: %+d
-    // ppm)\n",
-    //            *mult, *div, fout,
-    //            (int32_t)(((int64_t)fout - (int64_t)target_freq) * 1000000 / target_freq));
+#ifdef TRACE
+    // Optional quick check:
+    uint32_t fout = (rtc_freq * (*mult)) / (1u << (*div - 1));
+    // printf_log("target=%u, div=%u, dout=%u, mult=%u, fout=%u\n", target_freq, *div, dout,
+    *mult, fout); printf_log("Calculated FLL params: mult=%u, div=%u => fout=%u Hz (error: %+d
+    ppm)\n",
+               *mult, *div, fout,
+               (int32_t)(((int64_t)fout - (int64_t)target_freq) * 1000000 / target_freq));
+#endif
 
     return 0;
 }
@@ -100,11 +102,7 @@ uint32_t configure_fll(uint32_t target_freq, uint32_t rtc_freq) {
     }
 #endif
 
-    // Relative Error = 1 / 128 = 0.78%
-    // uint32_t ref_time_inv = rtc_freq / 128; // 32768 // 128 = 256
-    // uint32_t core_freq_fll = clint_get_core_freq(rtc_freq, ref_time_inv);
-
-    // // Relative Error = 1 / 32768 = 30.5 ppm
+    // Relative Error = 1 / 32768 = 30.5 ppm
     uint32_t ref_time_inv = 1;
     uint32_t core_freq_fll = clint_get_core_freq(rtc_freq, ref_time_inv);
 

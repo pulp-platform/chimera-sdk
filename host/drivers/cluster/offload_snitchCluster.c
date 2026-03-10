@@ -292,7 +292,8 @@ void wait_snitchCluster_busy(uint8_t clusterId) {
 }
 
 /**
- * @brief Wait for the cluster to return a value.
+ * @brief Wait for the cluster to return a value. The return value is written
+ * by the last core of the cluster.
  * The function busy waits until the cluster returns a non-zero value.
  *
  * @warning The return values must be non-zero, otherwise the function will busy wait forever!
