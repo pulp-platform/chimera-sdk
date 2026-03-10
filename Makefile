@@ -40,6 +40,7 @@ help:
 	@echo " - gvsoc: Install GVSoC @ ${GVSOC_INSTALL_DIR}"
 	@echo " - export-symbols: Print the list of symbols to export to run the SDK's tests"
 	@echo " - format: Format all code"
+	@echo " - picolibc-multilib: Build picolibc for all RISC-V variants"
 
 format:
 	@echo "Formatting code..."
@@ -177,11 +178,94 @@ $(eval $(call MAKE_CRT_BUILTINS_TARGET,rv64imafdc,riscv64,riscv64-unknown-elf,rv
 
 # Snitch Cluster Variants
 $(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32ima,riscv32,riscv32-unknown-elf,rv32ima,ilp32,4))
-$(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32imafd,riscv32,riscv32-unknown-elf,rv32imafd,ilp32,4))
+$(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32imafd,riscv32,riscv32-unknown-elf,rv32imafd,ilp32d,4))
 # $(eval $(call MAKE_CRT_BUILTINS_TARGET,rv32ima_xdma,riscv32,riscv32-unknown-elf,rv32ima_xdma,ilp32,4))
 
 # Convenience aggregate target
 .PHONY: compiler-rt-riscv-multilib
 compiler-rt-riscv-multilib: compiler-rt-rv32imc compiler-rt-rv32ima compiler-rt-rv64imc compiler-rt-rv32imafd compiler-rt-rv64imafdc #compiler-rt-rv32ima_xdma
+
+# -----------------------------------------------------------------------------
+# picolibc prebuilt (Meson + Ninja, one build per multilib variant)
+# -----------------------------------------------------------------------------
+
+PICOLIBC_GIT_URL     := https://github.com/picolibc/picolibc.git
+PICOLIBC_GIT_TAG     := 1.8.11
+PICOLIBC_SRC_DIR     ?= ${TOOLCHAIN_DIR}/picolibc
+PICOLIBC_INSTALL_DIR := ${INSTALL_DIR}/picolibc
+
+# Clone the official picolibc sources at the pinned tag.
+PICOLIBC_CLONE_STAMP := $(PICOLIBC_SRC_DIR)/.picolibc-cloned
+
+$(PICOLIBC_CLONE_STAMP):
+	@if [ ! -f "$(PICOLIBC_SRC_DIR)/meson.build" ]; then \
+		echo "[CHIMERA] Cloning picolibc $(PICOLIBC_GIT_TAG) into $(PICOLIBC_SRC_DIR)..."; \
+		mkdir -p $(PICOLIBC_SRC_DIR); \
+		git clone --depth 1 --branch $(PICOLIBC_GIT_TAG) $(PICOLIBC_GIT_URL) $(PICOLIBC_SRC_DIR); \
+	fi
+	touch $@
+
+.PHONY: picolibc-clone
+picolibc-clone: $(PICOLIBC_CLONE_STAMP)
+
+# Macro to generate one picolibc build+install target.
+# Args:
+#  1: variant name (used in stamp/build-dir names), e.g. rv32im-ilp32
+#  2: triple (--target), e.g. riscv32-unknown-elf
+#  3: march value, e.g. rv32im
+#  4: mabi value, e.g. ilp32
+#  5: Meson cpu string, e.g. riscv32
+#  6: Meson cpu_family string, e.g. riscv
+define MAKE_PICOLIBC_TARGET
+
+PICOLIBC_STAMP_$(1)      := $(PICOLIBC_INSTALL_DIR)/.picolibc-$(1)-installed
+PICOLIBC_BUILD_DIR_$(1)  := $(PICOLIBC_SRC_DIR)/build-$(1)
+PICOLIBC_CROSS_FILE_$(1) := $(PICOLIBC_SRC_DIR)/cross-$(1).txt
+
+$$(PICOLIBC_CROSS_FILE_$(1)): $(PICOLIBC_CLONE_STAMP)
+	@mkdir -p $(PICOLIBC_SRC_DIR)
+	@printf '[binaries]\n'                                                    > $$@
+	@printf "c     = '$(LLVM_INSTALL_DIR)/bin/clang'\n"                     >> $$@
+	@printf "ar    = '$(LLVM_INSTALL_DIR)/bin/llvm-ar'\n"                   >> $$@
+	@printf "strip = '$(LLVM_INSTALL_DIR)/bin/llvm-strip'\n"                >> $$@
+	@printf '\n[host_machine]\n'                                             >> $$@
+	@printf "system     = 'none'\n"                                         >> $$@
+	@printf "cpu_family = '$(6)'\n"                                         >> $$@
+	@printf "cpu        = '$(5)'\n"                                         >> $$@
+	@printf "endian     = 'little'\n"                                       >> $$@
+	@printf '\n[built-in options]\n'                                        >> $$@
+	@printf "c_args      = ['--target=$(2)', '-nostdlib', '-ggdb',\n"       >> $$@
+	@printf "               '-gdwarf-4', '-gstrict-dwarf',\n"               >> $$@
+	@printf "               '-march=$(3)', '-mabi=$(4)']\n"                 >> $$@
+	@printf "c_link_args = ['--target=$(2)', '-nostdlib', '-fno-common',\n" >> $$@
+	@printf "               '-Wl,-z,noexecstack', '-fuse-ld=lld',\n"       >> $$@
+	@printf "               '-march=$(3)', '-mabi=$(4)']\n"                 >> $$@
+
+$$(PICOLIBC_STAMP_$(1)): $$(PICOLIBC_CROSS_FILE_$(1))
+	@mkdir -p $$(PICOLIBC_BUILD_DIR_$(1)) $(PICOLIBC_INSTALL_DIR)
+	meson setup \
+		$$(PICOLIBC_BUILD_DIR_$(1)) $(PICOLIBC_SRC_DIR) \
+		--cross-file $$(PICOLIBC_CROSS_FILE_$(1)) \
+		-D multilib-list=$(3)/$(4) \
+		--prefix $(PICOLIBC_INSTALL_DIR) \
+		--default-library=static \
+		--wipe
+	ninja -C $$(PICOLIBC_BUILD_DIR_$(1))
+	ninja -C $$(PICOLIBC_BUILD_DIR_$(1)) install
+	touch $$@
+
+.PHONY: picolibc-$(1)
+picolibc-$(1): $$(PICOLIBC_STAMP_$(1))
+
+endef
+
+# ---- Define picolibc multilib variants ----
+$(eval $(call MAKE_PICOLIBC_TARGET,rv32im-ilp32,riscv32-unknown-elf,rv32im,ilp32,riscv32,riscv))
+$(eval $(call MAKE_PICOLIBC_TARGET,rv32imafd-ilp32d,riscv32-unknown-elf,rv32imafd,ilp32d,riscv32,riscv))
+$(eval $(call MAKE_PICOLIBC_TARGET,rv64imafdc-lp64d,riscv64-unknown-elf,rv64imafdc,lp64d,riscv64,riscv))
+
+
+.PHONY: picolibc-multilib
+picolibc-multilib: picolibc-rv32im-ilp32 picolibc-rv32imafd-ilp32d picolibc-rv64imafdc-lp64d
 
 .PHONY: format help export-symbols

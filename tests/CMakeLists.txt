@@ -41,3 +41,4 @@ chimera-host:
 
 # Call the macro
 add_chimera_subdirectories(${TARGET_PLATFORM} "Test" "${TEST_MAPPINGS}")
+

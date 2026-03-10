@@ -15,6 +15,8 @@
 
 // Include Runtime Headers
 #include "util.h"
+#include "shared.h"
+#include "log.h"
 
 // Import HAL Headers
 #include "device_api.h"
@@ -27,38 +29,6 @@
  */
 
 /**
- * @brief Persistent trampoline function pointers for each cluster core.
- *
- * Each entry holds the function to be called by the trampoline on the corresponding core.
- */
-void (*_trampoline_function[NUM_CLUSTER_CORES])(void *) = {NULL};
-
-/**
- * @brief Persistent argument storage for each cluster core's trampoline function.
- *
- * Each entry holds the `void*` argument passed to the trampoline on the corresponding core.
- */
-void *_trampoline_args[NUM_CLUSTER_CORES] = {NULL};
-
-/**
- * @brief Persistent stack pointer storage for each cluster core's trampoline context.
- *
- * Each entry holds the stack pointer to be loaded by the trampoline on the corresponding core.
- */
-void *_trampoline_stack[NUM_CLUSTER_CORES] = {NULL};
-
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-/**
- * @brief Trampoline function for the cluster core.
- * This function will set up the stack pointer and call the function.
- *
- * @warning Make sure that this function is compiled with ISA for the Snitch cores (RV32IM)
- *
- */
-extern void _trampoline();
-/// @endcond
-
-/**
  * @brief Generate a trampoline function for the cluster core.
  * The trampoline function will set up the stack pointer and call the function.
  *
@@ -68,16 +38,16 @@ extern void _trampoline();
  * @param stack Stack pointer for core
  * @return A pointer to the persistent trampoline function
  */
-static void *_generate_trampoline(uint32_t hartID, void (*function)(void *), void *args,
-                                  void *stack) {
+static void _setup_trampoline(uint32_t hartID, void (*function)(void *), void *args, void *stack) {
     uint32_t trampoline_idx = hartID - CLUSTER_HART_BASE;
 
     // Assign trampoline with captured arguments to the persistent function pointer
-    _trampoline_function[trampoline_idx] = function;
-    _trampoline_args[trampoline_idx] = args;
-    _trampoline_stack[trampoline_idx] = stack;
-
-    return _trampoline;
+    shared_data.trampoline_function[trampoline_idx] =
+        (uint32_t)((uint64_t)function & 0xFFFFFFFF); // Ensure LSB is 0 for RV32 pointer
+    shared_data.trampoline_args[trampoline_idx] =
+        (uint32_t)((uint64_t)args & 0xFFFFFFFF); // Ensure LSB is 0 for RV32 pointer
+    shared_data.trampoline_stack[trampoline_idx] =
+        (uint32_t)((uint64_t)stack & 0xFFFFFFFF); // Ensure LSB is 0 for RV32 pointer
 }
 
 /**
@@ -172,8 +142,8 @@ void *generate_snitchCluster_SPs_uniform(uint8_t clusterId, void *sp, uint32_t s
  * @param clusterId ID of the cluster to offload to
  * @param core_id ID of the core to offload to (cores are 0-indexed for each cluster)
  */
-void offload_snitchCluster_core(void *function, void *args, void *stack_ptr, uint8_t clusterId,
-                                uint32_t core_id) {
+void offload_snitchCluster_core(void *function, void *trampoline, void *args, void *stack_ptr,
+                                uint8_t clusterId, uint32_t core_id) {
     volatile void **snitchBootAddr =
         (volatile void **)(SOC_CTRL_BASE + CHIMERA_SNITCH_BOOT_ADDR_REG_OFFSET);
 
@@ -181,7 +151,9 @@ void offload_snitchCluster_core(void *function, void *args, void *stack_ptr, uin
 
     printf("Offloading to core %d in cluster %d with hartid %d\n", core_id, clusterId, hartId);
 
-    *snitchBootAddr = _generate_trampoline(hartId, function, args, stack_ptr);
+    _setup_trampoline(hartId, function, args, stack_ptr);
+
+    *snitchBootAddr = trampoline;
 
     // Check if the cluster is busy
     wait_snitchCluster_busy(clusterId);
@@ -199,37 +171,40 @@ void offload_snitchCluster_core(void *function, void *args, void *stack_ptr, uin
  * number of cores in the cluster
  * @param clusterId ID of the cluster to offload to
  */
-void offload_snitchCluster(void *function, void *args, void **stack_ptr, uint8_t clusterId) {
-    volatile void **snitchBootAddr =
-        (volatile void **)(SOC_CTRL_BASE + CHIMERA_SNITCH_BOOT_ADDR_REG_OFFSET);
+void offload_snitchCluster(void *function, void *trampoline, void *args, void **stack_ptr,
+                           uint8_t clusterId) {
+    volatile uint32_t *snitchBootAddr =
+        (uint32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_BOOT_ADDR_REG_OFFSET);
 
     uint32_t hartId = _get_hart_id(clusterId, 0);
 
 #ifdef TRACE
-    printf("[TRACE] Offloading to all cores in cluster %d starting at hartid %d\n", clusterId,
-           hartId);
+    printf_log("[TRACE] Offloading to all cores in cluster %d starting at hartid %d\n", clusterId,
+               hartId);
 #endif
 
     // Check if the cluster is busy
     wait_snitchCluster_busy(clusterId);
 
     for (uint32_t i = 0; i < _chimera_numCores[clusterId]; i++) {
-        *snitchBootAddr = _generate_trampoline(hartId + i, function, args, stack_ptr[i]);
+        _setup_trampoline(hartId + i, function, args, stack_ptr[i]);
+        *snitchBootAddr = (uint32_t)((uint64_t)trampoline & 0xFFFFFFFF);
+        fence();
         // Send interrupt to the core
         volatile uint32_t *interruptTarget = ((uint32_t *)CLINT_CTRL_BASE) + hartId + i;
         *interruptTarget = 1;
     }
 
 #ifdef TRACE
-    printf("[TRACE] Trampoline Function: %p\n", _trampoline);
+    printf("[TRACE] Trampoline Function: %p\n", trampoline);
     for (uint32_t i = 0; i < _chimera_numCores[clusterId]; i++) {
         uint32_t trampoline_idx = hartId - CLUSTER_HART_BASE + i;
         printf("[TRACE] Function [%02d:%02d] : %p @ %p\n", clusterId, i, function,
-               &_trampoline_function[trampoline_idx]);
+               &shared_data.trampoline_function[trampoline_idx]);
         printf("[TRACE] Args     [%02d:%02d] : %p @ %p\n", clusterId, i, args,
-               &_trampoline_args[trampoline_idx]);
+               &shared_data.trampoline_args[trampoline_idx]);
         printf("[TRACE] Stack    [%02d:%02d] : %p @ %p\n", clusterId, i, stack_ptr[i],
-               &_trampoline_stack[trampoline_idx]);
+               &shared_data.trampoline_stack[trampoline_idx]);
     }
 #endif
 
@@ -283,7 +258,7 @@ int snitchCluster_busy(uint8_t clusterId) {
 void wait_snitchCluster_busy(uint8_t clusterId) {
     while (snitchCluster_busy(clusterId) == 1);
     // TODO: temporary race condition fix
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 5000; i++) {
         // NOP
         asm volatile("addi x0, x0, 0\n" :::);
     }

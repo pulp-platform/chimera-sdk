@@ -6,6 +6,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "soc.h"
+
 // Include Runtime Headers
 #include "snrt.h"
 
@@ -136,4 +138,15 @@ void snrt_init() {
     }
 
     snrt_cluster_hw_barrier();
+}
+
+void snrt_exit(int exit_code) {
+
+    uint32_t cluster_idx = snrt_cluster_idx();
+
+    // Write to SOC_CTRL_BASE + cluster_idx
+    *reg32((void *)SOC_CTRL_BASE, CHIMERA_SNITCH_CLUSTER_0_RETURN_REG_OFFSET + cluster_idx) =
+        exit_code;
+
+    return;
 }

@@ -9,12 +9,13 @@
 
 // Initialization functions
 void snrt_init();
+void snrt_exit(int exit_code);
 void snrt_printf_init();
 
 // Standard I/O streams for Snitch cluster
-extern FILE *const snrt_stdin;
-extern FILE *const snrt_stdout;
-extern FILE *const snrt_stderr;
+extern FILE *const stdin;
+extern FILE *const stdout;
+extern FILE *const stderr;
 
 // Retarget printf to stdio of snitch cluster
 int snrt_printf_log(const char *fmt, ...);

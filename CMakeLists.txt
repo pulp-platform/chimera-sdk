@@ -3,6 +3,15 @@
 
 cmake_minimum_required(VERSION 3.22)
 
+# Check wehter TOOLCHAIN_DIR and PICOLIBC_DIR are correctly defined
+if (NOT DEFINED TOOLCHAIN_DIR)
+    message(FATAL_ERROR "TOOLCHAIN_DIR is not defined. Please set it to the path of the RISC-V toolchain.")
+endif()
+
+if (NOT DEFINED PICOLIBC_DIR)
+    message(FATAL_ERROR "PICOLIBC_DIR is not defined. Please set it to the path of the Picolibc library.")
+endif()
+
 # VIVIANEP: We need the C11 standard (or later) for building
 #           the OpenTitan peripheral drivers
 set(CMAKE_C_STANDARD 11)
@@ -14,20 +23,9 @@ set(CMAKE_C_COMPILER_WORKS 1)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 # include(cmake/debug.cmake)
 
-# Set host-specific flags
-set(HOST_ARCH "riscv32")
-set(HOST_FAMILY "riscv32")
-set(HOST_ENDIAN "little")
-set(HOST_SYSTEM "unknown")
-
 set(DISASSEMBLE_LIBRARIES CACHE BOOL OFF)
 
-# SCHEREMO: This toolchain file is only used for test compilation!
 set(CMAKE_TOOLCHAIN_FILE cmake/toolchain_llvm.cmake)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include("targets/${TARGET_PLATFORM}/config.cmake")
 
@@ -37,15 +35,6 @@ string(REGEX MATCH "^[a-z0-9]+" ISA_CLUSTER_SNITCH_BASE ${ISA_CLUSTER_SNITCH})
 
 project(chimera-sdk LANGUAGES C ASM)
 
-message(STATUS "[CHIMERA-SDK] ABI_HOST              : ${ABI_HOST}")
-message(STATUS "[CHIMERA-SDK] ABI_CLUSTER_SNITCH    : ${ABI_CLUSTER_SNITCH}")
-message(STATUS "[CHIMERA-SDK] ISA_HOST              : ${ISA_HOST}")
-message(STATUS "[CHIMERA-SDK] ISA_CLUSTER_SNITCH    : ${ISA_CLUSTER_SNITCH}")
-message(STATUS "[CHIMERA-SDK] Picolibc Host         : ${PICOLIB_HOST}")
-message(STATUS "[CHIMERA-SDK] Picolibc Snitch       : ${PICOLIB_CLUSTER_SNITCH}")
-message(STATUS "[CHIMERA-SDK] Compiler RT Host      : ${COMPILERRT_HOST}")
-message(STATUS "[CHIMERA-SDK] Compiler RT Snitch    : ${COMPILERRT_CLUSTER_SNITCH}")
-
 if(${DISASSEMBLE_LIBRARIES})
   message(STATUS "[CHIMERA-SDK] DISASSEMBLE_LIBRARIES : ON")
 else()
@@ -53,12 +42,36 @@ else()
 endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/Utils.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/Chimera.cmake)
 
-set(VALID_HARDWARE_BACKEND "RTL" "GVSoC" "ASIC")
-set(HARDWARE_BACKEND "GVSoC" CACHE STRING "Toogle the chimera backend")
+# Add CMAKE_BINARY_DIR to linker search path so *_placement.ldh files are found
+add_link_options(-L${CMAKE_BINARY_DIR})
+
+option(CHIMERA_UNIFIED_ELF "Merge all ELFs into one unified mixed-ISA ELF" ON)
 
 set(error_messages "")
 
+################################################################################
+# Python Tools                                                                #
+################################################################################
+
+# Bootstrap uv Python environment for post-build tools (optional)
+find_program(CHIMERA_UV uv
+    HINTS $ENV{HOME}/.local/bin /usr/local/bin
+    DOC "uv Python package manager")
+if(CHIMERA_UV)
+    execute_process(
+        COMMAND "${CHIMERA_UV}" sync
+        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+        RESULT_VARIABLE _uv_sync_result
+        OUTPUT_QUIET ERROR_QUIET
+    )
+    if(NOT _uv_sync_result EQUAL 0)
+        message(WARNING "[CHIMERA-SDK] uv sync failed (exit ${_uv_sync_result}); overlap checker may not work.")
+    endif()
+else()
+    message(STATUS "[CHIMERA-SDK] 'uv' not found; chimera_check_overlaps will be skipped.")
+endif()
 
 ################################################################################
 # Add subdirectories                                                           #
@@ -69,19 +82,34 @@ set(error_messages "")
 # - runtime_cluster_snitch
 add_subdirectory(targets)
 
-# VIVIANEP: Include the picolibc library
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/picolibc.cmake)
-
 # Include other subdirectories
+add_subdirectory(shared)
 add_subdirectory(devices)
 add_subdirectory(host)
 
+# Materialize accumulated global runtime properties into regular variables.
+# These variables are inherited by all subsequent add_subdirectory() calls (tests).
+get_property(CHIMERA_HOST_RUNTIME_SOURCES            GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_SOURCES)
+get_property(CHIMERA_HOST_RUNTIME_INCLUDES           GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_INCLUDES)
+get_property(CHIMERA_HOST_RUNTIME_DEFINES            GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_DEFINES)
+get_property(CHIMERA_HOST_RUNTIME_PRIVATE_INCLUDES   GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_PRIVATE_INCLUDES)
+get_property(CHIMERA_DEVICE_RUNTIME_SOURCES          GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_SOURCES)
+get_property(CHIMERA_DEVICE_RUNTIME_INCLUDES         GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_INCLUDES)
+get_property(CHIMERA_DEVICE_RUNTIME_PRIVATE_INCLUDES GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_PRIVATE_INCLUDES)
+get_property(CHIMERA_DEVICE_RUNTIME_DEFINES          GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_DEFINES)
+
 ################################################################################
-# Testing                                                                      #
+# Testing Tools                                                                #
 ################################################################################
+
+set(VALID_HARDWARE_BACKEND "RTL" "GVSoC" "ASIC")
+set(HARDWARE_BACKEND "GVSoC" CACHE STRING "Toogle the chimera backend")
 
 # JUNGVI: "simulation" compiles and run the test, "compile" just compiles the tests, and none does neither.
 set(VALID_TEST_MODES "simulation" "compile" "none")
+
+# Config Variables Default Values
+set(TEST_MODE "compile" CACHE STRING "Set what validation target the tests should be run on")
 
 if(NOT HARDWARE_BACKEND IN_LIST VALID_HARDWARE_BACKEND)
   list(APPEND error_messages "[CHIMERA-SDK] Invalid HARDWARE_BACKEND: ${HARDWARE_BACKEND}")
@@ -92,9 +120,6 @@ if(NOT HARDWARE_BACKEND IN_LIST VALID_HARDWARE_BACKEND)
 else()
   message(STATUS "[CHIMERA-SDK] Hardware Backend      : ${HARDWARE_BACKEND}")
 endif()
-
-# Config Variables Default Values
-set(TEST_MODE "compile" CACHE STRING "Set what validation target the tests should be run on")
 
 if(NOT TEST_MODE IN_LIST VALID_TEST_MODES)
   list(APPEND error_messages "[CHIMERA-SDK] Invalid TEST_MODE: ${TEST_MODE}")
@@ -110,9 +135,10 @@ if(error_messages)
 endif()
 
 set(SOC_MODEL_BINARY "chim.bin" CACHE STRING "Path to the simulation binary")
+set(SIMULATION_BINARY ${SOC_MODEL_BINARY})
 set(PRELOAD_MODE "0" CACHE STRING "Preload mode for simulation")
 
-if(TEST_MODE STREQUAL "compile")
+if(TEST_MODE STREQUAL "compile" OR TEST_MODE STREQUAL "simulation")
   add_subdirectory(tests)
 endif()
 

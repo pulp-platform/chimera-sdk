@@ -4,8 +4,9 @@
 // Include Standard Libraries
 
 // Include Application Headers
-#include "test_cluster.h"
 #include "test_host.h"
+
+#include "test_snitchCluster_matmul_device1_symbols.h"
 
 // Include Target Specific Headers
 #include "soc.h"
@@ -17,13 +18,12 @@
 #include "log.h"
 #include "util.h"
 #include "clint.h"
+#include "shared.h"
 
 // Import HAL Headers
 
 #define CLUSTER1 4
 #define STACK_ADDRESS (_chimera_clusterBase[CLUSTER1] + 0x20000 - 1)
-
-extern uintptr_t volatile tohost, fromhost;
 
 #if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE) && defined(HARDWARE_BACKEND_ASIC)
 void setGPIO0_UART() {
@@ -42,9 +42,7 @@ int main(void) {
     setGPIO0_UART();
 #endif
 
-#if defined(HARDWARE_BACKEND_RTL)
-    uint32_t core_freq = 500000000; // 500 MHz for RTL
-#else
+#if !defined(HARDWARE_BACKEND_RTL)
     // 2. Read the RTC frequency from a hardware register
     uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
 
@@ -57,7 +55,7 @@ int main(void) {
     void *stack_cluster_ptr[NUM_CLUSTER_CORES];
     generate_snitchCluster_SPs_uniform(CLUSTER1, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
 
-    setup_snitchCluster_interruptHandler(clusterInterruptHandler);
+    setup_snitchCluster_interruptHandler(device1_clusterInterruptHandler);
 
     set_snitchCluster_clockGating(CLUSTER1, 0);
 
@@ -72,23 +70,25 @@ int main(void) {
 
     // Disable interrupts
     set_mie(0);
-    offload_snitchCluster(testReturn, (void *)arg, stack_cluster_ptr, CLUSTER1);
+    offload_snitchCluster(device1_testReturn, device1_trampoline, (void *)arg, stack_cluster_ptr,
+                          CLUSTER1);
 
     // Enable interrupts
     set_mie(1);
 
-    // Handle tohost/fromhost communication
+    // Handle shared_data.device_to_host/shared_data.host_to_device communication
     while (snitchCluster_busy(CLUSTER1)) {
-        // Wait for tohost to be set by the device
-        if (tohost != 0) {
-            volatile uint32_t syscall_addr = tohost;
+        // Wait for shared_data.device_to_host to be set by the device
+        if (shared_data.device_to_host != 0) {
+            volatile uint32_t syscall_addr = shared_data.device_to_host;
 
-            // Acknowledge tohost
-            tohost = 0;
+            // Acknowledge shared_data.device_to_host
+            shared_data.device_to_host = 0;
 
-            // printf("Host received tohost: %#x\n", tohost);
+            // printf("Host received shared_data.device_to_host: %#x\n",
+            // shared_data.device_to_host);
 
-            // Cluster does tohost = (uintptr_t)buf->hdr.syscall_mem;
+            // Cluster does shared_data.device_to_host = (uintptr_t)buf->hdr.syscall_mem;
             uint32_t *syscall_mem = (uint32_t *)syscall_addr;
 
             // printf("Host handling syscall %u: fd=%#x, buf=%p, len=%#x\n", syscall_mem[0],
@@ -101,7 +101,7 @@ int main(void) {
             }
 
             // Notify cluster that syscall is done
-            fromhost = syscall_addr;
+            shared_data.host_to_device = syscall_addr;
         }
 
         // Enter low-power mode until next interrupt
