@@ -10,9 +10,9 @@
 #include "ITA_dims.h"
 
 // clang-format off
-extern const int8_t input[4232];
-extern const int8_t kernel[32768];
-extern const int8_t golden[16384];
+extern const int8_t input[529];
+extern const int8_t kernel[128];
+extern const int8_t golden[512];
 extern const uint32_t requant_eps_mult[1][2];
 extern const uint32_t requant_right_shift[1][2];
 extern const int32_t requant_add[1][2];

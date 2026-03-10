@@ -85,8 +85,17 @@ int main(void) {
     volatile uint32_t *scratch =
         (volatile uint32_t *)(&__base_regs + CHESHIRE_SCRATCH_0_REG_OFFSET);
 
-    if (scratch[0] == 1) {
+    switch (scratch[0]) {
+    case TEST_MODE_DUTCTL:
         mode = TEST_MODE_DUTCTL;
+        break;
+    case TEST_MODE_INTERACTIVE:
+        mode = TEST_MODE_INTERACTIVE;
+        break;
+    case TEST_MODE_AUTOMATIC:
+    default:
+        mode = TEST_MODE_AUTOMATIC;
+        break;
     }
 
     uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
@@ -124,7 +133,7 @@ int main(void) {
         // In DUTCTL mode, read target frequency from scratch register
         target_freq_mhz = scratch[3]; // e.g. 170
         printf("@dutctl:dutmeas:cfg_fll_MHz:%d\r\n", target_freq_mhz);
-    } else {
+    } else if (mode == TEST_MODE_INTERACTIVE) {
         // Ask user for target frequency
         printf_log("Enter target frequency in MHz (10-1000, or -1 to skip FLL configuration): ");
         fflush(stdout);
@@ -137,6 +146,10 @@ int main(void) {
 
         target_freq_mhz = atoi(input_buffer);
         printf("%d\n", target_freq_mhz);
+    } else {
+        // In other modes, default to 200 MHz
+        printf_log("Using target frequency = %d MHz\n", 200);
+        target_freq_mhz = 200;
     }
 
     uint32_t actual_freq = core_freq;
@@ -178,8 +191,12 @@ int main(void) {
         printf("@dutctl:psumeas:meas_core_V:500:E36312A_1:1\r\n");
     }
 
+#ifdef HARDWARE_BACKEND_RTL
+    clint_sleep_ticks(0, 20);
+#else
     // Sleep for 2 seconds
     clint_sleep_ticks(0, 2 * rtc_freq);
+#endif
 
     if (mode == TEST_MODE_DUTCTL) {
         printf("@dutctl:dutmeas:meas_errors:0\n");

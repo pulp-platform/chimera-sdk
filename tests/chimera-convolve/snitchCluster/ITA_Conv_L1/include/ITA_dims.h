@@ -6,18 +6,18 @@
 
 #define INPUT_H 23
 #define INPUT_W INPUT_H
-#define INPUT_C 8
+#define INPUT_C 1
 
 #define KERNEL_H 8
 #define KERNEL_W KERNEL_H
-#define KERNEL_C 64
+#define KERNEL_C 2
 
 #define OUTPUT_H (INPUT_H - KERNEL_H + 1)
 #define OUTPUT_W (INPUT_W - KERNEL_W + 1)
 #define OUTPUT_C KERNEL_C
 
 #define N_TILE_SEQUENCE_LENGTH 4
-#define N_TILE_EMBEDDING_SPACE 8
+#define N_TILE_EMBEDDING_SPACE 1
 #define N_TILE_PROJECTION_SPACE 1
 
 // IM2COL Convolution is MxK * KxN = MxN

@@ -105,7 +105,7 @@ int main(void) {
     };
 
     test_cluster_cfg_t test_cfg = {
-        .name = "L1 ITA MatMul Test",
+        .name = "L1 ITA Convolution Test",
         .mode = TEST_MODE_AUTOMATIC,
         .default_frequency_mhz = 200, // Frequency in MHz in automatic mode
         .default_repetitions = 1,     // Number of repetitions in automatic mode
@@ -114,7 +114,7 @@ int main(void) {
         .clusterIds = {4},
         .stack_start = {(void *)STACK_ADDRESS_4},
         .stack_sizes = {stack_size_4},
-        .function_test = (void *)ita_matmul_l1_test,
+        .function_test = (void *)ita_conv_l1_test,
         .function_interrupt = (void *)clusterInterruptHandler,
         .args = &test_args,
     };

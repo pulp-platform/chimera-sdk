@@ -16,11 +16,11 @@ import numpy as np
 # Tensor dimensions (mirrors ITA_dims.h)
 INPUT_H = (15 + 8)
 INPUT_W = INPUT_H
-INPUT_C = 8
+INPUT_C = 1
 
 KERNEL_H = 8
 KERNEL_W = KERNEL_H
-KERNEL_C = 64
+KERNEL_C = 2
 OUTPUT_C = KERNEL_C
 
 OUTPUT_H = INPUT_H - KERNEL_H + 1

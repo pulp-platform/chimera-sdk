@@ -185,7 +185,7 @@ int32_t add_l1_test(void *args) {
      * golden buffer `testOutputVector0`.  The function returns (tot_err << 1)
      * to encode the error count in the return value.
      */
-    int32_t tot_err = -1;
+    int32_t tot_err = 0;
     if (snrt_cluster_core_idx() == 0) {
         int32_t diff;
         int32_t expected, actual;

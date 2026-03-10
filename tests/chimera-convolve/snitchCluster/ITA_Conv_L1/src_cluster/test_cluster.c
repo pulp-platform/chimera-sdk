@@ -40,6 +40,8 @@ SNRT_CLUSTER_L1_ZERO(static int8_t *g_im2col_tile[2]);
 SNRT_CLUSTER_L1_ZERO(static int8_t *g_output_tile[2]);
 SNRT_CLUSTER_L1_ZERO(static int8_t *g_output_l1);
 
+SNRT_CLUSTER_L1_ZERO(static uint32_t tot_err);
+
 // Generate one IM2COL tile
 // Assumes input_ptr is laid out as NCHW with N=1 (i.e., CHW in memory).
 static inline void im2col_tile(const int8_t *input_ptr, int8_t *dst, int tile_m_start) {
@@ -188,9 +190,7 @@ void ita_set_tiles_fix(uint8_t m_tiles, uint8_t k_tiles, uint8_t n_tiles) {
  * @brief Convolution with IM2COL parallelized over compute cores. IM2COL tiles are prepared while
  * the ITA accelerator processes the previous tile (ping-pong buffering).
  */
-int32_t ita_matmul_l1_test(void *args) {
-    int32_t tot_err = -1;
-
+int32_t ita_conv_l1_test(void *args) {
     test_cluster_args_t *test_args = (test_cluster_args_t *)args;
     test_cluster_result_t *test_retVal = (test_cluster_result_t *)(test_args->result);
 
@@ -455,13 +455,13 @@ int32_t ita_matmul_l1_test(void *args) {
 #endif
             ita_wait_job();
             if (last_buf >= 0) {
-                // #ifdef DEBUG
-                //                 printf("ITA Output Tile (final, M tile %d) with shape
-                //                 (%ux%u):\n", last_m_tile,
-                //                        ITA_CHUNK_M, ITA_CHUNK_N);
-                //                 PrintMatrix_s8_NCHW(g_output_tile[last_buf], 1, 1, ITA_CHUNK_M,
-                //                 ITA_CHUNK_N, 0);
-                // #endif
+#ifdef DEBUG
+                printf("ITA Output Tile (final, M tile %d) with shape
+                       (% ux % u) :\n ", last_m_tile,
+                       ITA_CHUNK_M,
+                       ITA_CHUNK_N);
+                PrintMatrix_s8_NCHW(g_output_tile[last_buf], 1, 1, ITA_CHUNK_M, ITA_CHUNK_N, 0);
+#endif
                 writeback_output_tile(g_output_tile[last_buf], last_m_tile, g_output_l1);
             }
         }
@@ -472,12 +472,13 @@ int32_t ita_matmul_l1_test(void *args) {
     end_instructions = snrt_minstret();
 
     if (snrt_is_dm_core()) {
+#ifdef DEBUG
+        printf("Dumping final output tensor:\n");
+        dump_matrix_s8(g_output_l1, OUTPUT_C, OUTPUT_H * OUTPUT_W);
 
-        // printf("Dumping final output tensor:\n");
-        // dump_matrix_s8(g_output_l1, OUTPUT_C, OUTPUT_H * OUTPUT_W);
-
-        // printf("Output Matrix with shape (%ux%ux%u):\n", OUTPUT_C, OUTPUT_H, OUTPUT_W);
-        // PrintMatrix_s8_NCHW(g_output_l1, 1, OUTPUT_C, OUTPUT_H, OUTPUT_W, 0);
+        printf("Output Matrix with shape (%ux%ux%u):\n", OUTPUT_C, OUTPUT_H, OUTPUT_W);
+        PrintMatrix_s8_NCHW(g_output_l1, 1, OUTPUT_C, OUTPUT_H, OUTPUT_W, 0);
+#endif
 
         printf("ITA Conv cycles = %u\n", end_cycles - start_cycles);
         printf("ITA Conv instructions = %u\n", end_instructions - start_instructions);
