@@ -59,6 +59,11 @@ int calculate_fll_params(uint32_t target_freq, uint32_t rtc_freq, uint32_t *mult
 }
 
 uint32_t configure_fll(uint32_t target_freq, uint32_t rtc_freq) {
+#ifndef CHIMERA_DRIVER_FLL
+    printf_log("Error: FLL driver not included in build\n");
+    return -1;
+#else
+
     uint32_t mult, div;
     dif_result_t result;
 
@@ -113,9 +118,15 @@ uint32_t configure_fll(uint32_t target_freq, uint32_t rtc_freq) {
     }
 
     return core_freq_fll;
+#endif
 }
 
 uint32_t restore_default_freq(uint32_t rtc_freq) {
+#ifndef CHIMERA_DRIVER_FLL
+    printf_log("Error: FLL driver not included in build\n");
+    return -1;
+#else
+
     dif_result_t result;
 
 #if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE)
@@ -143,4 +154,5 @@ uint32_t restore_default_freq(uint32_t rtc_freq) {
     }
 
     return core_freq;
+#endif
 }
