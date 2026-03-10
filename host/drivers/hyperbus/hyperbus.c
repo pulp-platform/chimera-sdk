@@ -25,6 +25,7 @@
 
 // Include Runtime Headers
 #include "util.h"
+#include "log.h"
 
 // Import HAL Headers
 
