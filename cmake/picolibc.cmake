@@ -48,7 +48,7 @@ string(JOIN "," PICOLIB_MULTILIB ${PICOLIB_MULTILIB})
 ExternalProject_Add(
     picolibc
     GIT_REPOSITORY https://github.com/picolibc/picolibc.git
-    GIT_TAG main
+    GIT_TAG 1.8.11
     SOURCE_DIR ${PICOLIBC_SRC_DIR}
     BINARY_DIR ${PICOLIBC_BUILD_DIR}
     INSTALL_DIR ${PICOLIBC_INSTALL_DIR}
