@@ -1,6 +1,31 @@
 // SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * Snitch cluster runtime initialisation (snrt_init).
+ *
+ * Called once per core from crt0.S before main().  Initialisation is split
+ * between the DMA core (snrt_is_dm_core()) and compute cores:
+ *
+ * ALL CORES — Thread-Local Storage (TLS):
+ *   Copy .tdata from the binary LMA into each core's thread pointer region,
+ *   then zero .tbss.  Each core's tp register already points to its private
+ *   TLS block (set up by crt0.S from the per-core stack allocation).
+ *
+ * DMA CORE ONLY — Cluster memory:
+ *   1. DMA-copy per-cluster L1 data (.l1 sections) from the LMA in memisl to
+ *      the cluster's physical L1 base (_chimera_clusterL1Start[cluster_idx]).
+ *   2. DMA-copy the cluster-local data section (.cdata) — the CLS alias address
+ *      is translated to the physical L1 address before the transfer.
+ *   3. Zero-fill .cbss via the hardware zero-memory region (a read-only window
+ *      that always returns 0, used as a DMA memset source).
+ *   4. Initialise the L1 and L3 allocators from linker-defined heap symbols.
+ *   5. Initialise the printf mutex in L1.
+ *
+ * A cluster hardware barrier at the end ensures compute cores do not proceed
+ * past snrt_init() before the DMA core has finished all memory setup.
+ */
+
 // Include Standard Libraries
 #include <stddef.h>
 #include <stdint.h>

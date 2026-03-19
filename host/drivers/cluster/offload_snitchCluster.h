@@ -7,6 +7,11 @@
 #include <stdbool.h>
 
 /**
+ * @defgroup drivers Drivers
+ * @brief Low-level peripheral and device drivers for Chimera-SDK.
+ */
+
+/**
  * \defgroup drivers_snitch_cluster Snitch Cluster Device Driver
  * @ingroup drivers
  * @brief Driver for offloading tasks to Snitch clusters in Chimera-SDK.

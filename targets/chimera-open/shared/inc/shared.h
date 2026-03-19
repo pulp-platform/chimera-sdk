@@ -8,46 +8,49 @@
 
 #include "addr_maps/soc_addr_map.h"
 
-/*
- * Shared data structure exchanged between the host (CVA6, RV32IMC) and all
- * device accelerators (Snitch clusters, RV32IMAFD).
+/**
+ * @defgroup target_shared Shared Communication Interface
+ * @ingroup device_snitchCluster
+ * @brief Host–device shared memory layout for the chimera-open target.
  *
- * __attribute__((packed)) guarantees identical field layout regardless of the
- * ABI in use.  All fields use fixed-width types for the same reason.
- *
- * Both the host and each device define a 'shared_data' variable in the
- * '.common' section:
- *   - Host link.ld maps '.common' into memisl at 0x48000000 (loaded).
- *   - Device link.ld maps '.common' into memisl as NOLOAD (same address,
- *     no bytes emitted — device accesses host memory via AXI interconnect).
+ * All binaries (host + every cluster device) map the @c .common section to the
+ * same physical address (@c 0x48000000).  The host linker script loads
+ * @c .common; device linker scripts mark it @c NOLOAD.  The @c packed
+ * attribute ensures identical field offsets regardless of ISA or ABI.
+ * @{
  */
 
+/**
+ * @brief Shared memory region exchanged between the host and all cluster devices.
+ *
+ * Fields are accessed by both the CVA6 host (RV64IMC) and the Snitch cluster
+ * cores (RV32IMAFD) via the AXI interconnect.  @c __attribute__((packed))
+ * guarantees identical layout on both ISAs.
+ */
 typedef struct __attribute__((packed)) {
-    /*
-     * HTIF semihosting channels (replace the legacy
-     * shared_data.device_to_host/shared_data.host_to_device symbols previously defined in crt0.S
-     * .htif sections). Offset 0 is 64-byte aligned (shared_data itself is aligned(64)).
-     */
-    volatile uint32_t host_to_device; /* replaces shared_data.device_to_host   (offset  0) */
-    volatile uint32_t device_to_host; /* replaces shared_data.host_to_device (offset  8) */
+    volatile uint32_t host_to_device; /**< HTIF channel: host → device semihosting word. */
+    volatile uint32_t device_to_host; /**< HTIF channel: device → host semihosting word. */
 
-    /* Host sets host_to_device_flag[i] = 1 to signal cluster i to start. */
+    /** @brief Flag array: host sets @c host_to_device_flag[i]=1 to start cluster @c i. */
     volatile uint32_t host_to_device_flag[NUM_CLUSTERS];
 
-    /* Cluster i sets device_to_host_flag[i] = 1 when it is done. */
+    /** @brief Flag array: cluster @c i sets @c device_to_host_flag[i]=1 when done. */
     volatile uint32_t device_to_host_flag[NUM_CLUSTERS];
 
-    /* Persistent trampoline function pointer for each cluster core (RV32 pointer). */
+    /** @brief Per-core function pointer written by the host before releasing a core. */
     volatile uint32_t trampoline_function[NUM_CLUSTER_CORES];
 
-    /* Persistent argument storage for each cluster core's trampoline function. */
+    /** @brief Per-core argument pointer written by the host before releasing a core. */
     volatile uint32_t trampoline_args[NUM_CLUSTER_CORES];
 
-    /* Persistent stack pointer storage for each cluster core's trampoline context. */
+    /** @brief Per-core stack pointer written by the host before releasing a core. */
     volatile uint32_t trampoline_stack[NUM_CLUSTER_CORES];
 
 } chimera_shared_data_t;
 
+/** @brief Singleton instance of the shared communication region, placed in @c .common. */
 extern chimera_shared_data_t shared_data;
+
+/** @} */ // end defgroup target_shared
 
 #endif /* CHIMERA_SHARED_H */

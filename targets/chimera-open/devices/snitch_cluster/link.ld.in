@@ -31,9 +31,9 @@
  *
  * Note: rv32imafd_xdma has F and D extensions; snitch_crt0.S clears FP registers.
  *
- * Note: This file does NOT INCLUDE common.ldh to avoid pulling in host-only
- * symbol definitions (__global_pointer$ via ADDR(.misc)) that do not apply
- * to the device.  The MEMORY block and base-address symbols are inlined here.
+ * Note: This file INCLUDEs common.ldh for the shared MEMORY block and
+ * base-address symbols.  The device defines its own __global_pointer$ using
+ * ADDR(.data), not ADDR(.misc), so there is no conflict with the host script.
  */
 
 INCLUDE common.ldh

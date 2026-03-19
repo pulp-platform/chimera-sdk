@@ -1,0 +1,111 @@
+# SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+#
+# SPDX-License-Identifier: Apache-2.0
+
+---
+name: Docker • Build Chimera Container
+
+"on":
+  push:
+    branches:
+      - main
+      - devel
+    paths:
+      - "container/Dockerfile"
+      - "container/Makefile"
+      - "Makefile"
+      - ".github/workflows/docker-build-chimera.yml"
+  workflow_dispatch:
+
+jobs:
+  prepare:
+    name: Fetch branch name or tag
+    runs-on: ubuntu-latest
+    outputs:
+      docker_tag: ${{ steps.generate_tag.outputs.docker_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set Docker tag
+        id: generate_tag
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "docker_tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "docker_tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+  build-chimera:
+    name: Build Chimera Image
+    needs: [prepare]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free up disk space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: GHCR Log-in
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.IIS_GIT_SSH_KEY }}
+
+      - name: Add iis-git.ee.ethz.ch to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H iis-git.ee.ethz.ch >> ~/.ssh/known_hosts
+
+      - name: Restore ccache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: var-ccache
+          key: ${{ runner.os }}-amd64-build-cache-chimera-${{ github.ref_name }}
+          restore-keys: |
+            ${{ runner.os }}-amd64-build-cache-chimera-
+
+      - name: Inject build-cache into BuildKit
+        uses: reproducible-containers/buildkit-cache-dance@v3.1.0
+        with:
+          cache-map: |
+            {
+              "var-ccache": "/ccache"
+            }
+          skip-extraction: ${{ steps.cache.outputs.cache-hit }}
+
+      - name: Lower Case Repository Name
+        run: echo "OWNER_LC=${OWNER,,}" >> $GITHUB_ENV
+        env:
+          OWNER: "${{ github.repository_owner }}"
+
+      - name: Build and push Chimera image
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64
+          context: .
+          file: container/Dockerfile
+          push: true
+          ssh: default
+          cache-from: type=gha
+          cache-to: type=gha,mode=min
+          tags: |
+            ghcr.io/${{ env.OWNER_LC }}/chimera:latest
+            ghcr.io/${{ env.OWNER_LC }}/chimera:${{ needs.prepare.outputs.docker_tag }}

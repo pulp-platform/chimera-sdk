@@ -1,40 +1,79 @@
 # SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 # SPDX-License-Identifier: Apache-2.0
 
-# ---------------------------------------------------------------------------
-# add_device_binary(TARGET_NAME
-#   DEVICE_NNAME
-#   TARGET_DIR     <dir>           Directory containing target specific files (e.g. linker script template)
-#   DEVICE_DIR     <dir>           Directory containing device-specific sources and includes (optional; for host runtime config)
-#   ISA            <march>         e.g. rv32imafd
-#   ABI            <mabi>          e.g. ilp32d
-#   COMPILER       <triple>        e.g. riscv32-unknown-elf
-#   COMPIERT_RT    <rt-dir>        compiler-rt baremetal subdir (e.g. rv32imafd)
-#   SOURCES        <file> ...
-#   [PREV_DEVICE   <target>]       optional: device that precedes this one in
-#                                  memisl; its placement file is INCLUDEd by
-#                                  the generated linker script so this device
-#                                  starts immediately after it
-# )
-#
-# Linker script template placeholders (substituted by configure_file @ONLY):
-#   @CHIMERA_PREV_INCLUDE@     → empty, or "INCLUDE <prev>_placement.ldh"
-#   @CHIMERA_RESERVED_SECTION@ → empty, or a .reserved (NOLOAD) section that
-#                                 advances the LC past the previous device's
-#                                 memory region
-#
-# Build outputs (all in CMAKE_CURRENT_BINARY_DIR):
-#   ${TARGET_NAME}_link.ld       generated linker script (do not edit)
-#   ${TARGET_NAME}_host.elf           device ELF
-#   ${TARGET_NAME}_host.dump          disassembly
-#   ${TARGET_NAME}_host.sections      section headers  (input for overlap checker)
-#   ${TARGET_NAME}_host.symbols       full symbol table
-#   ${TARGET_NAME}_symbols.s     absolute-symbol assembly for the host linker
-#   ${TARGET_NAME}_symbols.h     extern declarations for host C code
-#   ${TARGET_NAME}_symbols       INTERFACE library consumed by add_host_binary
-#   ${TARGET_NAME}_placement.ldh
-#                                placement header read by the next binary
-# ---------------------------------------------------------------------------
+#[=======================================================================[.rst:
+.. cmake:command:: add_device_binary(TARGET_NAME)
+
+   Compile a device binary for one execution domain (e.g. a Snitch cluster)
+   and expose its public symbols for the host to link against.
+
+   This function drives the first two stages of the three-stage heterogeneous
+   compilation pipeline:
+
+   - **Stage 1** — Compile the device ELF with the device ISA/ABI.
+   - **Stage 2** — Extract public symbols with ``llvm-nm`` and write an
+     assembly stub (``_symbols.s``) and C header (``_symbols.h``) that the
+     host links against.  A placement header (``_placement.ldh``) recording
+     the 4 KiB-aligned end address of the device binary is also written.
+
+   The resulting ``${TARGET_NAME}_symbols`` INTERFACE library is consumed by
+   :cmake:command:`add_host_binary`.
+
+   :param TARGET_NAME: CMake target name for this device binary.
+   :param DEVICE_NAME: Short prefix applied to every exported symbol,
+      e.g. ``device`` produces ``device_main``.  Must be unique across all
+      devices in a build to avoid host link-time collisions.
+   :param TARGET_DIR: Directory containing ``common.ldh`` and other
+      target-wide shared files (e.g. ``targets/<target>/``).
+   :param DEVICE_DIR: Directory containing the device linker script template
+      ``link.ld.in`` and device-specific startup code
+      (e.g. ``targets/<target>/devices/snitch_cluster/``).
+   :param ISA: RISC-V march string for the device (e.g. ``rv32imafd``).
+   :param ABI: RISC-V mabi string for the device (e.g. ``ilp32d``).
+   :param COMPILER: LLVM target triple for the device
+      (e.g. ``riscv32-unknown-elf``).
+   :param COMPIERT_RT: compiler-rt baremetal subdirectory for this ABI
+      (e.g. ``rv32imafd``).
+   :param SOURCES: C and assembly source files compiled into the device ELF.
+   :param PREV_DEVICE: *(optional)* CMake target name of the preceding device
+      in memisl order.  When set, the generated linker script INCLUDEs that
+      device's placement header so this binary starts immediately after it.
+   :param PICOLIBC: *(optional)* Picolibc library variant to link
+      (e.g. ``rv32imafd``).
+
+   Linker script template placeholders substituted by this function:
+
+   - ``@CHIMERA_PREV_INCLUDE@`` — empty, or ``INCLUDE <prev>_placement.ldh``
+   - ``@CHIMERA_RESERVED_SECTION@`` — empty, or a NOLOAD ``.reserved`` section
+     advancing the location counter past the previous device's memory region
+
+   Build outputs (all in ``CMAKE_CURRENT_BINARY_DIR``):
+
+   - ``${TARGET_NAME}.elf`` — device ELF
+   - ``${TARGET_NAME}.dump`` — disassembly
+   - ``${TARGET_NAME}.sections`` — section headers (input for overlap checker)
+   - ``${TARGET_NAME}.symbols`` — full symbol table
+   - ``${TARGET_NAME}_symbols.s`` — absolute-address assembly for the host linker
+   - ``${TARGET_NAME}_symbols.h`` — ``extern`` declarations for host C code
+   - ``${TARGET_NAME}_symbols`` — INTERFACE library consumed by :cmake:command:`add_host_binary`
+   - ``${TARGET_NAME}_placement.ldh`` — placement header read by the next binary
+
+   .. code-block:: cmake
+      :caption: Example Usage
+
+      add_device_binary(${TEST_NAME}_device
+          DEVICE_NAME  device
+          ISA          ${ISA_CLUSTER_SNITCH}
+          ABI          ${ABI_CLUSTER_SNITCH}
+          COMPILER     ${CROSS_COMPILE_DEVICE_SNITCH_CLUSTER}
+          COMPIERT_RT  ${COMPILERRT_CLUSTER_SNITCH}
+          PICOLIBC     ${PICOLIB_CLUSTER_SNITCH}
+          TARGET_DIR   ${CHIMERA_TARGET_DIR}
+          DEVICE_DIR   ${CHIMERA_TARGET_DIR}/devices/snitch_cluster
+          SOURCES      ${TEST_SNITCH_SRCS}
+      )
+
+#]=======================================================================]
 function(add_device_binary TARGET_NAME)
     set(oneValueArgs   DEVICE_NAME TARGET_DIR DEVICE_DIR PREV_DEVICE ISA ABI COMPILER COMPIERT_RT PICOLIBC)
     set(multiValueArgs SOURCES)
@@ -328,33 +367,78 @@ function(add_device_binary TARGET_NAME)
 
 endfunction()
 
-# ---------------------------------------------------------------------------
-# add_host_binary(TARGET_NAME
-#   ARG_DEVICE_DIR  <dir>         Directory containing target specific files (e.g. linker script template)
-#   ISA            <march>        e.g. rv64imc
-#   ABI            <mabi>         e.g. lp64
-#   COMPILER       <triple>       e.g. riscv64-unknown-elf
-#   COMPIERT_RT    <rt-dir>       compiler-rt baremetal subdir (e.g. rv64imc)
-#   SOURCES        <file> ...
-#   DEVICE_DEPS    <target> ...   device targets that must be built first
-#   DEVICE_SYMBOLS <lib>   ...   ${dev}_symbols INTERFACE libraries to link
-#   LAST_DEVICE    <target>       device at the tail of the placement chain;
-#                                 its _placement.ldh is INCLUDEd by the host
-#                                 linker script via @CHIMERA_LAST_DEVICE@
-# )
-#
-# Linker script template placeholder:
-#   @CHIMERA_LAST_DEVICE@   → the value of LAST_DEVICE (e.g. snitch_cluster_1)
-#                             Used to form "INCLUDE snitch_cluster_1_placement.ldh"
-#                             and "__snitch_cluster_1_end" in the script.
-#
-# Post-build targets created by this function:
-#   chimera_check_overlaps   prints memory map + checks for VMA conflicts
-#                            (Python script; replaces CMake-only implementation)
-#   chimera_merge_elf        (optional, requires CHIMERA_UNIFIED_ELF=ON)
-#                            merges all ELFs into one file using lief
-#   chimera_footer           prints the build summary
-# ---------------------------------------------------------------------------
+#[=======================================================================[.rst:
+.. cmake:command:: add_host_binary(TARGET_NAME)
+
+   Compile the host binary and link the device symbol stubs produced by
+   :cmake:command:`add_device_binary`.
+
+   This function drives Stage 3 of the three-stage heterogeneous compilation
+   pipeline: the host ELF is compiled with the host ISA/ABI and linked with
+   the absolute-address symbol stubs from every attached device.  A post-build
+   step runs the section-overlap checker and, when ``CHIMERA_UNIFIED_ELF`` is
+   enabled, merges all ELFs into a single mixed-ISA file for simulation.
+
+   :param TARGET_NAME: CMake target name for this host binary.
+   :param TARGET_DIR: Directory containing ``common.ldh`` and other
+      target-wide shared files (e.g. ``targets/<target>/``).
+   :param DEVICE_DIR: Directory containing the host linker script template
+      ``link.ld.in`` and host-specific startup code
+      (e.g. ``targets/<target>/host/``).
+   :param ISA: RISC-V march string for the host (e.g. ``rv64imc``).
+   :param ABI: RISC-V mabi string for the host (e.g. ``lp64``).
+   :param COMPILER: LLVM target triple for the host
+      (e.g. ``riscv64-unknown-elf``).
+   :param COMPIERT_RT: compiler-rt baremetal subdirectory for this ABI
+      (e.g. ``rv64imc``).
+   :param SOURCES: C and assembly source files compiled into the host ELF.
+   :param DEVICE_DEPS: *(optional)* Device ELF targets that must finish
+      building before symbol extraction begins.  Used for build ordering only;
+      no object code is pulled from these targets.
+   :param DEVICE_SYMBOLS: *(optional)* ``${dev}_symbols`` INTERFACE libraries
+      produced by :cmake:command:`add_device_binary`.  Their compiled object
+      files (the ``.set`` stubs) are linked into the host ELF so that device
+      symbols resolve to their correct absolute addresses.
+   :param LAST_DEVICE: *(optional)* Name of the device at the tail of the
+      placement chain.  Its ``_placement.ldh`` is included by the host linker
+      script so host ``.text`` is placed immediately after all device code.
+      Omit or leave empty for host-only builds.
+   :param PICOLIBC: *(optional)* Picolibc library variant to link
+      (e.g. ``rv64imc``).
+
+   Linker script template placeholders substituted by this function:
+
+   - ``@CHIMERA_PLACEMENT_INCLUDE@`` — empty when ``LAST_DEVICE`` is unset,
+     or ``INCLUDE <last_device>_placement.ldh`` otherwise
+   - ``@CHIMERA_RESERVED_SECTION@`` — empty when ``LAST_DEVICE`` is unset,
+     or a NOLOAD ``.reserved`` section advancing the LC past all device memory
+
+   Post-build targets created:
+
+   - ``chimera_check_overlaps`` — memory map printer and VMA conflict checker
+     (``scripts/check_section_overlaps.py``)
+   - ``chimera_merge_elf`` — *(optional, requires* ``CHIMERA_UNIFIED_ELF=ON`` *)* merges
+     device + host ELFs into one mixed-ISA file via ``lief``
+   - ``chimera_footer`` — prints the build summary
+
+   .. code-block:: cmake
+      :caption: Example Usage
+
+      add_host_binary(${TEST_NAME}
+          ISA          ${ISA_HOST}
+          ABI          ${ABI_HOST}
+          COMPILER     ${CROSS_COMPILE_HOST}
+          COMPIERT_RT  ${COMPILERRT_HOST}
+          PICOLIBC     ${PICOLIB_HOST}
+          TARGET_DIR   ${CHIMERA_TARGET_DIR}
+          DEVICE_DIR   ${CHIMERA_TARGET_DIR}/host
+          SOURCES      ${TEST_HOST_SRCS}
+          DEVICE_DEPS    ${TEST_NAME}_device
+          DEVICE_SYMBOLS ${TEST_NAME}_device_symbols
+          LAST_DEVICE    ${TEST_NAME}_device
+      )
+
+#]=======================================================================]
 function(add_host_binary TARGET_NAME)
     set(oneValueArgs   TARGET_DIR DEVICE_DIR LAST_DEVICE ISA ABI COMPILER COMPIERT_RT PICOLIBC)
     set(multiValueArgs SOURCES DEVICE_DEPS DEVICE_SYMBOLS)

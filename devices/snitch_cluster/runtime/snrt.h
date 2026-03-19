@@ -3,6 +3,15 @@
 
 #pragma once
 
+/**
+ * @defgroup device_snitchCluster Snitch Cluster Device Runtime
+ * @brief Runtime library for code executing on Snitch cluster cores.
+ *
+ * Provides initialisation, I/O, and synchronisation primitives for
+ * RV32 device-side code running on a Snitch cluster.
+ * @{
+ */
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -81,3 +90,5 @@ int snrt_printf(const char *fmt, ...);
  * Places a initialized declaration into the L1 memory of a specific cluster.
  */
 #define SNRT_CLUSTER_L1(decl, cluster_id) decl __attribute__((section(".l1_c" #cluster_id)))
+
+/** @} */ // End of device_snitchCluster group

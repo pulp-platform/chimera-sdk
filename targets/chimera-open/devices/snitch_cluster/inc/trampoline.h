@@ -52,7 +52,7 @@
     "add t1, t1, t3\n"   /* t1 += t3 (cluster_id = 4) */
 
 /**
- * @brief Compute cluster id form the hartid adn set busy flag.
+ * @brief Calculate the cluster ID from mhartid and set the busy flag.
  *
  * @note This is a naked-friendly macro intended to be used inside an asm volatile block.
  */

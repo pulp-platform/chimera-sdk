@@ -1,6 +1,19 @@
 // SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * UART instance and backend-specific initialisation.
+ *
+ * default_uart_cfg and default_uart_inst are the module-level singletons used
+ * by the rest of the runtime (putc.c, stdio.c, fll.c).
+ *
+ * _uart_init() is conditional on HARDWARE_BACKEND:
+ *  - GVSOC / RTL:  no-op (the simulator handles UART internally).
+ *  - ASIC:         measures the actual core clock via CLINT before opening the
+ *                  UART so that the baud divisor is computed from the real
+ *                  frequency rather than the compile-time default.
+ */
+
 #ifdef CHIMERA_DRIVER_UART
 
 // Include Standard Libraries

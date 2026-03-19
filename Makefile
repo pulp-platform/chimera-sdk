@@ -32,6 +32,7 @@ CLANG_FORMAT_EXECUTABLE ?= clang-format
 
 CMAKE ?= cmake
 
+.PHONY: help
 help:
 	@echo "Usage: make <target>"
 	@echo ""
@@ -41,11 +42,14 @@ help:
 	@echo " - export-symbols: Print the list of symbols to export to run the SDK's tests"
 	@echo " - format: Format all code"
 	@echo " - picolibc-multilib: Build picolibc for all RISC-V variants"
+	@echo " - container: Build the chimera-sdk Docker image"
 
+.PHONY: format
 format:
 	@echo "Formatting code..."
 	@pre-commit run --all-files
 
+.PHONY: export-symbols
 export-symbols:
 	@echo "Please export the following symbols:"
 	@echo "GVSOC_HOME=${GVSOC_INSTALL_DIR}/gvsoc"
@@ -205,7 +209,6 @@ $(PICOLIBC_CLONE_STAMP):
 	fi
 	touch $@
 
-.PHONY: picolibc-clone
 picolibc-clone: $(PICOLIBC_CLONE_STAMP)
 
 # Macro to generate one picolibc build+install target.
@@ -268,4 +271,41 @@ $(eval $(call MAKE_PICOLIBC_TARGET,rv64imafdc-lp64d,riscv64-unknown-elf,rv64imaf
 .PHONY: picolibc-multilib
 picolibc-multilib: picolibc-rv32im-ilp32 picolibc-rv32imafd-ilp32d picolibc-rv64imafdc-lp64d
 
-.PHONY: format help export-symbols
+# -----------------------------------------------------------------------------
+# Docker container
+# -----------------------------------------------------------------------------
+
+.PHONY: container
+container:
+	$(MAKE) -C container chimera
+
+# -----------------------------------------------------------------------------
+# Documentation (Sphinx + Doxygen)
+# -----------------------------------------------------------------------------
+
+VENV_NAME?=.venv
+VENV_ACTIVATE=. $(VENV_NAME)/bin/activate
+PYTHON=${VENV_NAME}/bin/python3
+
+.PHONY: docs-venv
+docs-venv:
+	if [ ! -d $(VENV_NAME) ]; then \
+		echo "[CHIMERA] Creating Python venv for docs..."; \
+		python3 -m venv $(VENV_NAME); \
+	fi; \
+	echo "[CHIMERA] Installing Python dependencies for docs..."; \
+	${PYTHON} -m pip install --upgrade pip; \
+	${PYTHON} -m pip install -r requirements.txt; \
+	${PYTHON} -m pip install -r requirements-docs.txt
+
+
+
+.PHONY: docs
+docs: docs-venv
+	$(VENV_ACTIVATE) && cd docs; $(MAKE) html
+
+# Reroute all docs-* targets to the docs Makefile, which handles Sphinx and Doxygen.
+docs-%:
+	$(VENV_ACTIVATE) && cd docs; $(MAKE) $*
+
+

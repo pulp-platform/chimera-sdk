@@ -2,7 +2,7 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 /*
- * Host linker script template for chimera-convolve (RV32IMC host).
+ * Host linker script template for chimera-host (host-only, no cluster devices).
  *
  * cmake/Chimera.cmake calls configure_file() on this template to produce
  * the actual linker script.  The placeholders below are substituted:

@@ -18,4 +18,3 @@ void initFll(volatile uint32_t *fllPtr);
 void setFllFreq(volatile uint32_t *fllPtr, uint32_t mult, uint32_t div);
 
 /** @} */ // End of drivers_fll group
-/** @} */ // End of drivers group

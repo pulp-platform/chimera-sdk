@@ -1,10 +1,15 @@
 // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
-// Define the standard C I/O streams for the Snitch cluster device binary.
-// picolibc's printf/vfprintf require stdin/stdout/stderr to be defined.
-// We back them with snrt_putchar so that cluster printf output goes via
-// the same HTIF semihosting path as snrt_printf.
+/*
+ * Standard I/O streams for the Snitch cluster (picolibc).
+ *
+ * picolibc requires stdin/stdout/stderr to be defined as FILE* globals.
+ * FDEV_SETUP_STREAM connects them to snrt_putchar (defined in putc.c), which
+ * buffers output and flushes via HTIF semihosting.  The read and flush hooks
+ * are NULL because cluster cores do not support interactive input and buffering
+ * is handled entirely inside snrt_putchar.
+ */
 
 #include <stdio.h>
 

@@ -4,6 +4,57 @@ Chimera-SDK is a bare-metal development platform for ASICs based on the [Chimera
 
 Chimera and Chimera-SDK are developed as part of the PULP project, a joint effort between ETH Zurich and the University of Bologna.
 
+## Getting Started
+
+### 1. Get the repository
+
+```bash
+git clone https://github.com/pulp-platform/chimera-sdk.git
+cd chimera-sdk
+git submodule update --init --recursive
+```
+
+### 2. Get the Docker container
+
+Pull the pre-built container (includes LLVM toolchain, picolibc, and all required dependencies):
+
+```bash
+docker pull ghcr.io/pulp-platform/chimera:latest
+```
+
+### 3. Build
+
+Start an interactive shell with the repository mounted:
+
+```bash
+docker run -it --name chimera \
+    -v $(pwd):/app/chimera \
+    ghcr.io/pulp-platform/chimera:latest \
+    zsh
+```
+
+Inside the container, configure and build:
+
+```bash
+cd /app/chimera
+cmake -D TARGET_PLATFORM=chimera-open \
+      -D TOOLCHAIN_DIR=/app/install/llvm-18.1.4-pulp \
+      -D PICOLIBC_DIR=/app/install/picolibc \
+      -D HARDWARE_BACKEND=RTL \
+      -D CHIMERA_UNIFIED_ELF=ON \
+      -B build
+cmake --build build -j
+```
+
+To re-enter the container after closing it:
+
+```bash
+docker start chimera
+docker exec -it chimera zsh
+```
+
+For ASIC targets, GDB flashing, and other environments see the [full documentation](https://pulp-platform.github.io/chimera-sdk/).
+
 ## Documentation
 All revelevant documentation can be found in the `docs` folder and is hosted on GitHub Pages.
 Access the documentation on

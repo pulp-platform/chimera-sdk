@@ -46,7 +46,7 @@ typedef struct chi_device {
 typedef bool (*chi_device_callback_t)(chi_device_t *device);
 
 /**
- * @ingroup device
+ * @ingroup hal_device
  * @struct chi_device_api
  * @brief Device API structure defining function pointers for a device.
  *
