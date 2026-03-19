@@ -954,6 +954,7 @@ WARN_LOGFILE           =
 
 INPUT                  = ../host/hal/inc ../host/drivers ../host/runtime \
                          ../shared/inc \
+                         ../targets/chimera-open/shared/inc \
                          ../targets/chimera-open/host
 
 # This tag can be used to specify the character encoding of the source files

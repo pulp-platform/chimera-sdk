@@ -32,6 +32,7 @@
 #include <string.h>
 
 #include "soc.h"
+#include "symbols.h"
 
 // Include Runtime Headers
 #include "snrt.h"
