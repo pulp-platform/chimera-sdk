@@ -56,4 +56,4 @@ uint32_t configure_fll(uint32_t target_freq, uint32_t rtc_freq);
  */
 uint32_t restore_default_freq(uint32_t rtc_freq);
 
-/** @} */ // end defgroup runtime_fll
+/** @} */

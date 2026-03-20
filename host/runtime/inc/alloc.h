@@ -184,4 +184,4 @@ bool memory_island_heap_check(void);
 }
 #endif
 
-/** @} */ // end defgroup runtime_alloc
+/** @} */

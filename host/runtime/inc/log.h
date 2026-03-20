@@ -33,4 +33,4 @@
  */
 int printf_log(const char *fmt, ...);
 
-/** @} */ // end defgroup runtime_log
+/** @} */

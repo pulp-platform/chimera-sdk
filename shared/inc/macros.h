@@ -30,4 +30,4 @@
 #define KEEP __attribute__((used))
 #endif
 
-/** @} */ // end defgroup shared_macros
+/** @} */

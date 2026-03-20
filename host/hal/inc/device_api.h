@@ -102,8 +102,8 @@ struct chi_device_api {
                      chi_device_callback_t cb);
 };
 
-/** @} */ // end defgroup device
+/** @} */
 
 #endif // DEVICE_API_H
 
-/** @} */ // end defgroup hal
+/** @} */

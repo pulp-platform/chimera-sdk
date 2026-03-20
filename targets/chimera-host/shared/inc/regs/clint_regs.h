@@ -73,5 +73,5 @@ extern "C" {
 
 #endif // _CLINT_REG_DEFS_
 
-/** @} */ // End of targets_chimera_host_clint_registers group
-/** @} */ // End of targets_chimera_host group
+/** @} */
+/** @} */

@@ -50,6 +50,6 @@ typedef struct __attribute__((packed)) {
 /** @brief Singleton instance of the shared communication region, placed in @c .common. */
 extern chimera_shared_data_t shared_data;
 
-/** @} */ // end defgroup target_shared
+/** @} */
 
 #endif /* CHIMERA_SHARED_H */

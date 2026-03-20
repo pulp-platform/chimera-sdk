@@ -77,5 +77,5 @@ static const uint64_t __BOOT_DTB_TYPE_GUID[2] = {0x42DE2AEFBA442F61UL, 0x9DCB3A5
 static const uint64_t __BOOT_FW_TYPE_GUID[2] = {0x4B0D3F5B99EC86DAUL, 0x59F8A5CFBAC44B8FUL};
 /** @} */
 
-/** @} */ // End of targets_chimera_host_memory group
-/** @} */ // End of targets_chimera_host group
+/** @} */
+/** @} */

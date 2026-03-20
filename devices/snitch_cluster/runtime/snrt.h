@@ -91,4 +91,4 @@ int snrt_printf(const char *fmt, ...);
  */
 #define SNRT_CLUSTER_L1(decl, cluster_id) decl __attribute__((section(".l1_c" #cluster_id)))
 
-/** @} */ // End of device_snitchCluster group
+/** @} */
