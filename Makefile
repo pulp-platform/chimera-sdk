@@ -108,6 +108,8 @@ $(LLVM_STAMP): $(TOOLCHAIN_DIR)/$(LLVM_DIR)
 	  -DCMAKE_BUILD_TYPE=Release \
 	  -DCMAKE_C_COMPILER_LAUNCHER=ccache \
 	  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+	  -DCMAKE_C_COMPILER=gcc \
+	  -DCMAKE_CXX_COMPILER=g++ \
 	  ../llvm; \
 	$(CMAKE) --build . -j; \
 	$(CMAKE) --install .; \
