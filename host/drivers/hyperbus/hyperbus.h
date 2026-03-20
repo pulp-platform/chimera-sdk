@@ -12,6 +12,8 @@
  * the hardware.
  */
 
+#pragma once
+
 // Include Standard Libraries
 #include <stdint.h>
 
@@ -22,9 +24,6 @@
 
 // Include Runtime Headers
 #include "util.h"
-
-#ifndef HYPERBUS_H
-#define HYPERBUS_H
 
 #define HYPERBUS_NUM_PHYS 1u
 #define HYPERBUS_NUM_CHIPS 2u
@@ -376,6 +375,4 @@ int hyperram_cfg_write(void *base, const hyperram_cfg_t *cfg);
  */
 void hyperram_cfg_print(void *base);
 
-#endif // HYPERBUS_H
-
-/** @} */ // End of drivers_hyperbus group
+/** @} */

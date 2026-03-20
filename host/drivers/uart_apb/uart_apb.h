@@ -50,4 +50,4 @@
 
 #endif // UART_APB_H
 
-/** @} */ // End of drivers_uart_apb group
+/** @} */

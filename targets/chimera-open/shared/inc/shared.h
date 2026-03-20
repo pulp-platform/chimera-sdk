@@ -10,7 +10,6 @@
 
 /**
  * @defgroup target_shared Shared Communication Interface
- * @ingroup device_snitchCluster
  * @brief Host–device shared memory layout for the chimera-open target.
  *
  * All binaries (host + every cluster device) map the @c .common section to the

@@ -48,4 +48,4 @@ int snitchCluster_busy(uint8_t clusterId);
 void wait_snitchCluster_busy(uint8_t clusterId);
 uint32_t wait_snitchCluster_return(uint8_t clusterId);
 
-/** @} */ // End of drivers_snitch_cluster group
+/** @} */
