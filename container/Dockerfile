@@ -48,8 +48,6 @@ RUN apt-get update && \
     doxygen \
     python3-dev \
     python-is-python3 \
-    python3.10-venv \
-    python3.10-distutils \
     curl \
     wget \
     git \
@@ -61,11 +59,9 @@ RUN apt-get update && \
     zsh && \
     rm -rf /var/lib/apt/lists/*
 
-# Install pip and meson (required by the picolibc Makefile target)
-RUN curl -s https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
-    python get-pip.py && \
-    rm get-pip.py && \
-    pip install meson
+# Install uv and meson (meson is required by the picolibc Makefile target)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+RUN uv pip install --system meson
 
 # Install Oh My ZSH with cypher theme
 RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended && \
@@ -84,4 +80,14 @@ RUN --mount=type=ssh \
     make picolibc-multilib && \
     ccache -s
 
+# Build LLVM, compiler-rt, and picolibc via the project Makefile
+RUN --mount=type=ssh \
+    --mount=type=cache,target=/ccache \
+    mkdir -p /root/.ssh && \
+    ssh-keyscan iis-git.ee.ethz.ch >> /root/.ssh/known_hosts 2>/dev/null; \
+    ccache -z && \
+    make gvsoc && \
+    ccache -s
+
 WORKDIR /app
+RUN rm -rf /app/build

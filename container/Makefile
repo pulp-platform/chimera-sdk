@@ -30,9 +30,9 @@ chimera:
 	ssh-add $(SSH_PRIVATE_KEY) && \
 	DOCKER_BUILDKIT=1 docker build \
 		--ssh default \
-		-f container/Dockerfile \
+		-f Dockerfile \
 		-t $(CHIMERA_IMAGE) \
-		.
+		..
 
 push:
 	docker push $(CHIMERA_IMAGE)

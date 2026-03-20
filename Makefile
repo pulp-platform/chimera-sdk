@@ -18,7 +18,7 @@ GVSOC_INSTALL_DIR := ${INSTALL_DIR}/gvsoc
 LLVM_DIR := llvm-18.1.4-pulp
 LLVM_INSTALL_DIR := ${INSTALL_DIR}/${LLVM_DIR}
 LLVM_GIT_URL := git@iis-git.ee.ethz.ch:iis-compilers/llvm-project.git
-LLVM_COMMIT_HASH ?= ac3041771cba42a1a5e4c62d52dca046d95a0e9c
+LLVM_COMMIT_HASH ?= cc8682a5602aa2ea1907bafa21afe7ec041b9d22
 
 # LLVM 15.0.0-pulp
 # LLVM_DIR := llvm-15.0.0-pulp
@@ -47,7 +47,8 @@ help:
 .PHONY: format
 format:
 	@echo "Formatting code..."
-	@pre-commit run --all-files
+	@uv sync
+	@uv run pre-commit run --all-files
 
 .PHONY: export-symbols
 export-symbols:
@@ -63,8 +64,9 @@ ${TOOLCHAIN_DIR}/gvosc:
 	git clone https://github.com/Xeratec/gvsoc.git && \
 	cd ${TOOLCHAIN_DIR}/gvsoc && git checkout ${GVSOC_COMMIT_HASH} && \
 	git submodule update --init --recursive && \
-	pip install -r core/requirements.txt && \
-	pip install -r gapy/requirements.txt && \
+	uv pip install --system -r core/requirements.txt && \
+	uv pip install --system -r gapy/requirements.txt && \
+	uv pip install --system setuptools==81.0.0 && \
 	make all TARGETS=chimera INSTALLDIR=${GVSOC_INSTALL_DIR}
 
 ${GVSOC_INSTALL_DIR}: ${TOOLCHAIN_DIR}/gvosc
@@ -77,8 +79,11 @@ gvsoc: ${GVSOC_INSTALL_DIR}
 ${TOOLCHAIN_DIR}/${LLVM_DIR}:
 	mkdir -p ${TOOLCHAIN_DIR} && \
 	cd ${TOOLCHAIN_DIR} && \
-	git clone ${LLVM_GIT_URL} -b main ${LLVM_DIR} && \
-	cd ${TOOLCHAIN_DIR}/${LLVM_DIR} && git checkout ${LLVM_COMMIT_HASH} && \
+	git init ${LLVM_DIR} && \
+	cd ${TOOLCHAIN_DIR}/${LLVM_DIR} && \
+	git remote add origin ${LLVM_GIT_URL} && \
+	git fetch --depth=1 origin ${LLVM_COMMIT_HASH} && \
+	git checkout ${LLVM_COMMIT_HASH} && \
 	git submodule update --init --recursive
 
 
@@ -195,7 +200,7 @@ compiler-rt-riscv-multilib: compiler-rt-rv32imc compiler-rt-rv32ima compiler-rt-
 
 PICOLIBC_GIT_URL     := https://github.com/picolibc/picolibc.git
 PICOLIBC_GIT_TAG     := 1.8.11
-PICOLIBC_SRC_DIR     ?= ${TOOLCHAIN_DIR}/picolibc
+PICOLIBC_SRC_DIR     ?= ${INSTALL_DIR}/picolibc-src
 PICOLIBC_INSTALL_DIR := ${INSTALL_DIR}/picolibc
 
 # Clone the official picolibc sources at the pinned tag.
@@ -255,6 +260,7 @@ $$(PICOLIBC_STAMP_$(1)): $$(PICOLIBC_CROSS_FILE_$(1))
 		--wipe
 	ninja -C $$(PICOLIBC_BUILD_DIR_$(1))
 	ninja -C $$(PICOLIBC_BUILD_DIR_$(1)) install
+	ninja -C $$(PICOLIBC_BUILD_DIR_$(1)) clean
 	touch $$@
 
 .PHONY: picolibc-$(1)
@@ -283,29 +289,14 @@ container:
 # Documentation (Sphinx + Doxygen)
 # -----------------------------------------------------------------------------
 
-VENV_NAME?=.venv
-VENV_ACTIVATE=. $(VENV_NAME)/bin/activate
-PYTHON=${VENV_NAME}/bin/python3
-
-.PHONY: docs-venv
-docs-venv:
-	if [ ! -d $(VENV_NAME) ]; then \
-		echo "[CHIMERA] Creating Python venv for docs..."; \
-		python3 -m venv $(VENV_NAME); \
-	fi; \
-	echo "[CHIMERA] Installing Python dependencies for docs..."; \
-	${PYTHON} -m pip install --upgrade pip; \
-	${PYTHON} -m pip install -r requirements.txt; \
-	${PYTHON} -m pip install -r requirements-docs.txt
-
-
-
 .PHONY: docs
-docs: docs-venv
-	$(VENV_ACTIVATE) && cd docs; $(MAKE) html
+docs:
+	@uv sync
+	cd docs && uv run $(MAKE) html
 
 # Reroute all docs-* targets to the docs Makefile, which handles Sphinx and Doxygen.
 docs-%:
-	$(VENV_ACTIVATE) && cd docs; $(MAKE) $*
+	@uv sync
+	cd docs && uv run $(MAKE) $*
 
 
