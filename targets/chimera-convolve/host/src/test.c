@@ -228,11 +228,12 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
                 shared_data.device_to_host = 0;
 
                 // Cluster does shared_data.device_to_host = (uintptr_t)buf->hdr.syscall_mem;
-                uint32_t *syscall_mem = (uint32_t *)syscall_addr;
+                uint32_t *syscall_mem = (uint32_t *)((uint64_t)syscall_addr);
+                const void *syscall_buf = (const void *)((uint64_t)syscall_mem[2]);
 
                 if (syscall_mem[0] == 64) { // sys_write
-                    fwrite((const void *)syscall_mem[2], 1, syscall_mem[3], (FILE *)syscall_mem[1]);
-                    fflush((FILE *)syscall_mem[1]);
+                    fwrite(syscall_buf, 1, syscall_mem[3], stdout);
+                    fflush(stdout);
                 } else {
                     printf_log("Unknown syscall: %u\n", syscall_mem[0]);
                 }
