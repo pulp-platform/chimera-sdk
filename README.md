@@ -77,28 +77,32 @@ Add `--skip-ita` to build only the tests that need no [ITA](https://github.com/p
 
 We provide the [pre-commit](https://pre-commit.com) configuration file which you can use to install github hooks that execute the formatting commands on your changes.
 
-We recommend that you setup a virtual environment and install the required dependencies using the following commands:
+We use [uv](https://docs.astral.sh/uv/) to manage Python dependencies. Install it once with:
+
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-pip install -r requirements-docs.txt
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Then install all dependencies (uv creates and manages the virtual environment automatically):
+
+```bash
+uv sync
 ```
 
 The configuration sets the default stage for all the hooks to `pre-push` so to install the git hooks run:
 ```bash
-pre-commit install --hook-type pre-push
+uv run pre-commit install --hook-type pre-push
 ```
 The hooks will run before each push, making sure the pushed code can pass linting checks and not fail the CI on linting.
 
 If you change your mind and don't want the git hooks:
 ```bash
-pre-commit uninstall
+uv run pre-commit uninstall
 ```
 
 You can also run the hooks manually on all files using:
 ```bash
-pre-commit run --all-files
+uv run pre-commit run --all-files
 # Or use the Makefile target
 make format
 ```
