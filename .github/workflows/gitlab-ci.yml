@@ -6,15 +6,14 @@ name: gitlab-ci
 "on": [push, pull_request, workflow_dispatch]
 
 jobs:
-  # Deactivated
-  # gitlab-ci:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Check Gitlab CI
-  #       uses: pulp-platform/pulp-actions/gitlab-ci@v2.4.1 # update version as needed, not auto-updated
-  #       # Check if GITLAB_TOKEN is set to avoid running on forks.
-  #       if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
-  #       with:
-  #         domain: iis-git.ee.ethz.ch
-  #         repo: github-mirror/chimera-sdk
-  #         token: ${{ secrets.GITLAB_TOKEN }}
+  gitlab-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Gitlab CI
+        uses: pulp-platform/pulp-actions/gitlab-ci@v2.4.1 # update version as needed, not auto-updated
+        # Check if GITLAB_TOKEN is set to avoid running on forks.
+        if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        with:
+          domain: iis-git.ee.ethz.ch
+          repo: github-mirror/chimera-sdk
+          token: ${{ secrets.GITLAB_TOKEN }}
