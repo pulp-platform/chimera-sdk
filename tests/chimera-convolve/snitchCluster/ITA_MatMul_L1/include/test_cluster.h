@@ -6,14 +6,14 @@
 
 #include <stdint.h>
 
-// #include "ITA_dims_64x64x64.h"
-#include "ITA_dims_64x128x64.h"
-// #include "ITA_dims_64x256x64.h"
-// #include "ITA_dims_64x512x64.h"
-// #include "ITA_dims_128x512x64.h"
-// #include "ITA_dims_192x512x64.h"
-// #include "ITA_dims_256x512x64.h"
-// #include "ITA_dims_512x512x64.h"
+// The matrix shape is selected at configure time via ITA_MATMUL_L1_SHAPE;
+// see this test's CMakeLists.txt. The fallback keeps the header self-contained
+// for tooling that compiles it outside the CMake build.
+#ifndef ITA_DIMS_HEADER
+#define ITA_DIMS_HEADER "ITA_dims_64x128x64.h"
+#endif
+
+#include ITA_DIMS_HEADER
 
 void clusterInterruptHandler();
 

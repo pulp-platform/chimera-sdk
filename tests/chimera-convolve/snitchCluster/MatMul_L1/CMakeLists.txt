@@ -3,6 +3,14 @@
 
 set(TEST_NAME test_snitchCluster_MatMul_L1)
 
+######## Matrix Shape ##########################################################
+# Pick the MxNxP shape to build for, e.g. -DMATMUL_L1_SHAPE=16x16x16
+chimera_select_shape(
+  OPTION          MATMUL_L1_SHAPE
+  DEFAULT         32x48x64
+  HEADER_PREFIXES testinputs_ testoutputs_
+)
+
 ######## HOST Code #############################################################
 file(GLOB_RECURSE TEST_HOST_SRCS
   "src_host/*.c"
@@ -25,6 +33,11 @@ file(GLOB_RECURSE TEST_SNITCH_SRCS
 
 add_library(${TEST_NAME}_cluster OBJECT ${TEST_SNITCH_SRCS})
 target_include_directories(${TEST_NAME}_cluster PUBLIC include)
+target_compile_definitions(${TEST_NAME}_cluster
+  PUBLIC
+  TESTINPUTS_HEADER="testinputs_${SELECTED_SHAPE}.h"
+  TESTOUTPUTS_HEADER="testoutputs_${SELECTED_SHAPE}.h"
+)
 
 target_compile_options(${TEST_NAME}_cluster
   PRIVATE

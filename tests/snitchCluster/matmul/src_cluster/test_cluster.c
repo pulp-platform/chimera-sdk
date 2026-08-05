@@ -9,11 +9,17 @@
 #include "test_cluster.h"
 #include "test_host.h"
 
-// #include "testinputs_32x48x64.h"
-// #include "testoutputs_32x48x64.h"
+// The matrix shape is selected at configure time via MATMUL_SHAPE;
+// see this test's CMakeLists.txt.
+#ifndef TESTINPUTS_HEADER
+#define TESTINPUTS_HEADER "testinputs_16x16x16.h"
+#endif
+#ifndef TESTOUTPUTS_HEADER
+#define TESTOUTPUTS_HEADER "testoutputs_16x16x16.h"
+#endif
 
-#include "testinputs_16x16x16.h"
-#include "testoutputs_16x16x16.h"
+#include TESTINPUTS_HEADER
+#include TESTOUTPUTS_HEADER
 
 // Include Target Specific Headers
 #include "soc.h"

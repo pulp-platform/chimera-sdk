@@ -6,9 +6,14 @@
 
 #include <stdint.h>
 
-// #include "ITA_dims_S64_E128_P64.h"
-#include "ITA_dims_S128_E128_P64.h"
-// #include "ITA_dims_S256_E384_P64.h"
+// The matrix shape is selected at configure time via ITA_SHA_L2_SHAPE;
+// see this test's CMakeLists.txt. The fallback keeps the header self-contained
+// for tooling that compiles it outside the CMake build.
+#ifndef ITA_DIMS_HEADER
+#define ITA_DIMS_HEADER "ITA_dims_S128_E128_P64.h"
+#endif
+
+#include ITA_DIMS_HEADER
 
 void clusterInterruptHandler();
 
