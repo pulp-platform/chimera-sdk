@@ -162,15 +162,6 @@ int32_t fll_matmul_test(void *args) {
         DeeployNetwork_input_1 = testInputVector1;
         DeeployNetwork_output_0 = (int32_t *)snrt_l1_alloc(sizeof(testOutputVector0));
 
-        /*
-         * Print tensor pointer addresses for easier debugging when inspecting
-         * memory layout and ensuring the DM core set up buffers correctly.
-         */
-        // printf("DeeployNetwork_input_0  @ %p = %p\n", &DeeployNetwork_input_0, testInputVector0);
-        // printf("DeeployNetwork_input_1  @ %p = %p\n", &DeeployNetwork_input_1, testInputVector1);
-        // printf("DeeployNetwork_output_0 @ %p = %p\n", &DeeployNetwork_output_0,
-        // testOutputVector0);
-
         printf("Starting MatMul execution (%ux%u x %ux%u = %ux%u) for %d iterations\n", MAT_M,
                MAT_N, MAT_N, MAT_P, MAT_M, MAT_P, test_args->repetitions);
     }

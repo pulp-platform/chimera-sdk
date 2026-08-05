@@ -80,7 +80,6 @@ int32_t ita_sha_l2_test(void *args) {
         printf("Starting ITA SHA execution (S=%u, E=%u P=%u) for %d iterations\n", SEQUENCE_LENGTH,
                EMBEDDING_SPACE, PROJECTION_SPACE, test_args->repetitions);
 
-        // printf("Core %d: Setting up ITA Test...\n", snrt_cluster_core_idx());
         const int8_t *interm_Pq = user_args->interm_Pq;
         const int8_t *interm_Pk = user_args->interm_Pk;
         const int8_t *interm_Pv = user_args->interm_Pv;
@@ -123,9 +122,6 @@ int32_t ita_sha_l2_test(void *args) {
         // Initialize all buffers with values from L2
         uint32_t reps = l1_arena_size / (SEQUENCE_LENGTH * EMBEDDING_SPACE);
         const size_t input_q_size = SEQUENCE_LENGTH * EMBEDDING_SPACE;
-        // printf("Initializing L1 arena of size %u bytes with %u repetitions of input_q (%u bytes
-        // each)\n",
-        //        (unsigned int)l1_arena_size, (unsigned int)reps, (unsigned int)input_q_size);
         for (uint32_t i = 0; i < reps; i++) {
             snrt_dma_start_1d((void *)l1_arena_start + i * input_q_size, (void *)input_q,
                               input_q_size);
@@ -133,8 +129,6 @@ int32_t ita_sha_l2_test(void *args) {
         // Transfer remeining bytes if any
         size_t remaining_bytes = l1_arena_size % input_q_size;
         if (remaining_bytes > 0) {
-            // printf("Transferring remaining %u bytes to L1 arena\n", (unsigned
-            // int)remaining_bytes);
             snrt_dma_start_1d((void *)l1_arena_start + reps * input_q_size, (void *)input_q,
                               remaining_bytes);
         }

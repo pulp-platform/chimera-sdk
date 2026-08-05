@@ -63,22 +63,6 @@ void SnitchAdd(int8_t *pIn1, int8_t *pIn2, int32_t *pOut, uint32_t size) {
     for (uint32_t i = start; i < stop; i++) {
         pOut[i] = pIn1[i] + pIn2[i];
     }
-
-    //     int i;
-    // #pragma loopunroll 4
-    // for (i = start; i < stop; i+=4) {
-    //         int32_t in1_packed = *(int32_t *)&pIn1[i];
-    //         int32_t in2_packed = *(int32_t *)&pIn2[i];
-    //         int32_t out_packed;
-    //         out_packed = in1_packed + in2_packed;
-    //         pOut[i] = (out_packed >> 0) & 0xFF;
-    //         pOut[i+1] = (out_packed >> 8) & 0xFF;
-    //         pOut[i+2] = (out_packed >> 16) & 0xFF;
-    //         pOut[i+3] = (out_packed >> 24) & 0xFF;
-    // }
-    // for (; i < stop; i++) {
-    //         pOut[i] = pIn1[i] + pIn2[i];
-    // }
 }
 
 /*
