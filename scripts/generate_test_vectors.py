@@ -98,9 +98,9 @@ SHA_SHAPES = {
 }
 
 ITA_TESTS = [
-    ("tests/chimera-convolve/snitchCluster/ITA_MatMul_L1", MATMUL_SHAPES, ITA_MATMUL_ARRAYS),
-    ("tests/chimera-convolve/snitchCluster/ITA_MatMul_L2", MATMUL_SHAPES, ITA_MATMUL_ARRAYS),
-    ("tests/chimera-convolve/snitchCluster/ITA_SHA_L2", SHA_SHAPES, ITA_SHA_ARRAYS),
+    ("tests/chimera-convolve/snitchCluster/ITA_MatMul_L1", MATMUL_SHAPES, ITA_MATMUL_ARRAYS, "matmul"),
+    ("tests/chimera-convolve/snitchCluster/ITA_MatMul_L2", MATMUL_SHAPES, ITA_MATMUL_ARRAYS, "matmul"),
+    ("tests/chimera-convolve/snitchCluster/ITA_SHA_L2", SHA_SHAPES, ITA_SHA_ARRAYS, "sha"),
 ]
 
 HEADER = """// SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
@@ -160,6 +160,65 @@ def emit_ita_file(path: Path, arrays: dict, spec: list, shape: tuple) -> None:
     path.write_text("".join(body))
 
 
+# ITA_dims_<shape>.h is the shape's dimension header. It is what
+# chimera_select_shape() globs to discover the selectable shapes, and it carries
+# the chimera-specific macros (N_CONTEXT, *_OPS, buffer sizes) on top of the
+# dimensions PyITA reports.
+DIMS_COMMON = """
+// SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+// SPDX-License-Identifier: Apache-2.0
+
+#ifndef _ITA_DIMS_INCLUDE_GUARD_
+#define _ITA_DIMS_INCLUDE_GUARD_
+
+#define HEADS 1
+#define SEQUENCE_LENGTH {s}
+#define EMBEDDING_SPACE {e}
+#define PROJECTION_SPACE {p}
+#define N_TILE_SEQUENCE_LENGTH {ts}
+#define N_TILE_EMBEDDING_SPACE {te}
+#define N_TILE_PROJECTION_SPACE {tp}
+#define TILE_SIZE_SEQUENCE_LENGTH {m}
+#define TILE_SIZE_EMBEDDING_SPACE {m}
+#define TILE_SIZE_PROJECTION_SPACE {m}
+#define N_CONTEXT 4
+"""
+
+DIMS_TAIL = """
+#define MAX_TILE_SIZE \\
+    (MAX(TILE_SIZE_SEQUENCE_LENGTH, MAX(TILE_SIZE_PROJECTION_SPACE, TILE_SIZE_EMBEDDING_SPACE)))
+#define MAX_BUFFER_SIZE (MAX_TILE_SIZE * MAX_TILE_SIZE)
+#define MAX_BUFFER_BIAS_SIZE (3 * MAX_TILE_SIZE)
+
+#endif //_ITA_DIMS_INCLUDE_GUARD_"""
+
+DIMS_MATMUL_OPS = """
+// 1x MatMul SxExP + 1x Requant SxP
+#define MAT_OPS \\
+    (2ULL * SEQUENCE_LENGTH * EMBEDDING_SPACE * PROJECTION_SPACE + \\
+     4ULL * SEQUENCE_LENGTH * PROJECTION_SPACE)
+"""
+
+DIMS_SHA_OPS = """
+// 4x MatMul SxExP + 2xMatMul SxSxP + 4x Requant SxE
+// + 1x Requant SxS + 1x Requant SxP + 1x Softmax SxS
+#define SHA_OPS \\
+    (2ULL * 4ULL * SEQUENCE_LENGTH * EMBEDDING_SPACE * PROJECTION_SPACE + \\
+     2ULL * 2ULL * SEQUENCE_LENGTH * SEQUENCE_LENGTH * PROJECTION_SPACE + \\
+     4ULL * 4ULL * SEQUENCE_LENGTH * EMBEDDING_SPACE + 4ULL * SEQUENCE_LENGTH * SEQUENCE_LENGTH + \\
+     4ULL * SEQUENCE_LENGTH * PROJECTION_SPACE + 3ULL * SEQUENCE_LENGTH * SEQUENCE_LENGTH + \\
+     SEQUENCE_LENGTH)
+"""
+
+ITA_M = 64
+
+
+def emit_dims_file(path: Path, shape: tuple, ops: str) -> None:
+    s, e, p = shape
+    body = DIMS_COMMON.format(s = s, e = e, p = p, m = ITA_M, ts = s // ITA_M, te = e // ITA_M, tp = p // ITA_M)
+    path.write_text(body + ops + DIMS_TAIL)
+
+
 def ensure_ita(ita_dir: Path | None, workdir: Path) -> tuple[Path, Path]:
     """Return (ita repo path, python interpreter with ITA's deps installed)."""
     if ita_dir is None:
@@ -182,7 +241,7 @@ def ensure_ita(ita_dir: Path | None, workdir: Path) -> tuple[Path, Path]:
 
 def generate_ita(ita_dir: Path | None, workdir: Path) -> int:
     ita, python = ensure_ita(ita_dir, workdir)
-    wanted = {shape for _, shapes, _ in ITA_TESTS for shape in shapes.values()}
+    wanted = {shape for _, shapes, _, _ in ITA_TESTS for shape in shapes.values()}
     exports = {}
     for (s, e, p) in sorted(wanted):
         print(f"==> ITA testGenerator: S={s} E={e} P={p}")
@@ -200,12 +259,14 @@ def generate_ita(ita_dir: Path | None, workdir: Path) -> int:
         exports[(s, e, p)] = parse_c_arrays(export.read_text())
 
     written = 0
-    for test, shapes, spec in ITA_TESTS:
+    for test, shapes, spec, kind in ITA_TESTS:
+        ops = DIMS_SHA_OPS if kind == "sha" else DIMS_MATMUL_OPS
         for suffix, shape in shapes.items():
             arrays = exports[shape]
             missing = [n for _, n, _ in spec if n not in arrays]
             if missing:
                 raise SystemExit(f"ITA export for {shape} lacks {missing}")
+            emit_dims_file(REPO / test / "include" / f"ITA_dims_{suffix}.h", shape, ops)
             out = REPO / test / "src_cluster" / f"ITA_mem_{suffix}.c"
             emit_ita_file(out, arrays, spec, shape)
             written += 1

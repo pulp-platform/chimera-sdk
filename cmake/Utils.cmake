@@ -76,7 +76,10 @@ function(chimera_select_shape)
 
   if(NOT shapes)
     message(FATAL_ERROR
-      "[CHIMERA-SDK] No ${discovery_prefix}*.h headers found in ${header_root}")
+      "[CHIMERA-SDK] No ${discovery_prefix}*.h headers found in:\n"
+      "    ${header_root}\n"
+      "  Test vectors are not tracked in git. Generate them with:\n"
+      "    python scripts/generate_test_vectors.py")
   endif()
 
   set(${ARG_OPTION} ${ARG_DEFAULT} CACHE STRING
