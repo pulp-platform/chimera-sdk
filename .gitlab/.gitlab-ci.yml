@@ -5,6 +5,10 @@ variables:
   CMAKE: "riscv /usr/sepp/bin/cmake-3.28.3"
   LLVM_INSTALL_PATH: "/usr/scratch/normandie/jungvi/llvm"
   GVSOC_HOME: "/scratch/jungvi/chimera-sdk/install/gvsoc"
+  # Optional pre-cloned https://github.com/pulp-platform/ITA. When empty,
+  # scripts/generate_test_vectors.py clones it on demand, which needs network
+  # access from the runner.
+  ITA_HOME: ""
 
 .setup:
   script:
@@ -12,6 +16,13 @@ variables:
     - eval "$(micromamba shell hook --shell bash)"
     - micromamba activate chimera-sdk-ci
     - rm -rf build
+    # Test Vector Generation
+    - |
+      GEN_ARGS="--skip-ita"
+      if [ "$TARGET" = "chimera-convolve" ]; then
+        if [ -n "$ITA_HOME" ]; then GEN_ARGS="--ita-dir $ITA_HOME"; else GEN_ARGS=""; fi
+      fi
+      python scripts/generate_test_vectors.py $GEN_ARGS
 
 build_sdk:
   parallel:
