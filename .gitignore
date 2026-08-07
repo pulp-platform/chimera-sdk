@@ -20,3 +20,13 @@ docs/_autosummary
 # Dept Install Dir
 install
 toolchain
+# Generated test vectors
+tests/**/src_cluster/ITA_mem_*.c
+tests/**/include/testdata_*.h
+tests/**/include/testinputs_*.h
+tests/**/include/testoutputs_*.h
+tests/**/iNoNorm_L1/src_cluster/data.c
+# Generated ITA_Conv_L1 declarations
+tests/**/ITA_Conv_L1/src_cluster/ITA_mem.c
+tests/**/ITA_Conv_L1/include/ITA_mem.h
+tests/**/ITA_Conv_L1/include/ITA_dims.h
