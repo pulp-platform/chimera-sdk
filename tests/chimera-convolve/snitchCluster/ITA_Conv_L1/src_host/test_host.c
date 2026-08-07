@@ -116,7 +116,7 @@ int main(void) {
         .stack_sizes = {stack_size_4},
         .function_test = (void *)ita_conv_l1_test,
         .function_interrupt = (void *)clusterInterruptHandler,
-        .args = &test_args,
+        .args = {&test_args},
     };
 
     /*

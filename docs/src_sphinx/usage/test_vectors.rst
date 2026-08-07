@@ -13,8 +13,9 @@ Generate everything with::
 
 Run it once after cloning, and again whenever a generator changes.
 
-Note that the per-shape ``ITA_dims_*.h`` headers **are** tracked. They declare
-which shapes exist and drive the shape selection described below.
+This includes the per-shape ``ITA_dims_*.h`` headers, which declare which
+shapes exist and drive the shape selection described below. Nothing under a
+test's ``include/`` or ``src_cluster/`` is tracked once it is generated.
 
 Test Vector Sources
 -------------------
@@ -72,9 +73,9 @@ commenting includes in and out::
     cmake -DITA_MATMUL_L1_SHAPE=64x512x64 ...
 
 Available shapes are discovered from the ``ITA_dims_*.h`` (or
-``testinputs_*.h``) headers present in the test, so adding a new shape is a
-matter of generating its files. An unknown shape, or one whose header and
-source disagree, triggers a configure-time error.
+``testinputs_*.h``) headers a generator has written into the test, so adding a
+new shape is a matter of teaching the generator about it. An unknown shape, or
+one whose header and source disagree, triggers a configure-time error.
 
 Adding a new generator
 ----------------------
