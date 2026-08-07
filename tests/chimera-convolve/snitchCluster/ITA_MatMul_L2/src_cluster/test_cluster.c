@@ -14,7 +14,7 @@
 #include "ITA_mem.h"
 #include "ITA_types.h"
 #include "ITA_utils.h"
-#include "ITA_ctrl.h"
+#include "ITA_layers.h"
 
 // Include Target Specific Headers
 #include "soc.h"
