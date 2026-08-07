@@ -42,7 +42,9 @@ int main(void) {
     setGPIO0_UART();
 #endif
 
-#if !defined(HARDWARE_BACKEND_RTL)
+#if defined(HARDWARE_BACKEND_RTL)
+    uint32_t core_freq = 500000000; // 500 MHz for RTL
+#else
     // 2. Read the RTC frequency from a hardware register
     uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
 
