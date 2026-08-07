@@ -3,6 +3,16 @@
 
 set(TEST_NAME test_snitchCluster_matmul)
 
+######## Test Vectors ##########################################################
+chimera_test_vector_generator(
+  GENERATOR ${CMAKE_CURRENT_SOURCE_DIR}/generate_vectors.py
+  OUTPUTS
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testinputs_16x16x16.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testoutputs_16x16x16.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testinputs_32x48x64.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testoutputs_32x48x64.h
+)
+
 ######## Matrix Shape ##########################################################
 # Pick the MxNxP shape to build for, e.g. -DMATMUL_SHAPE=32x48x64
 chimera_select_shape(

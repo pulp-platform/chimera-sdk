@@ -3,6 +3,13 @@
 
 set(TEST_NAME test_snitchCluster_LayerScale_L1)
 
+######## Test Vectors ##########################################################
+chimera_test_vector_generator(
+  GENERATOR ${CMAKE_CURRENT_SOURCE_DIR}/generate_vectors.py
+  OUTPUTS
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testdata_16x384.h
+)
+
 ######## HOST Code #############################################################
 file(GLOB_RECURSE TEST_HOST_SRCS
   "src_host/*.c"

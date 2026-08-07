@@ -20,31 +20,19 @@ endmacro()
 #[=======================================================================[.rst:
 .. cmake:command:: chimera_select_shape(OPTION <var> DEFAULT <shape> HEADER_PREFIXES <prefix>...)
 
-   Select which data shape a test is built for.
+   Pick one data shape for a test at configure time. Shapes are discovered from
+   the headers matching the first ``HEADER_PREFIXES`` entry, so adding
+   ``<prefix><shape>.h`` is enough to make a new shape selectable.
 
-   Tests that ship several problem sizes keep one header per shape (and
-   optionally one source per shape). This picks exactly one of them at
-   configure time instead of requiring includes to be commented in and out.
+   Sets ``SELECTED_SHAPE`` and ``SELECTED_SHAPE_SOURCE`` in the caller's scope.
 
-   The available shapes are discovered from the files on disk matching the
-   first entry of ``HEADER_PREFIXES``, so adding ``<prefix><shape>.h`` to the
-   test is enough to make a new shape selectable.
-
-   :param OPTION: Name of the cache variable exposed to the user. Required.
-   :param DEFAULT: Shape to use when the user does not set ``OPTION``. Required.
-   :param HEADER_PREFIXES: Filename prefixes of the per-shape headers. The first
-      is used to discover the available shapes; every prefix must resolve to an
-      existing header for the selected shape. Required.
-   :param HEADER_DIR: Directory holding the headers. Defaults to ``include``.
+   :param OPTION: Cache variable exposed to the user. Required.
+   :param DEFAULT: Shape used when ``OPTION`` is unset. Required.
+   :param HEADER_PREFIXES: Prefixes of the per-shape headers. The first discovers
+      the shapes; all must exist for the selected one. Required.
+   :param HEADER_DIR: Where the headers live. Defaults to ``include``.
    :param SOURCE_PREFIX: If given, also select ``<SOURCE_DIR>/<prefix><shape>.c``.
-   :param SOURCE_DIR: Directory holding the sources. Defaults to ``src_cluster``.
-
-   Sets in the caller's scope:
-
-   ``SELECTED_SHAPE``
-      The chosen shape, e.g. ``64x128x64``.
-   ``SELECTED_SHAPE_SOURCE``
-      The matching source file, or empty if no ``SOURCE_PREFIX`` was given.
+   :param SOURCE_DIR: Where the sources live. Defaults to ``src_cluster``.
 
    .. code-block:: cmake
       :caption: Example Usage
@@ -102,8 +90,7 @@ function(chimera_select_shape)
       "Available shapes: ${shapes}")
   endif()
 
-  # Every prefix must resolve for the selected shape, otherwise the dimension
-  # macros and the data they describe would silently disagree.
+  # All prefixes must resolve, else the dimension macros and the data disagree
   foreach(prefix IN LISTS ARG_HEADER_PREFIXES)
     if(NOT EXISTS ${header_root}/${prefix}${shape}.h)
       message(FATAL_ERROR
@@ -117,7 +104,10 @@ function(chimera_select_shape)
     set(source ${CMAKE_CURRENT_SOURCE_DIR}/${ARG_SOURCE_DIR}/${ARG_SOURCE_PREFIX}${shape}.c)
     if(NOT EXISTS ${source})
       message(FATAL_ERROR
-        "[CHIMERA-SDK] Shape '${shape}' selected by ${ARG_OPTION} is missing ${source}")
+        "[CHIMERA-SDK] Shape '${shape}' selected by ${ARG_OPTION} is missing:\n"
+        "    ${source}\n"
+        "  Test vectors are not tracked in git. Generate them with:\n"
+        "    python scripts/generate_test_vectors.py")
     endif()
   endif()
 
@@ -125,6 +115,74 @@ function(chimera_select_shape)
 
   set(SELECTED_SHAPE        ${shape}  PARENT_SCOPE)
   set(SELECTED_SHAPE_SOURCE ${source} PARENT_SCOPE)
+endfunction()
+
+#[=======================================================================[.rst:
+.. cmake:command:: chimera_test_vector_generator(GENERATOR <script> OUTPUTS <file>...)
+
+   Register a test's ``generate_vectors.py``. Fails configure with an actionable
+   message when the vectors have not been generated yet, and adds them to the
+   ``regenerate-test-vectors`` target.
+
+   :param GENERATOR: Path to the generator script. Required.
+   :param OUTPUTS: Files the generator writes. Required. Used for the
+      missing-vector check and as the target's byproducts.
+   :param ARGS: Optional generator arguments. Omit when the generator already
+      defaults to the right paths, which is the usual case.
+
+#]=======================================================================]
+function(chimera_test_vector_generator)
+  set(oneValueArgs GENERATOR)
+  set(multiValueArgs OUTPUTS ARGS)
+  cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  if(NOT ARG_GENERATOR OR NOT ARG_OUTPUTS)
+    message(FATAL_ERROR
+      "[CHIMERA-SDK] chimera_test_vector_generator requires GENERATOR and OUTPUTS")
+  endif()
+  if(NOT EXISTS ${ARG_GENERATOR})
+    message(FATAL_ERROR "[CHIMERA-SDK] Generator ${ARG_GENERATOR} does not exist")
+  endif()
+
+  # Only needed when a generator runs; resolve lazily and cache for later callers
+  if(NOT DEFINED CHIMERA_VECTOR_PYTHON)
+    find_package(Python3 QUIET COMPONENTS Interpreter)
+    set(CHIMERA_VECTOR_PYTHON "${Python3_EXECUTABLE}" CACHE INTERNAL
+        "Interpreter used to run test-vector generators")
+  endif()
+
+  # One global target that refreshes every registered generator in-tree
+  if(NOT TARGET regenerate-test-vectors)
+    add_custom_target(regenerate-test-vectors
+      COMMENT "[CHIMERA-SDK] Regenerating test vectors")
+  endif()
+
+  # Fail here rather than letting the compiler report a missing header
+  foreach(required IN LISTS ARG_OUTPUTS)
+    if(NOT EXISTS ${required})
+      message(FATAL_ERROR
+        "[CHIMERA-SDK] Missing generated test vector:\n"
+        "    ${required}\n"
+        "  Test vectors are not tracked in git. Generate them with:\n"
+        "    python scripts/generate_test_vectors.py\n"
+        "  (add --skip-ita to build only the tests that need no ITA checkout)")
+    endif()
+  endforeach()
+
+  # Name the target after its location, not the absolute path, so it stays
+  # readable in `cmake --build --target help`
+  file(RELATIVE_PATH rel ${PROJECT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+  if(NOT rel)
+    get_filename_component(rel ${ARG_GENERATOR} NAME_WE)
+  endif()
+  string(MAKE_C_IDENTIFIER "${rel}" stem)
+  add_custom_target(regenerate_${stem}
+    COMMAND ${CHIMERA_VECTOR_PYTHON} ${ARG_GENERATOR} ${ARG_ARGS}
+    BYPRODUCTS ${ARG_OUTPUTS}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMENT "[CHIMERA-SDK] Regenerating vectors for ${rel}"
+    VERBATIM)
+  add_dependencies(regenerate-test-vectors regenerate_${stem})
 endfunction()
 
 macro(add_target_source name)

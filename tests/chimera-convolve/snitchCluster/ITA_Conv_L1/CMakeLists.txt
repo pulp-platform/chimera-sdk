@@ -3,6 +3,15 @@
 
 set(TEST_NAME test_snitchCluster_ITA_Conv_L1)
 
+######## Test Vectors ##########################################################
+chimera_test_vector_generator(
+  GENERATOR ${CMAKE_CURRENT_SOURCE_DIR}/generate_vectors.py
+  OUTPUTS
+            ${CMAKE_CURRENT_SOURCE_DIR}/src_cluster/ITA_mem.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/ITA_dims.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/ITA_mem.h
+)
+
 ######## HOST Code #############################################################
 file(GLOB_RECURSE TEST_HOST_SRCS
   "src_host/*.c"

@@ -3,6 +3,15 @@
 
 set(TEST_NAME test_snitchCluster_iNoNorm_L1)
 
+######## Test Vectors ##########################################################
+chimera_test_vector_generator(
+  GENERATOR ${CMAKE_CURRENT_SOURCE_DIR}/generate_vectors.py
+  OUTPUTS
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testinputs_128x128.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testoutputs_128x128.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/src_cluster/data.c
+)
+
 ######## HOST Code #############################################################
 file(GLOB_RECURSE TEST_HOST_SRCS
   "src_host/*.c"
