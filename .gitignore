@@ -3,6 +3,7 @@
 
 *~
 .ninja*
+gmon.out
 **/build*/
 .DS_Store
 

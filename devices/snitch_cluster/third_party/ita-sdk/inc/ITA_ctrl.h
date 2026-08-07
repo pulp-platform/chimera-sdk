@@ -13,7 +13,6 @@
 
 // Include Target Specific Headers
 #include "soc.h"
-#include "cluster_4.h"
 
 // Include Driver Headers
 

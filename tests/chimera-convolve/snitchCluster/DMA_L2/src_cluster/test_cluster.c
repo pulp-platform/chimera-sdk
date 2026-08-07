@@ -14,7 +14,8 @@
 #include "test.h"
 
 // Include Driver Headers
-#include "trampoline_snitchCluster.h"
+#include "macros.h"
+#include "trampoline.h"
 
 // Include Runtime Headers
 #include "snrt.h"
@@ -24,7 +25,7 @@
  *
  * @warning Stack, thread and global pointer might not yet be set up!
  */
-__attribute__((naked)) void clusterInterruptHandler() {
+__attribute__((naked)) KEEP void clusterInterruptHandler() {
     _SET_CLUSTER_BUSY();
     _SETUP_GP();
 
@@ -52,7 +53,7 @@ __attribute__((naked)) void clusterInterruptHandler() {
  *
  * @return int Return 0 if the test was successful, -1 otherwise.
  */
-int32_t dma_l2_test(void *args) {
+KEEP int32_t dma_l2_test(void *args) {
     test_cluster_args_t *test_args = (test_cluster_args_t *)args;
     test_cluster_result_t *test_retVal = (test_cluster_result_t *)(test_args->result);
     dma_l2_test_args_t *user_args = (dma_l2_test_args_t *)(test_args->args);

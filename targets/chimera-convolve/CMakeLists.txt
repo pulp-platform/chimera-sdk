@@ -22,7 +22,6 @@ set_property(GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/shared/src/shared.c
 )
 set_property(GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_INCLUDES
-    ${CMAKE_CURRENT_LIST_DIR}/host/inc
     ${CMAKE_CURRENT_LIST_DIR}/shared/inc
     ${CMAKE_CURRENT_LIST_DIR}/shared/inc/regs
     ${CMAKE_CURRENT_LIST_DIR}/shared/inc/addr_maps
