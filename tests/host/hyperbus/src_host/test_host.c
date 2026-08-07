@@ -18,11 +18,16 @@
 // Include Runtime Headers
 #include "log.h"
 #include "util.h"
+#include "fll.h"
 
 // Import HAL Headers
 #include "interface_api.h"
 
 #define TESTVAL (uint32_t)0x1234ABCD
+
+// CONVOLVE brings HyperBus up at a reduced clock; the pad drive strengths and
+// the HyperBus padframe only exist on that target.
+#define HYPERBUS_BRINGUP_FREQ 50000000 // 50 MHz
 
 #if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE) && defined(HARDWARE_BACKEND_ASIC)
 static const dif_gpio_t gpio = {
@@ -90,6 +95,40 @@ int main(void) {
         printf_log("Error: Cannot set GPIO 2 as output\n");
         return -1;
     }
+
+    // Set GPIO 2 high to enable FLL bypass
+    result = dif_gpio_write(&gpio, 2, kDifToggleEnabled);
+    if (result != kDifOk) {
+        printf_log("Error: Cannot enable FLL bypass\n");
+        return -1;
+    }
+#endif
+
+#if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE)
+    // Drop to a slower core clock before touching HyperBus.
+    uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
+    uint32_t actual_freq = configure_fll(HYPERBUS_BRINGUP_FREQ, rtc_freq);
+    if (actual_freq == 0) {
+        printf("Error: Failed to configure FLL\n");
+        return -1;
+    }
+    printf("FLL configured to %u.%03u MHz\n", (actual_freq / 1000000), (actual_freq % 1000000));
+
+    printf("Drive Strength Configuration\n");
+    printf("  CS0 : %d\n", padframe_hyperbus_cs0_cfg_drv_get());
+    printf("  CS1 : %d\n", padframe_hyperbus_cs1_cfg_drv_get());
+    printf("  CLK : %d\n", padframe_hyperbus_clk_cfg_drv_get());
+    printf("  CLKN: %d\n", padframe_hyperbus_clkn_cfg_drv_get());
+    printf("  RST : %d\n", padframe_hyperbus_rst_cfg_drv_get());
+    printf("  RWDS: %d\n", padframe_hyperbus_rwds_cfg_drv_get());
+    printf("  DQ0 : %d\n", padframe_hyperbus_dq0_cfg_drv_get());
+    printf("  DQ1 : %d\n", padframe_hyperbus_dq1_cfg_drv_get());
+    printf("  DQ2 : %d\n", padframe_hyperbus_dq2_cfg_drv_get());
+    printf("  DQ3 : %d\n", padframe_hyperbus_dq3_cfg_drv_get());
+    printf("  DQ4 : %d\n", padframe_hyperbus_dq4_cfg_drv_get());
+    printf("  DQ5 : %d\n", padframe_hyperbus_dq5_cfg_drv_get());
+    printf("  DQ6 : %d\n", padframe_hyperbus_dq6_cfg_drv_get());
+    printf("  DQ7 : %d\n", padframe_hyperbus_dq7_cfg_drv_get());
 #endif
 
     printf("HyperBus Configuration\n");
@@ -98,6 +137,10 @@ int main(void) {
     printf("Starting HyperBus tests...\n");
     uint32_t test_result =
         test_hyperbus((void *)HYPERBUS_CTRL_BASE, (void *)HYPERRAM_BASE_ADDR, 0x10000);
+
+#if defined(TARGET_PLATFORM_CHIMERA_CONVOLVE)
+    restore_default_freq(rtc_freq);
+#endif
 
     return test_result;
 }

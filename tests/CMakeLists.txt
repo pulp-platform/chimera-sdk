@@ -12,6 +12,7 @@ chimera-convolve:
   host/returnZero,
   host/uartSimple,
   host/dutctl,
+  host/hyperbus,
   snitchCluster/matmul,
   snitchCluster/snrt,
   snitchCluster/simpleOffload
