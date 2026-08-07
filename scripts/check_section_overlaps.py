@@ -174,6 +174,13 @@ def check_overlaps(loaded: List[Section], addr_space: str) -> bool:
             if a.binary == b.binary:
                 continue
 
+            # The same section name at the same address in two binaries is the
+            # intentionally shared region (.common). The device maps it NOLOAD
+            # but objdump still reports it as loaded, so it reaches this loop.
+            # check_shared_section_sizes() is what validates that case.
+            if a.name == b.name and a.vma_start == b.vma_start:
+                continue
+
             a_start = getattr(a, start_attr)
             a_end = getattr(a, end_attr)
             b_start = getattr(b, start_attr)
