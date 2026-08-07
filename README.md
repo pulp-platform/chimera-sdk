@@ -12,6 +12,16 @@ Access the documentation on
 
 The documentation for a specific branch can be accessed via `https://pulp-platform.github.io/chimera-sdk/branch/<branch>`
 
+## Test Vectors
+
+The tests' input and golden tensors are generated, so a fresh clone has none. Generate them once after cloning:
+
+```bash
+python scripts/generate_test_vectors.py
+```
+
+Add `--skip-ita` to build only the tests that need no [ITA](https://github.com/pulp-platform/ITA) checkout, or `--ita-dir <path>` to reuse one you already have. See the *Test Vectors* page in the documentation for details.
+
 ## Formatting and Linting
 
 We provide the [pre-commit](https://pre-commit.com) configuration file which you can use to install github hooks that execute the formatting commands on your changes.

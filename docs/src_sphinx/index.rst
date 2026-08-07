@@ -18,6 +18,7 @@ Chimera SDK Documentation
    /usage/usage
    /usage/structure
    /usage/build
+   /usage/test_vectors
    /usage/ci
 
 .. toctree::
