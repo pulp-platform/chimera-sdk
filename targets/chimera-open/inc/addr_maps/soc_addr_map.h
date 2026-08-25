@@ -67,11 +67,12 @@ extern char __l1_c0_lma_end[], __l1_c1_lma_end[], __l1_c2_lma_end[], __l1_c3_lma
     __l1_c4_lma_end[];
 extern const uintptr_t _chimera_clusterL1LmaEnd[_chimera_numClusters];
 
-#ifdef CHIMERA_PADFRAME_BASE_ADDRESS
-#undef CHIMERA_PADFRAME_BASE_ADDRESS
+#ifdef PADFRAME_GPIO_BASE
+#undef PADFRAME_GPIO_BASE
 #endif
-#define CHIMERA_PADFRAME_BASE_ADDRESS 0x30002000
+#define PADFRAME_GPIO_BASE 0x30002000
 
 #define FLL_BASE_ADDR 0x30003000
+#define FLL_CTRL_BASE_ADDR 0x30003000
 
 #endif

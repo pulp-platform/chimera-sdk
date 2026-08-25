@@ -3,6 +3,24 @@
 
 set(TEST_NAME test_snitchCluster_matmul)
 
+######## Test Vectors ##########################################################
+chimera_test_vector_generator(
+  GENERATOR ${CMAKE_CURRENT_SOURCE_DIR}/generate_vectors.py
+  OUTPUTS
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testinputs_16x16x16.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testoutputs_16x16x16.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testinputs_32x48x64.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testoutputs_32x48x64.h
+)
+
+######## Matrix Shape ##########################################################
+# Pick the MxNxP shape to build for, e.g. -DMATMUL_SHAPE=32x48x64
+chimera_select_shape(
+  OPTION          MATMUL_SHAPE
+  DEFAULT         16x16x16
+  HEADER_PREFIXES testinputs_ testoutputs_
+)
+
 ######## HOST Code #############################################################
 file(GLOB_RECURSE TEST_HOST_SRCS
   "src_host/*.c"
@@ -25,6 +43,11 @@ file(GLOB_RECURSE TEST_SNITCH_SRCS
 
 add_library(${TEST_NAME}_cluster OBJECT ${TEST_SNITCH_SRCS})
 target_include_directories(${TEST_NAME}_cluster PUBLIC include)
+target_compile_definitions(${TEST_NAME}_cluster
+  PUBLIC
+  TESTINPUTS_HEADER="testinputs_${SELECTED_SHAPE}.h"
+  TESTOUTPUTS_HEADER="testoutputs_${SELECTED_SHAPE}.h"
+)
 
 target_compile_options(${TEST_NAME}_cluster
   PRIVATE

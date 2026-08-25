@@ -635,4 +635,4 @@ extern "C" {
 } // extern "C"
 #endif
 #endif // _CHIMERA_PADFRAME_AON_CONFIG_REG_DEFS_
-       // End generated register defines for chimera_padframe_aon_config
+       // End generated register defines for padframe_aon_config

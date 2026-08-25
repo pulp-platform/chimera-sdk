@@ -89,7 +89,6 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
             }
         } else {
             // In other modes, use default of 1
-            printf_log("Using repetitions = %d\n", test_cfg->default_repetitions);
             for (int id = 0; id < test_cfg->clusters; id++) {
                 test_cluster_args_t *arg = test_cfg->args[id];
                 arg->repetitions = test_cfg->default_repetitions;
@@ -159,18 +158,12 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
 
 #else
         uint32_t actual_freq = core_freq;
-        printf_log("Note: FLL configuration only available on ASIC target\n");
 #endif
         // Setup cluster
         setup_snitchCluster_interruptHandler(test_cfg->function_interrupt);
         void *stack_cluster_ptr[test_cfg->clusters][NUM_CLUSTER_CORES];
         for (int id = 0; id < test_cfg->clusters; id++) {
             uint8_t clusterId = test_cfg->clusterIds[id];
-            if (test_cfg->mode != TEST_MODE_DUTCTL) {
-                printf_log("----------------------------------------\n");
-                printf_log("Setting up cluster %d...\n", clusterId);
-                printf_log("----------------------------------------\n");
-            }
 
             generate_snitchCluster_SPs(clusterId, test_cfg->stack_start[id],
                                        test_cfg->stack_sizes[id], stack_cluster_ptr[id]);
@@ -277,10 +270,6 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
                 // Ops per cycle in  Op / cycle * 1e6 * 1e-3 * Hz * 1e-3 = Op/s
                 uint32_t kops_per_sec =
                     ((arg->result)->ops_per_cycle / 10000) * (actual_freq / 100000);
-
-                // printf(" arg->ops_per_cycle = %u\n", (arg->result)->ops_per_cycle);
-                // printf(" actual_freq = %u\n", actual_freq);
-                // printf(" kops_per_sec = %u\n", kops_per_sec);
 
                 if (test_cfg->mode == TEST_MODE_DUTCTL) {
                     printf("@dutctl:dutmeas:meas_ops_per_cycle_%d:%u.%06u\n", clusterId,

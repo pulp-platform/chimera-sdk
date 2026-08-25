@@ -25,7 +25,7 @@ static const uint32_t _chimera_clusterBase[] = {0};
 
 #define _chimera_numClusters 0
 
-#define CHIMERA_PADFRAME_BASE_ADDRESS 0x30002000
-#define FLL_BASE_ADDR 0x30003000
+#define PADFRAME_GPIO_BASE 0x30002000
+#define FLL_CTRL_BASE_ADDR 0x30003000
 
 #endif
