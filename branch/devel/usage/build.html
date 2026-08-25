@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMake Build System &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Test Vectors" href="test_vectors.html" />
+    <link rel="prev" title="Folder Structure" href="structure.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Folder Structure</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">CMake Build System</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#build-configuration">Build Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-a-binary">Building a Binary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#host-code">Host Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cluster-code">Cluster Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#unified-binary">Unified Binary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">CMake Build System</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/build.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmake-build-system">
+<h1>CMake Build System<a class="headerlink" href="#cmake-build-system" title="Link to this heading"></a></h1>
+<p>The Chimera-SDK build flow uses CMake to organize and compile code for both the host and cluster cores. Each component is separated into dedicated static libraries: <code class="docutils literal notranslate"><span class="pre">runtime_host</span></code> for host runtime functions, <code class="docutils literal notranslate"><span class="pre">runtime_cluster_&lt;type&gt;</span></code> for cluster runtime functions, and <code class="docutils literal notranslate"><span class="pre">hal_host</span></code> for the host HAL. We rely on Picolibc as the C standard library, which is compiled separately for host and cluster into <code class="docutils literal notranslate"><span class="pre">picolibc_host</span></code> and <code class="docutils literal notranslate"><span class="pre">picolibc_cluster_&lt;type&gt;</span></code>. In addition, trampoline functions provide the minimal startup logic needed to bring up the cluster before the runtime and libraries are available. These functions run before the stack and global pointers are initialized, which is why they are implemented as naked functions without compiler-generated prologues or epilogues.</p>
+<p>We separately compile code for the host and cluster cores into two object libraries, which are then currently linked together into a single executable.</p>
+<section id="build-configuration">
+<h2>Build Configuration<a class="headerlink" href="#build-configuration" title="Link to this heading"></a></h2>
+<p>ISA and ABI settings are handled by variables in the main <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ABI</span></code> – ABI for all code (e.g., <code class="docutils literal notranslate"><span class="pre">ilp32</span></code> or <code class="docutils literal notranslate"><span class="pre">ilp32d</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ISA_HOST</span></code> – ISA for host (e.g., <code class="docutils literal notranslate"><span class="pre">rv32imc</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ISA_CLUSTER_SNITCH</span></code> – ISA for cluster (e.g., <code class="docutils literal notranslate"><span class="pre">rv32ima_xdma</span></code> or <code class="docutils literal notranslate"><span class="pre">rv32imafd_xdma</span></code>)</p></li>
+</ul>
+</section>
+<section id="building-a-binary">
+<h2>Building a Binary<a class="headerlink" href="#building-a-binary" title="Link to this heading"></a></h2>
+<p>The build process involves creating separate object libraries for host and cluster code, linking them with the appropriate static libraries, and combining them into a unified executable.</p>
+<section id="host-code">
+<h3>Host Code<a class="headerlink" href="#host-code" title="Link to this heading"></a></h3>
+<p>The host code is compiled into an object library and linked with the necessary static libraries. Source files for the host are typically organized in a <code class="docutils literal notranslate"><span class="pre">src_host</span></code> directory. The available libraries for host code are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hal_host</span></code> - Hardware Abstraction Layer for host core</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">runtime_host</span></code> - Runtime functions for host core</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">picolibc_host</span></code> - Picolibc C library for host core</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trampoline_rv32im</span></code> - Trampoline functions for using RV32IM</p></li>
+</ul>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">file(</span><span class="no">GLOB_RECURSE</span><span class="w"> </span><span class="no">TEST_HOST_SRCS</span><span class="w"> </span><span class="s">&quot;src_host/*.c&quot;</span><span class="nf">)</span>
+<span class="nf">add_library(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_host</span><span class="w"> </span><span class="no">OBJECT</span><span class="w"> </span><span class="o">${</span><span class="nt">TEST_HOST_SRCS</span><span class="o">}</span><span class="nf">)</span>
+<span class="nf">target_link_libraries(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_host</span><span class="w"> </span><span class="no">PUBLIC</span>
+<span class="w">  </span><span class="nb">hal_host</span>
+<span class="w">  </span><span class="nb">runtime_host</span>
+<span class="w">  </span><span class="nb">picolibc_host</span>
+<span class="w">  </span><span class="nb">trampoline_rv32im</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+</section>
+<section id="cluster-code">
+<h3>Cluster Code<a class="headerlink" href="#cluster-code" title="Link to this heading"></a></h3>
+<p>The cluster code is compiled into an object library and linked with the necessary static libraries. Source files for the cluster are typically organized in a <code class="docutils literal notranslate"><span class="pre">src_cluster</span></code> directory. The available libraries for cluster code are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">runtime_cluster_snitch</span></code> - Runtime functions for Snitch cluster core</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">picolibc_cluster_snitch</span></code> - Picolibc C library for Snitch cluster core</p></li>
+</ul>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">file(</span><span class="no">GLOB_RECURSE</span><span class="w"> </span><span class="no">TEST_CLUSTER_SRCS</span><span class="w"> </span><span class="s">&quot;src_cluster/*.c&quot;</span><span class="nf">)</span>
+<span class="nf">add_library(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_cluster</span><span class="w"> </span><span class="no">OBJECT</span><span class="w"> </span><span class="o">${</span><span class="nt">TEST_CLUSTER_SRCS</span><span class="o">}</span><span class="nf">)</span>
+<span class="nf">target_link_libraries(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_cluster</span><span class="w"> </span><span class="no">PUBLIC</span>
+<span class="w">  </span><span class="nb">runtime_cluster_snitch</span>
+<span class="w">  </span><span class="nb">picolibc_cluster_snitch</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Special attention is required for functions that execute before the cluster core is fully initialized, such as the trampoline function and interrupt handlers. At this stage, critical resources like the stack, global pointer, and thread pointer are not yet configured. Consequently, the compiler must not generate code that allocates stack frames. To address this, such functions are implemented as naked functions, which prevent the compiler from adding prologues or epilogues that rely on stack operations.</p>
+</div>
+</section>
+<section id="unified-binary">
+<h3>Unified Binary<a class="headerlink" href="#unified-binary" title="Link to this heading"></a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The current approach compiles all code for both the host and cluster cores into a single library. This requires precise handling to ensure compatibility between the different instruction set architectures (ISAs) and application binary interfaces (ABIs). The ABI has to be identical to ensure correct function calls.
+This requires careful handling to avoid invalid instructions caused by mismatched ISAs between the host and cluster cores.</p>
+<p>To combine host and cluster into one executable:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">add_chimera_test(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nf">)</span>
+<span class="nf">target_link_libraries(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="w"> </span><span class="no">PUBLIC</span><span class="w"> </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_host</span><span class="w"> </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_cluster</span><span class="nf">)</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>It is recommended to always check the generated assembly code to ensure that the correct instructions are generated for the target core!</strong></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="structure.html" class="btn btn-neutral float-left" title="Folder Structure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="test_vectors.html" class="btn btn-neutral float-right" title="Test Vectors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

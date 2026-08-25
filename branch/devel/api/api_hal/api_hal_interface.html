@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HAL Communication Interface &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="HAL Interrupt Controller" href="api_hal_interrupt.html" />
+    <link rel="prev" title="Host High‑Level API Reference (HAL)" href="api_hal.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="api_hal.html">Host High‑Level API Reference (HAL)</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">HAL Communication Interface</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv424chi_interface_callback_t"><code class="docutils literal notranslate"><span class="pre">chi_interface_callback_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410iface_openPK15chi_interface_t"><code class="docutils literal notranslate"><span class="pre">iface_open()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411iface_closePK15chi_interface_t"><code class="docutils literal notranslate"><span class="pre">iface_close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410iface_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t"><code class="docutils literal notranslate"><span class="pre">iface_read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411iface_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t"><code class="docutils literal notranslate"><span class="pre">iface_write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411iface_flushPK15chi_interface_t"><code class="docutils literal notranslate"><span class="pre">iface_flush()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415chi_interface_t"><code class="docutils literal notranslate"><span class="pre">chi_interface_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417chi_interface_api"><code class="docutils literal notranslate"><span class="pre">chi_interface_api</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_hal_interrupt.html">HAL Interrupt Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_hal_device.html">HAL Accelerator Device</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_ll/api_ll.html">Host Runtime API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+      <li class="breadcrumb-item active">HAL Communication Interface</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_hal/api_hal_interface.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hal-communication-interface">
+<h1>HAL Communication Interface<a class="headerlink" href="#hal-communication-interface" title="Link to this heading"></a></h1>
+<p>A communication interface is represented by <cite>chi_interface_t</cite> and exposes
+<cite>open</cite>, <cite>close</cite>, <cite>read</cite>, and <cite>write</cite> methods for UART, SPI, etc.</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv424chi_interface_callback_t">
+<span id="_CPPv324chi_interface_callback_t"></span><span id="_CPPv224chi_interface_callback_t"></span><span id="chi_interface_callback_t"></span><span class="target" id="group__hal__interface_1ga7b53a3dc72240f76ae9e383c9a24cc3f"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">chi_interface_callback_t</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iface</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv424chi_interface_callback_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Callback function type for asynchronous interface operations. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param iface<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if the operation was successful, false otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410iface_openPK15chi_interface_t">
+<span id="_CPPv310iface_openPK15chi_interface_t"></span><span id="_CPPv210iface_openPK15chi_interface_t"></span><span id="iface_open__chi_interface_tCP"></span><span class="target" id="group__hal__interface_1ga915b7b1d5f6e1f25b15c8a6bfc6c3c37"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iface_open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410iface_openPK15chi_interface_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Wrapper functions for interface operations. </p>
+<p>These functions call the corresponding function pointers in the <a class="reference internal" href="#structchi__interface__api"><span class="std std-ref">chi_interface_api</span></a> structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iface</strong> – Pointer to the interface instance </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Return 0 on success, negative value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411iface_closePK15chi_interface_t">
+<span id="_CPPv311iface_closePK15chi_interface_t"></span><span id="_CPPv211iface_closePK15chi_interface_t"></span><span id="iface_close__chi_interface_tCP"></span><span class="target" id="group__hal__interface_1ga0d26847aca5a611132c6271e57e24ba3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iface_close</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411iface_closePK15chi_interface_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Wrapper functions for interface operations. </p>
+<p>These functions call the corresponding function pointers in the <a class="reference internal" href="#structchi__interface__api"><span class="std std-ref">chi_interface_api</span></a> structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iface</strong> – Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Return 0 on success, negative value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410iface_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t">
+<span id="_CPPv310iface_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t"></span><span id="_CPPv210iface_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t"></span><span id="iface_read__chi_interface_tCP.voidP.uint32_t.chi_interface_callback_t"></span><span class="target" id="group__hal__interface_1ga6ce9f31c4c963606d58ca0608c742e23"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iface_read</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <a class="reference internal" href="#_CPPv424chi_interface_callback_t" title="chi_interface_callback_t"><span class="n"><span class="pre">chi_interface_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410iface_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Wrapper functions for interface operations. </p>
+<p>These functions call the corresponding function pointers in the <a class="reference internal" href="#structchi__interface__api"><span class="std std-ref">chi_interface_api</span></a> structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iface</strong> – Pointer to the interface instance. </p></li>
+<li><p><strong>buffer</strong> – Pointer to the buffer for incoming data. </p></li>
+<li><p><strong>size</strong> – Number of bytes to read. </p></li>
+<li><p><strong>cb</strong> – Callback when the operation completes. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ssize_t Number of bytes read on success, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411iface_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t">
+<span id="_CPPv311iface_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t"></span><span id="_CPPv211iface_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t"></span><span id="iface_write__chi_interface_tCP.voidCP.uint32_t.chi_interface_callback_t"></span><span class="target" id="group__hal__interface_1ga8bb2a393d973068d3803267a0bb0f080"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iface_write</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <a class="reference internal" href="#_CPPv424chi_interface_callback_t" title="chi_interface_callback_t"><span class="n"><span class="pre">chi_interface_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411iface_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Wrapper functions for interface operations. </p>
+<p>These functions call the corresponding function pointers in the <a class="reference internal" href="#structchi__interface__api"><span class="std std-ref">chi_interface_api</span></a> structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iface</strong> – Pointer to the interface instance. </p></li>
+<li><p><strong>buffer</strong> – Pointer to the data to send. </p></li>
+<li><p><strong>size</strong> – Number of bytes to write. </p></li>
+<li><p><strong>cb</strong> – Callback when the operation completes. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ssize_t Number of bytes written on success, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411iface_flushPK15chi_interface_t">
+<span id="_CPPv311iface_flushPK15chi_interface_t"></span><span id="_CPPv211iface_flushPK15chi_interface_t"></span><span id="iface_flush__chi_interface_tCP"></span><span class="target" id="group__hal__interface_1gacae5e49ac7120fb0e231fbd268e03d67"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iface_flush</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411iface_flushPK15chi_interface_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Wrapper function to flush the interface buffers. </p>
+<p>This function calls the corresponding function pointer in the <a class="reference internal" href="#structchi__interface__api"><span class="std std-ref">chi_interface_api</span></a> structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iface</strong> – Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Return 0 on success, negative value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv415chi_interface_t">
+<span id="_CPPv315chi_interface_t"></span><span id="_CPPv215chi_interface_t"></span><span id="chi_interface_t"></span><span class="target" id="structchi__interface__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chi_interface_t</span></span></span><a class="headerlink" href="#_CPPv415chi_interface_t" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;interface_api.h&gt;</em></div>
+<p>Communication interface instance. </p>
+<p>This structure represents a generic communication interface (e.g. UART, SPI) and holds the API pointer, the MMIO base, and a driver‑specific configuration pointer. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15chi_interface_t3apiE">
+<span id="_CPPv3N15chi_interface_t3apiE"></span><span id="_CPPv2N15chi_interface_t3apiE"></span><span id="chi_interface_t::api__chi_interface_api_tCP"></span><span class="target" id="structchi__interface__t_1a1a92ffd949a68f40285f646f620400e1"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interface_api_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">api</span></span></span><a class="headerlink" href="#_CPPv4N15chi_interface_t3apiE" title="Link to this definition"></a><br /></dt>
+<dd><p>Function pointers for this interface. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15chi_interface_t4baseE">
+<span id="_CPPv3N15chi_interface_t4baseE"></span><span id="_CPPv2N15chi_interface_t4baseE"></span><span id="chi_interface_t::base__uintptr_t"></span><span class="target" id="structchi__interface__t_1a0851f13e5769da7ba835ab05fe8a9dfa"></span><span class="n"><span class="pre">uintptr_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">base</span></span></span><a class="headerlink" href="#_CPPv4N15chi_interface_t4baseE" title="Link to this definition"></a><br /></dt>
+<dd><p>MMIO base address (if applicable). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N15chi_interface_t3cfgE">
+<span id="_CPPv3N15chi_interface_t3cfgE"></span><span id="_CPPv2N15chi_interface_t3cfgE"></span><span id="chi_interface_t::cfg__voidP"></span><span class="target" id="structchi__interface__t_1acfaf1b54dfdc60f19010a769f2c35185"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cfg</span></span></span><a class="headerlink" href="#_CPPv4N15chi_interface_t3cfgE" title="Link to this definition"></a><br /></dt>
+<dd><p>Driver‑specific configuration. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv417chi_interface_api">
+<span id="_CPPv317chi_interface_api"></span><span id="_CPPv217chi_interface_api"></span><span id="chi_interface_api"></span><span class="target" id="structchi__interface__api"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chi_interface_api</span></span></span><a class="headerlink" href="#_CPPv417chi_interface_api" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;interface_api.h&gt;</em></div>
+<p>API structure defining function pointers for communication interfaces. </p>
+<p>Forward declaration of chi_interface_api_t.</p>
+<p>This structure contains the <code class="docutils literal notranslate"><span class="pre">open</span></code>, <code class="docutils literal notranslate"><span class="pre">close</span></code>, <code class="docutils literal notranslate"><span class="pre">read</span></code>, and <code class="docutils literal notranslate"><span class="pre">write</span></code> function pointers, enabling a standardized interface for UART, SPI, etc. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17chi_interface_api4openE">
+<span id="_CPPv3N17chi_interface_api4openE"></span><span id="_CPPv2N17chi_interface_api4openE"></span><span class="target" id="structchi__interface__api_1a6c2115259266a6d1e08498c46e5cf242"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">open</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iface</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N17chi_interface_api4openE" title="Link to this definition"></a><br /></dt>
+<dd><p>Opens the interface. </p>
+<p>This function initializes the hardware and prepares it for use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param iface<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, negative value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17chi_interface_api5closeE">
+<span id="_CPPv3N17chi_interface_api5closeE"></span><span id="_CPPv2N17chi_interface_api5closeE"></span><span class="target" id="structchi__interface__api_1a72eb4e63b9d00c29dda3ad910297fd41"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iface</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N17chi_interface_api5closeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Closes the interface. </p>
+<p>This function releases any resources held by the interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param iface<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, negative value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17chi_interface_api4readE">
+<span id="_CPPv3N17chi_interface_api4readE"></span><span id="_CPPv2N17chi_interface_api4readE"></span><span class="target" id="structchi__interface__api_1a098ee481e71ef5ef35addda92d318800"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">read</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iface</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv424chi_interface_callback_t" title="chi_interface_callback_t"><span class="n"><span class="pre">chi_interface_callback_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">cb</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N17chi_interface_api4readE" title="Link to this definition"></a><br /></dt>
+<dd><p>Reads data from the interface. </p>
+<p>Performs an asynchronous or blocking read, depending on the driver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param iface<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Param buffer<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pointer to the buffer for incoming data. </p>
+</dd>
+<dt class="field-odd">Param size<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bytes to read. </p>
+</dd>
+<dt class="field-even">Param cb<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callback when the operation completes. </p>
+</dd>
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bytes read on success, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17chi_interface_api5writeE">
+<span id="_CPPv3N17chi_interface_api5writeE"></span><span id="_CPPv2N17chi_interface_api5writeE"></span><span class="target" id="structchi__interface__api_1a1f0c8cd73c1ce462db6f9764d3f6fcb0"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">write</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iface</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv424chi_interface_callback_t" title="chi_interface_callback_t"><span class="n"><span class="pre">chi_interface_callback_t</span></span></a><span class="w"> </span><span class="n"><span class="pre">cb</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N17chi_interface_api5writeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Writes data to the interface. </p>
+<p>Performs an asynchronous or blocking write, depending on the driver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param iface<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Param buffer<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pointer to the data to send. </p>
+</dd>
+<dt class="field-odd">Param size<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bytes to write. </p>
+</dd>
+<dt class="field-even">Param cb<span class="colon">:</span></dt>
+<dd class="field-even"><p>Callback when the operation completes. </p>
+</dd>
+<dt class="field-odd">Return<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Number of bytes written on success, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N17chi_interface_api5flushE">
+<span id="_CPPv3N17chi_interface_api5flushE"></span><span id="_CPPv2N17chi_interface_api5flushE"></span><span class="target" id="structchi__interface__api_1ab7e2bd96ab65c283208b68a0be86539c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">flush</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">iface</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N17chi_interface_api5flushE" title="Link to this definition"></a><br /></dt>
+<dd><p>Flushes the interface buffers. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Param iface<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pointer to the interface instance. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, negative value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_hal.html" class="btn btn-neutral float-left" title="Host High‑Level API Reference (HAL)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_hal_interrupt.html" class="btn btn-neutral float-right" title="HAL Interrupt Controller" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

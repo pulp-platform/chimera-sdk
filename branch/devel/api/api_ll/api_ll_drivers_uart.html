@@ -1,0 +1,622 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UART &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="CLINT" href="api_ll_drivers_clint.html" />
+    <link rel="prev" title="Host Runtime API Reference" href="api_ll.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api_ll.html">Host Runtime API Reference</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">UART</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_PARITY_NONE"><code class="docutils literal notranslate"><span class="pre">UART_PARITY_NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_PARITY_EVEN"><code class="docutils literal notranslate"><span class="pre">UART_PARITY_EVEN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_PARITY_ODD"><code class="docutils literal notranslate"><span class="pre">UART_PARITY_ODD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_DEFAULT_BAUD_RATE"><code class="docutils literal notranslate"><span class="pre">UART_DEFAULT_BAUD_RATE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_DEFAULT_DATA_BITS"><code class="docutils literal notranslate"><span class="pre">UART_DEFAULT_DATA_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_DEFAULT_PARITY"><code class="docutils literal notranslate"><span class="pre">UART_DEFAULT_PARITY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_DEFAULT_STOP_BITS"><code class="docutils literal notranslate"><span class="pre">UART_DEFAULT_STOP_BITS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_CLK_FREQ_HZ"><code class="docutils literal notranslate"><span class="pre">UART_CLK_FREQ_HZ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.UART_BASE_ADDR"><code class="docutils literal notranslate"><span class="pre">UART_BASE_ADDR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410_uart_initv"><code class="docutils literal notranslate"><span class="pre">_uart_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412_uart_deinitv"><code class="docutils literal notranslate"><span class="pre">_uart_deinit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49uart_putccP4FILE"><code class="docutils literal notranslate"><span class="pre">uart_putc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv49uart_getcP4FILE"><code class="docutils literal notranslate"><span class="pre">uart_getc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv410uart_flushP4FILE"><code class="docutils literal notranslate"><span class="pre">uart_flush()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416default_uart_cfg"><code class="docutils literal notranslate"><span class="pre">default_uart_cfg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416default_uart_api"><code class="docutils literal notranslate"><span class="pre">default_uart_api</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417default_uart_inst"><code class="docutils literal notranslate"><span class="pre">default_uart_inst</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413uart_config_t"><code class="docutils literal notranslate"><span class="pre">uart_config_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#apb-uart-driver">APB UART Driver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_clint.html">CLINT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_cluster.html">Snitch Clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_fll.html">FLL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_alloc.html">Memory Allocation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="api_ll.html">Host Runtime API Reference</a></li>
+      <li class="breadcrumb-item active">UART</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_ll/api_ll_drivers_uart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="uart">
+<h1>UART<a class="headerlink" href="#uart" title="Link to this heading"></a></h1>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__drivers__uart"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">UART</span> <span class="pre">Driver</span></span></dt>
+<dd><p>Generic UART driver implementation for Chimera-SDK. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-uart-parity-modes">UART Parity Modes</p>
+<p>Defines available parity options for UART. </p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_PARITY_NONE">
+<span class="target" id="group__drivers__uart_1ga270dea6e1a92dd83fe58802450bdd60c"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_PARITY_NONE</span></span></span><a class="headerlink" href="#c.UART_PARITY_NONE" title="Link to this definition"></a><br /></dt>
+<dd><p>No parity. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_PARITY_EVEN">
+<span class="target" id="group__drivers__uart_1ga063b14ac42ef9e8f4246c17a586b14eb"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_PARITY_EVEN</span></span></span><a class="headerlink" href="#c.UART_PARITY_EVEN" title="Link to this definition"></a><br /></dt>
+<dd><p>Even parity. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_PARITY_ODD">
+<span class="target" id="group__drivers__uart_1ga229615e64964f68f7a856ea6ffea359e"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_PARITY_ODD</span></span></span><a class="headerlink" href="#c.UART_PARITY_ODD" title="Link to this definition"></a><br /></dt>
+<dd><p>Odd parity. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-default-uart-configurations">Default UART Configurations</p>
+<p>Defines default UART settings, which can be overridden at compile-time. </p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_DEFAULT_BAUD_RATE">
+<span class="target" id="group__drivers__uart_1ga695ad4d27f59bb03b44bdaa55b17c7b5"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_DEFAULT_BAUD_RATE</span></span></span><a class="headerlink" href="#c.UART_DEFAULT_BAUD_RATE" title="Link to this definition"></a><br /></dt>
+<dd><p>Default baud rate (bps). </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_DEFAULT_DATA_BITS">
+<span class="target" id="group__drivers__uart_1gaed01711bbda8d6630409a73fe67b8501"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_DEFAULT_DATA_BITS</span></span></span><a class="headerlink" href="#c.UART_DEFAULT_DATA_BITS" title="Link to this definition"></a><br /></dt>
+<dd><p>Default number of data bits. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_DEFAULT_PARITY">
+<span class="target" id="group__drivers__uart_1ga7acb7474eeba61bfe5f28c3629f619ed"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_DEFAULT_PARITY</span></span></span><a class="headerlink" href="#c.UART_DEFAULT_PARITY" title="Link to this definition"></a><br /></dt>
+<dd><p>Default parity mode. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_DEFAULT_STOP_BITS">
+<span class="target" id="group__drivers__uart_1gaea62f470e264a7286e51b0cf978f047b"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_DEFAULT_STOP_BITS</span></span></span><a class="headerlink" href="#c.UART_DEFAULT_STOP_BITS" title="Link to this definition"></a><br /></dt>
+<dd><p>Default number of stop bits. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_CLK_FREQ_HZ">
+<span class="target" id="group__drivers__uart_1gaaaa17b3804fec3b54647cb5be21ae023"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_CLK_FREQ_HZ</span></span></span><a class="headerlink" href="#c.UART_CLK_FREQ_HZ" title="Link to this definition"></a><br /></dt>
+<dd><p>Default clock frequency in Hz. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_BASE_ADDR">
+<span class="target" id="group__drivers__uart_1ga4b087ed9535f88e678cea65809f2a71f"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_BASE_ADDR</span></span></span><a class="headerlink" href="#c.UART_BASE_ADDR" title="Link to this definition"></a><br /></dt>
+<dd><p>Default base address for UART. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410_uart_initv">
+<span id="_CPPv310_uart_initv"></span><span id="_CPPv210_uart_initv"></span><span id="_uart_init__void"></span><span class="target" id="group__drivers__uart_1ga3167fae37fe2f11d141e470ad571815f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_uart_init</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410_uart_initv" title="Link to this definition"></a><br /></dt>
+<dd><p>Initializes the UART interface. This function sets up the UART hardware with the specified configuration. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412_uart_deinitv">
+<span id="_CPPv312_uart_deinitv"></span><span id="_CPPv212_uart_deinitv"></span><span id="_uart_deinit__void"></span><span class="target" id="group__drivers__uart_1ga1b2762786016f8fdce5d6112fbae29c4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_uart_deinit</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412_uart_deinitv" title="Link to this definition"></a><br /></dt>
+<dd><p>De-initializes the UART interface. This function releases any resources held by the UART driver. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49uart_putccP4FILE">
+<span id="_CPPv39uart_putccP4FILE"></span><span id="_CPPv29uart_putccP4FILE"></span><span id="uart_putc__c.FILEP"></span><span class="target" id="group__drivers__uart_1gad9a45cdfde675cd246edce45258345d3"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_putc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">c</span></span>, <span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49uart_putccP4FILE" title="Link to this definition"></a><br /></dt>
+<dd><p>Puts a character to the UART. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>c</strong> – Character to send. </p></li>
+<li><p><strong>file</strong> – Pointer to the FILE structure (unused). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The character written as an unsigned char cast to an int or EOF on error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv49uart_getcP4FILE">
+<span id="_CPPv39uart_getcP4FILE"></span><span id="_CPPv29uart_getcP4FILE"></span><span id="uart_getc__FILEP"></span><span class="target" id="group__drivers__uart_1ga468f8e53d9547d9de274ce1f4720d553"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_getc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv49uart_getcP4FILE" title="Link to this definition"></a><br /></dt>
+<dd><p>Gets a character from the UART. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> – Pointer to the FILE structure (unused). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The character read as an unsigned char cast to an int or EOF on error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv410uart_flushP4FILE">
+<span id="_CPPv310uart_flushP4FILE"></span><span id="_CPPv210uart_flushP4FILE"></span><span id="uart_flush__FILEP"></span><span class="target" id="group__drivers__uart_1gaa7c6dafc10861405a92cf246e088b07c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_flush</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">FILE</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">file</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv410uart_flushP4FILE" title="Link to this definition"></a><br /></dt>
+<dd><p>Flushes the UART output buffer. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> – Pointer to the FILE structure (unused). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, negative value on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv416default_uart_cfg">
+<span id="_CPPv316default_uart_cfg"></span><span id="_CPPv216default_uart_cfg"></span><span id="default_uart_cfg__uart_config_tC"></span><span class="target" id="group__drivers__uart_1gad904cb730ccc217077e2116e65474495"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv413uart_config_t" title="uart_config_t"><span class="n"><span class="pre">uart_config_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_uart_cfg</span></span></span><a class="headerlink" href="#_CPPv416default_uart_cfg" title="Link to this definition"></a><br /></dt>
+<dd><p>Default UART configuration settings. </p>
+<p>This global configuration structure defines default parameters for UART communication, which can be overridden by the user.</p>
+<p><strong>Default Configuration:</strong> <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">uart_config_t</span> <span class="n">default_cfg</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">.</span><span class="n">baud_rate</span>   <span class="o">=</span> <span class="n">UART_DEFAULT_BAUD_RATE</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">clk_freq_hz</span> <span class="o">=</span> <span class="n">UART_CLK_FREQ_HZ</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">data_bits</span>   <span class="o">=</span> <span class="n">UART_DEFAULT_DATA_BITS</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">parity</span>      <span class="o">=</span> <span class="n">UART_DEFAULT_PARITY</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">stop_bits</span>   <span class="o">=</span> <span class="n">UART_DEFAULT_STOP_BITS</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv416default_uart_api">
+<span id="_CPPv316default_uart_api"></span><span id="_CPPv216default_uart_api"></span><span id="default_uart_api__chi_interface_api_tC"></span><span class="target" id="group__drivers__uart_1ga6a60f7d77e4a0084fd9f7f34da90bbd7"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interface_api_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_uart_api</span></span></span><a class="headerlink" href="#_CPPv416default_uart_api" title="Link to this definition"></a><br /></dt>
+<dd><p>UART HAL API structure. </p>
+<p>This structure defines function pointers for UART operations, allowing for modular driver implementations.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">chi_interface_api_t</span> <span class="n">uart_api</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="o">.</span><span class="n">open</span>  <span class="o">=</span> <span class="n">uart_open</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">close</span> <span class="o">=</span> <span class="n">uart_close</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">read</span>  <span class="o">=</span> <span class="n">uart_read</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">write</span> <span class="o">=</span> <span class="n">uart_write</span><span class="p">,</span>
+    <span class="o">.</span><span class="n">flush</span> <span class="o">=</span> <span class="n">uart_flush</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv417default_uart_inst">
+<span id="_CPPv317default_uart_inst"></span><span id="_CPPv217default_uart_inst"></span><span id="default_uart_inst__chi_interface_t"></span><span class="target" id="group__drivers__uart_1gaf1327509987cb17c5e595d1bc1dc252f"></span><a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_uart_inst</span></span></span><a class="headerlink" href="#_CPPv417default_uart_inst" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv413uart_config_t">
+<span id="_CPPv313uart_config_t"></span><span id="_CPPv213uart_config_t"></span><span id="uart_config_t"></span><span class="target" id="structuart__config__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_config_t</span></span></span><a class="headerlink" href="#_CPPv413uart_config_t" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;uart.h&gt;</em></div>
+<p>UART configuration structure. </p>
+<p>This structure holds the configuration settings for UART initialization. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13uart_config_t9baud_rateE">
+<span id="_CPPv3N13uart_config_t9baud_rateE"></span><span id="_CPPv2N13uart_config_t9baud_rateE"></span><span id="uart_config_t::baud_rate__uint32_t"></span><span class="target" id="structuart__config__t_1a988fe3be69cba628a241033f1b16f35e"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">baud_rate</span></span></span><a class="headerlink" href="#_CPPv4N13uart_config_t9baud_rateE" title="Link to this definition"></a><br /></dt>
+<dd><p>Baud rate in bits per second. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13uart_config_t11clk_freq_hzE">
+<span id="_CPPv3N13uart_config_t11clk_freq_hzE"></span><span id="_CPPv2N13uart_config_t11clk_freq_hzE"></span><span id="uart_config_t::clk_freq_hz__uint32_t"></span><span class="target" id="structuart__config__t_1acc4c2218bf2c607f3a1e41dca7f6bf84"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clk_freq_hz</span></span></span><a class="headerlink" href="#_CPPv4N13uart_config_t11clk_freq_hzE" title="Link to this definition"></a><br /></dt>
+<dd><p>Clock frequency in Hz. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13uart_config_t9data_bitsE">
+<span id="_CPPv3N13uart_config_t9data_bitsE"></span><span id="_CPPv2N13uart_config_t9data_bitsE"></span><span id="uart_config_t::data_bits__uint8_t"></span><span class="target" id="structuart__config__t_1a0f3c088321cde3aec9b58b9522f4aff2"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">data_bits</span></span></span><a class="headerlink" href="#_CPPv4N13uart_config_t9data_bitsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of data bits (typically 8). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13uart_config_t6parityE">
+<span id="_CPPv3N13uart_config_t6parityE"></span><span id="_CPPv2N13uart_config_t6parityE"></span><span id="uart_config_t::parity__uint8_t"></span><span class="target" id="structuart__config__t_1aff64c6f22826d8d2fff036ad2e0e778d"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">parity</span></span></span><a class="headerlink" href="#_CPPv4N13uart_config_t6parityE" title="Link to this definition"></a><br /></dt>
+<dd><p>Parity setting (None, Even, Odd). </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13uart_config_t9stop_bitsE">
+<span id="_CPPv3N13uart_config_t9stop_bitsE"></span><span id="_CPPv2N13uart_config_t9stop_bitsE"></span><span id="uart_config_t::stop_bits__uint8_t"></span><span class="target" id="structuart__config__t_1a3337bd57233f4fc49cbddedbc6b79efa"></span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stop_bits</span></span></span><a class="headerlink" href="#_CPPv4N13uart_config_t9stop_bitsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of stop bits (1 or 2). </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<section id="apb-uart-driver">
+<h2>APB UART Driver<a class="headerlink" href="#apb-uart-driver" title="Link to this heading"></a></h2>
+<p>The APB UART driver implementation for Chimera-SDK. This driver provides
+initialization, read, and write functions for an APB-based UART peripheral.</p>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__drivers__uart__apb"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">UART</span> <span class="pre">APB</span> <span class="pre">Driver</span></span></dt>
+<dd><p>APB UART driver implementation for Chimera-SDK. </p>
+<p>APB UART register definitions for Chimera-SDK.</p>
+<p>This file provides the implementation of UART initialization, read, and write functions for an APB-based UART peripheral. It includes blocking read and write operations along with basic configuration.</p>
+<p>This file defines register offsets and fields for an APB-based UART peripheral. It is used in conjunction with the UART driver to configure and interact with the hardware. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-uart-register-offsets">UART Register Offsets</p>
+<p>Defines the register offsets for the APB UART peripheral. </p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_RBR_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga42674f8a1ba1befd74f767ace1330425"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_RBR_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_RBR_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Receiver Buffer Register (RBR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_THR_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga42eaefda4eb3664bb0435d606451cf47"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_THR_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_THR_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Transmitter Holding Register (THR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_INTR_ENABLE_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga5a4456b1f9be07cc625f0a08ce9f914c"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_INTR_ENABLE_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_INTR_ENABLE_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Interrupt Enable Register (IER) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_INTR_IDENT_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga6fe53cbb4df13a2fb64a76f0af7f2313"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_INTR_IDENT_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_INTR_IDENT_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Interrupt Identification Register (IIR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_FIFO_CONTROL_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga8fd56da62c3c54eb9394e54fd2a014c7"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_FIFO_CONTROL_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_FIFO_CONTROL_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>FIFO Control Register (FCR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_LINE_CONTROL_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga987d7a8cddb861735eac8e1a1e63fcaa"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_LINE_CONTROL_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_LINE_CONTROL_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Line Control Register (LCR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_MODEM_CONTROL_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1gabf0ac3058e7b5968112adf36e52d9a0b"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_MODEM_CONTROL_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_MODEM_CONTROL_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Modem Control Register (MCR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_LINE_STATUS_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga9d2c8bad8febe3dcc9ecd726dc24616a"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_LINE_STATUS_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_LINE_STATUS_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Line Status Register (LSR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_MODEM_STATUS_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga396409615316693ef8a66f89a162c89d"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_MODEM_STATUS_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_MODEM_STATUS_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Modem Status Register (MSR) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_DLAB_LSB_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1gad99b2d3c55d9eba20624a8fc0d149124"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_DLAB_LSB_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_DLAB_LSB_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Divisor Latch LSB Register (DLAB_LSB) Offset. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_DLAB_MSB_REG_OFFSET">
+<span class="target" id="group__drivers__uart__apb_1ga1f9d6325710f2d14dea26a2ba5605761"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_DLAB_MSB_REG_OFFSET</span></span></span><a class="headerlink" href="#c.UART_DLAB_MSB_REG_OFFSET" title="Link to this definition"></a><br /></dt>
+<dd><p>Divisor Latch MSB Register (DLAB_MSB) Offset. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-uart-line-status-register-(lsr)-bit-definitions">UART Line Status Register (LSR) Bit Definitions</p>
+<p>Defines the bit positions for the Line Status Register (LSR). </p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_LINE_STATUS_DATA_READY_BIT">
+<span class="target" id="group__drivers__uart__apb_1ga3f0be74fd15f2bdd8a78234865779f54"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_LINE_STATUS_DATA_READY_BIT</span></span></span><a class="headerlink" href="#c.UART_LINE_STATUS_DATA_READY_BIT" title="Link to this definition"></a><br /></dt>
+<dd><p>Data Ready (DR) bit. Set when data is available in RBR. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_LINE_STATUS_THR_EMPTY_BIT">
+<span class="target" id="group__drivers__uart__apb_1ga703ede2e30064e784bfee50b3dd8e766"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_LINE_STATUS_THR_EMPTY_BIT</span></span></span><a class="headerlink" href="#c.UART_LINE_STATUS_THR_EMPTY_BIT" title="Link to this definition"></a><br /></dt>
+<dd><p>Transmitter Holding Register (THR) empty bit. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.UART_LINE_STATUS_TMIT_EMPTY_BIT">
+<span class="target" id="group__drivers__uart__apb_1ga388b4f5e265847a60e1af3df4e53c243"></span><span class="sig-name descname"><span class="n"><span class="pre">UART_LINE_STATUS_TMIT_EMPTY_BIT</span></span></span><a class="headerlink" href="#c.UART_LINE_STATUS_TMIT_EMPTY_BIT" title="Link to this definition"></a><br /></dt>
+<dd><p>Transmitter empty bit. Set when both THR and shift register are empty. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48rx_ready8uint32_t">
+<span id="_CPPv38rx_ready8uint32_t"></span><span id="_CPPv28rx_ready8uint32_t"></span><span id="rx_ready__uint32_t"></span><span class="target" id="group__drivers__uart__apb_1ga680f2fdb367f1cdf9418423b15998340"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rx_ready</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48rx_ready8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks if data is available to read from the UART receiver. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – Base address of the UART peripheral. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1 if data is ready, 0 otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48tx_ready8uint32_t">
+<span id="_CPPv38tx_ready8uint32_t"></span><span id="_CPPv28tx_ready8uint32_t"></span><span id="tx_ready__uint32_t"></span><span class="target" id="group__drivers__uart__apb_1ga8a02d9c9a058c3dbe0edfda9f0e3e21d"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tx_ready</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48tx_ready8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks if the transmitter is ready to accept new data. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – Base address of the UART peripheral. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1 if the transmitter is ready, 0 otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48tx_empty8uint32_t">
+<span id="_CPPv38tx_empty8uint32_t"></span><span id="_CPPv28tx_empty8uint32_t"></span><span id="tx_empty__uint32_t"></span><span class="target" id="group__drivers__uart__apb_1gad750183538808746682504508ba45f98"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tx_empty</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48tx_empty8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks if the transmitter is completely empty. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – Base address of the UART peripheral. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1 if the transmitter is empty, 0 otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414uart_apb_flushPK15chi_interface_t">
+<span id="_CPPv314uart_apb_flushPK15chi_interface_t"></span><span id="_CPPv214uart_apb_flushPK15chi_interface_t"></span><span id="uart_apb_flush__chi_interface_tCP"></span><span class="target" id="group__drivers__uart__apb_1ga8078aee99e8682a5c1730d6b2ae5f299"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_apb_flush</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414uart_apb_flushPK15chi_interface_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Flushes the UART transmitter, ensuring all data is sent. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iface</strong> – UART interface instance. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, -1 on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413uart_apb_openPK15chi_interface_t">
+<span id="_CPPv313uart_apb_openPK15chi_interface_t"></span><span id="_CPPv213uart_apb_openPK15chi_interface_t"></span><span id="uart_apb_open__chi_interface_tCP"></span><span class="target" id="group__drivers__uart__apb_1gad110379bbee9667d9b1d05273599ee69"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_apb_open</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413uart_apb_openPK15chi_interface_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Opens and initializes the UART interface. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iface</strong> – UART interface instance. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, -1 on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414uart_apb_closePK15chi_interface_t">
+<span id="_CPPv314uart_apb_closePK15chi_interface_t"></span><span id="_CPPv214uart_apb_closePK15chi_interface_t"></span><span id="uart_apb_close__chi_interface_tCP"></span><span class="target" id="group__drivers__uart__apb_1gaf155d0f5190810a9e13c20b50b5db1ff"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_apb_close</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414uart_apb_closePK15chi_interface_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Closes the UART interface. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>iface</strong> – UART interface instance. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, -1 on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413uart_apb_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t">
+<span id="_CPPv313uart_apb_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t"></span><span id="_CPPv213uart_apb_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t"></span><span id="uart_apb_read__chi_interface_tCP.voidP.uint32_t.chi_interface_callback_t"></span><span class="target" id="group__drivers__uart__apb_1ga10ef6a8947bbb617308d080888ca4e8d"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_apb_read</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv424chi_interface_callback_t" title="chi_interface_callback_t"><span class="n"><span class="pre">chi_interface_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413uart_apb_readPK15chi_interface_tPv8uint32_t24chi_interface_callback_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Reads data from the UART receiver (blocking mode). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iface</strong> – UART interface instance. </p></li>
+<li><p><strong>buffer</strong> – Buffer to store received data. </p></li>
+<li><p><strong>size</strong> – Number of bytes to read. </p></li>
+<li><p><strong>cb</strong> – Optional callback function (set to NULL if not needed). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of bytes read on success, -1 on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv414uart_apb_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t">
+<span id="_CPPv314uart_apb_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t"></span><span id="_CPPv214uart_apb_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t"></span><span id="uart_apb_write__chi_interface_tCP.voidCP.uint32_t.chi_interface_callback_t"></span><span class="target" id="group__drivers__uart__apb_1ga5cd6f59fd4d5ff2f650f5914b40cd0e3"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uart_apb_write</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv415chi_interface_t" title="chi_interface_t"><span class="n"><span class="pre">chi_interface_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">iface</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buffer</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span>, <a class="reference internal" href="../api_hal/api_hal_interface.html#_CPPv424chi_interface_callback_t" title="chi_interface_callback_t"><span class="n"><span class="pre">chi_interface_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv414uart_apb_writePK15chi_interface_tPKv8uint32_t24chi_interface_callback_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Writes data to the UART transmitter (blocking mode). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>iface</strong> – UART interface instance. </p></li>
+<li><p><strong>buffer</strong> – Data to send. </p></li>
+<li><p><strong>size</strong> – Number of bytes to write. </p></li>
+<li><p><strong>cb</strong> – Optional callback function (set to NULL if not needed). </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of bytes written on success, -1 on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_ll.html" class="btn btn-neutral float-left" title="Host Runtime API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_ll_drivers_clint.html" class="btn btn-neutral float-right" title="CLINT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

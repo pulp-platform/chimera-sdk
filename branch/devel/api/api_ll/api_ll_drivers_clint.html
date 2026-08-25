@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLINT &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Snitch Clusters" href="api_ll_drivers_cluster.html" />
+    <link rel="prev" title="UART" href="api_ll_drivers_uart.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api_ll.html">Host Runtime API Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_uart.html">UART</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">CLINT</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv415clint_get_mtimev"><code class="docutils literal notranslate"><span class="pre">clint_get_mtime()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv421clint_mtime_less_than13clint_mtime_t13clint_mtime_t"><code class="docutils literal notranslate"><span class="pre">clint_mtime_less_than()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416clint_spin_until13clint_mtime_t"><code class="docutils literal notranslate"><span class="pre">clint_spin_until()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416clint_spin_ticks8uint32_t"><code class="docutils literal notranslate"><span class="pre">clint_spin_ticks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv419clint_get_core_freq8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">clint_get_core_freq()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv419clint_set_mtimecmpx8uint32_t13clint_mtime_t"><code class="docutils literal notranslate"><span class="pre">clint_set_mtimecmpx()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417clint_sleep_until8uint32_t13clint_mtime_t"><code class="docutils literal notranslate"><span class="pre">clint_sleep_until()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417clint_sleep_ticks8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">clint_sleep_ticks()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv419default_trap_vectorv"><code class="docutils literal notranslate"><span class="pre">default_trap_vector()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417default_clint_api"><code class="docutils literal notranslate"><span class="pre">default_clint_api</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418default_clint_inst"><code class="docutils literal notranslate"><span class="pre">default_clint_inst</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413clint_mtime_t"><code class="docutils literal notranslate"><span class="pre">clint_mtime_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#bit-clint-driver">64-bit CLINT Driver</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id1">32-bit CLINT Driver</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_cluster.html">Snitch Clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_fll.html">FLL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_alloc.html">Memory Allocation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="api_ll.html">Host Runtime API Reference</a></li>
+      <li class="breadcrumb-item active">CLINT</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_ll/api_ll_drivers_clint.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="clint">
+<h1>CLINT<a class="headerlink" href="#clint" title="Link to this heading"></a></h1>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__drivers__clint"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">CLINT</span> <span class="pre">Driver</span></span></dt>
+<dd><p>Core Local Interruptor (CLINT) driver implementation for Chimera-SDK. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv415clint_get_mtimev">
+<span id="_CPPv315clint_get_mtimev"></span><span id="_CPPv215clint_get_mtimev"></span><span id="clint_get_mtime__void"></span><span class="target" id="group__drivers__clint_1ga56a4bdaed6e6bfc10a2e4051b8253b78"></span><a class="reference internal" href="#_CPPv413clint_mtime_t" title="clint_mtime_t"><span class="n"><span class="pre">clint_mtime_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_get_mtime</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv415clint_get_mtimev" title="Link to this definition"></a><br /></dt>
+<dd><p>Retrieves the current CLINT mtime value. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current CLINT timer value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421clint_mtime_less_than13clint_mtime_t13clint_mtime_t">
+<span id="_CPPv321clint_mtime_less_than13clint_mtime_t13clint_mtime_t"></span><span id="_CPPv221clint_mtime_less_than13clint_mtime_t13clint_mtime_t"></span><span id="clint_mtime_less_than__clint_mtime_t.clint_mtime_t"></span><span class="target" id="group__drivers__clint_1ga2dd99ef969e4700d11fce04328dfdfb9"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_mtime_less_than</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413clint_mtime_t" title="clint_mtime_t"><span class="n"><span class="pre">clint_mtime_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">a</span></span>, <a class="reference internal" href="#_CPPv413clint_mtime_t" title="clint_mtime_t"><span class="n"><span class="pre">clint_mtime_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421clint_mtime_less_than13clint_mtime_t13clint_mtime_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Compares two CLINT mtime values. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> – First CLINT time value. </p></li>
+<li><p><strong>b</strong> – Second CLINT time value. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1 if a is less than b, 0 otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416clint_spin_until13clint_mtime_t">
+<span id="_CPPv316clint_spin_until13clint_mtime_t"></span><span id="_CPPv216clint_spin_until13clint_mtime_t"></span><span id="clint_spin_until__clint_mtime_t"></span><span class="target" id="group__drivers__clint_1ga6e44c0848c41cc56961ad01ff4a5dd6b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_spin_until</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv413clint_mtime_t" title="clint_mtime_t"><span class="n"><span class="pre">clint_mtime_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">tgt_mtime</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416clint_spin_until13clint_mtime_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Spins (busy-waits) until the specified CLINT mtime value is reached. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tgt_mtime</strong> – Target CLINT time value. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416clint_spin_ticks8uint32_t">
+<span id="_CPPv316clint_spin_ticks8uint32_t"></span><span id="_CPPv216clint_spin_ticks8uint32_t"></span><span id="clint_spin_ticks__uint32_t"></span><span class="target" id="group__drivers__clint_1gaaa846a6725c6ec4c6381d7687850ea3f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_spin_ticks</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ticks</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416clint_spin_ticks8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Spins (busy-waits) for a given number of ticks. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ticks</strong> – Number of clock cycles to wait. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419clint_get_core_freq8uint32_t8uint32_t">
+<span id="_CPPv319clint_get_core_freq8uint32_t8uint32_t"></span><span id="_CPPv219clint_get_core_freq8uint32_t8uint32_t"></span><span id="clint_get_core_freq__uint32_t.uint32_t"></span><span class="target" id="group__drivers__clint_1ga22475cee920ee2ddd75c292db26cb82d"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_get_core_freq</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ref_freq</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ref_time_inv</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419clint_get_core_freq8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Estimates the core frequency based on a reference measurement period. </p>
+<p>The parameter <code class="docutils literal notranslate"><span class="pre">ref_time_inv</span></code> is the inverse of the measurement period.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ref_freq</strong> – Reference frequency in Hz. </p></li>
+<li><p><strong>ref_time_inv</strong> – Inverse of the measurement period. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Estimated core frequency in Hz. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419clint_set_mtimecmpx8uint32_t13clint_mtime_t">
+<span id="_CPPv319clint_set_mtimecmpx8uint32_t13clint_mtime_t"></span><span id="_CPPv219clint_set_mtimecmpx8uint32_t13clint_mtime_t"></span><span id="clint_set_mtimecmpx__uint32_t.clint_mtime_t"></span><span class="target" id="group__drivers__clint_1ga3b3880542e161e1f6daf6dd3e8bfc18a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_set_mtimecmpx</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timer_idx</span></span>, <a class="reference internal" href="#_CPPv413clint_mtime_t" title="clint_mtime_t"><span class="n"><span class="pre">clint_mtime_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419clint_set_mtimecmpx8uint32_t13clint_mtime_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Sets the mtimecmp register for a specific timer index. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timer_idx</strong> – Timer index to configure. </p></li>
+<li><p><strong>value</strong> – Target mtimecmp value. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417clint_sleep_until8uint32_t13clint_mtime_t">
+<span id="_CPPv317clint_sleep_until8uint32_t13clint_mtime_t"></span><span id="_CPPv217clint_sleep_until8uint32_t13clint_mtime_t"></span><span id="clint_sleep_until__uint32_t.clint_mtime_t"></span><span class="target" id="group__drivers__clint_1ga8b75ef6be910bd99c8cb2db64156dd78"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_sleep_until</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timer_idx</span></span>, <a class="reference internal" href="#_CPPv413clint_mtime_t" title="clint_mtime_t"><span class="n"><span class="pre">clint_mtime_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">tgt_mtime</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417clint_sleep_until8uint32_t13clint_mtime_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Puts the core to sleep until the specified CLINT mtime value is reached. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timer_idx</strong> – Timer index. </p></li>
+<li><p><strong>tgt_mtime</strong> – Target CLINT time value for wakeup. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417clint_sleep_ticks8uint32_t8uint32_t">
+<span id="_CPPv317clint_sleep_ticks8uint32_t8uint32_t"></span><span id="_CPPv217clint_sleep_ticks8uint32_t8uint32_t"></span><span id="clint_sleep_ticks__uint32_t.uint32_t"></span><span class="target" id="group__drivers__clint_1gadcfa7b95cad58ee5354e709f985cab11"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_sleep_ticks</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timer_idx</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ticks</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417clint_sleep_ticks8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Puts the core to sleep for a specified number of ticks. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>timer_idx</strong> – Timer index. </p></li>
+<li><p><strong>ticks</strong> – Number of clock cycles to sleep. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419default_trap_vectorv">
+<span id="_CPPv319default_trap_vectorv"></span><span id="_CPPv219default_trap_vectorv"></span><span id="default_trap_vector__void"></span><span class="target" id="group__drivers__clint_1ga9a04c7fe4cd4077bd8793977d14cb70e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_trap_vector</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419default_trap_vectorv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default trap vector handler. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-variables">Variables</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv417default_clint_api">
+<span id="_CPPv317default_clint_api"></span><span id="_CPPv217default_clint_api"></span><span id="default_clint_api__chi_interrupt_api_tC"></span><span class="target" id="group__drivers__clint_1gab8b00ad9283056c8e69944565e9adec6"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_api_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_clint_api</span></span></span><a class="headerlink" href="#_CPPv417default_clint_api" title="Link to this definition"></a><br /></dt>
+<dd><p>CLINT’s implementation of the generic interrupt-controller API. </p>
+<p>Users should use the <code class="docutils literal notranslate"><span class="pre">chi_interrupt_t</span></code> + <code class="docutils literal notranslate"><span class="pre">interrupt_api</span></code> abstraction when driving CLINT. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv418default_clint_inst">
+<span id="_CPPv318default_clint_inst"></span><span id="_CPPv218default_clint_inst"></span><span id="default_clint_inst__chi_interrupt_t"></span><span class="target" id="group__drivers__clint_1ga711ee23cb81ba07cc78e5e18f1417491"></span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_clint_inst</span></span></span><a class="headerlink" href="#_CPPv418default_clint_inst" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv413clint_mtime_t">
+<span id="_CPPv313clint_mtime_t"></span><span id="_CPPv213clint_mtime_t"></span><span id="clint_mtime_t"></span><span class="target" id="structclint__mtime__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint_mtime_t</span></span></span><a class="headerlink" href="#_CPPv413clint_mtime_t" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;clint.h&gt;</em></div>
+<p>Platform-specific mtime type definition. </p>
+<p><ul class="simple">
+<li><p>In a 64-bit system, <a class="reference internal" href="#structclint__mtime__t"><span class="std std-ref">clint_mtime_t</span></a> is typedef’d to uint64_t.</p></li>
+<li><p>In a 32-bit system, <a class="reference internal" href="#structclint__mtime__t"><span class="std std-ref">clint_mtime_t</span></a> is a structure with <code class="docutils literal notranslate"><span class="pre">.low</span></code> and <code class="docutils literal notranslate"><span class="pre">.high</span></code> members.</p></li>
+</ul>
+</p>
+<p>32-bit representation of mtime (split into low/high). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13clint_mtime_t3lowE">
+<span id="_CPPv3N13clint_mtime_t3lowE"></span><span id="_CPPv2N13clint_mtime_t3lowE"></span><span id="clint_mtime_t::low__uint32_t"></span><span class="target" id="structclint__mtime__t_1af4cec7f5c10b8da11df15b6a60c10d15"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">low</span></span></span><a class="headerlink" href="#_CPPv4N13clint_mtime_t3lowE" title="Link to this definition"></a><br /></dt>
+<dd><p>Lower 32 bits of mtime. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N13clint_mtime_t4highE">
+<span id="_CPPv3N13clint_mtime_t4highE"></span><span id="_CPPv2N13clint_mtime_t4highE"></span><span id="clint_mtime_t::high__uint32_t"></span><span class="target" id="structclint__mtime__t_1ac8742d5c3ea611ad5b5b19b1f181fcef"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">high</span></span></span><a class="headerlink" href="#_CPPv4N13clint_mtime_t4highE" title="Link to this definition"></a><br /></dt>
+<dd><p>Upper 32 bits of mtime. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<section id="bit-clint-driver">
+<h2>64-bit CLINT Driver<a class="headerlink" href="#bit-clint-driver" title="Link to this heading"></a></h2>
+<p>The 64-bit CLINT driver implements timer and interrupt functionalities using a 64-bit data type (<cite>uint64_t</cite>) for the mtime register. This configuration is activated when the <cite>PLATFORM_IS_64BIT</cite> flag is defined.</p>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__drivers__clint__64"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">64-bit</span> <span class="pre">CLINT</span> <span class="pre">Driver</span></span></dt>
+<dd><p>64-bit CLINT driver implementation for Chimera-SDK. </p>
+<p>This header provides the declarations for the 64-bit CLINT driver. The generic CLINT HAL API functions (declared in hal/inc/clint.h) are aliased to the 64-bit implementations in this driver. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.PLATFORM_IS_64BIT">
+<span class="target" id="group__drivers__clint__64_1ga358276678ea98a816b4f7a7e7d159e58"></span><span class="sig-name descname"><span class="n"><span class="pre">PLATFORM_IS_64BIT</span></span></span><a class="headerlink" href="#c.PLATFORM_IS_64BIT" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412clint64_initPK15chi_interrupt_t">
+<span id="_CPPv312clint64_initPK15chi_interrupt_t"></span><span id="_CPPv212clint64_initPK15chi_interrupt_t"></span><span id="clint64_init__chi_interrupt_tCP"></span><span class="target" id="group__drivers__clint__64_1ga16563cffd538c320d3668dd6e0036db4"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint64_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412clint64_initPK15chi_interrupt_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424clint64_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv">
+<span id="_CPPv324clint64_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv"></span><span id="_CPPv224clint64_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv"></span><span id="clint64_register_handler__chi_interrupt_tCP.i.chi_irq_handler_t.voidP"></span><span class="target" id="group__drivers__clint__64_1ga02afad6205e861e168cbf0b1f1f3e07e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint64_register_handler</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span>, <a class="reference internal" href="../api_hal/api_hal_interrupt.html#_CPPv417chi_irq_handler_t" title="chi_irq_handler_t"><span class="n"><span class="pre">chi_irq_handler_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handler</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424clint64_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418clint64_enable_irqPK15chi_interrupt_ti">
+<span id="_CPPv318clint64_enable_irqPK15chi_interrupt_ti"></span><span id="_CPPv218clint64_enable_irqPK15chi_interrupt_ti"></span><span id="clint64_enable_irq__chi_interrupt_tCP.i"></span><span class="target" id="group__drivers__clint__64_1gae5d8f0e2bfdfef7600c656582c2b79a1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint64_enable_irq</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418clint64_enable_irqPK15chi_interrupt_ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419clint64_disable_irqPK15chi_interrupt_ti">
+<span id="_CPPv319clint64_disable_irqPK15chi_interrupt_ti"></span><span id="_CPPv219clint64_disable_irqPK15chi_interrupt_ti"></span><span id="clint64_disable_irq__chi_interrupt_tCP.i"></span><span class="target" id="group__drivers__clint__64_1ga6e9349f33b185f757fbecc6774a8f0f9"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint64_disable_irq</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419clint64_disable_irqPK15chi_interrupt_ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420clint64_set_priorityPK15chi_interrupt_tii">
+<span id="_CPPv320clint64_set_priorityPK15chi_interrupt_tii"></span><span id="_CPPv220clint64_set_priorityPK15chi_interrupt_tii"></span><span id="clint64_set_priority__chi_interrupt_tCP.i.i"></span><span class="target" id="group__drivers__clint__64_1gac8cc7b5c514ca0711b71e1558563dc24"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint64_set_priority</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">priority</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420clint64_set_priorityPK15chi_interrupt_tii" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419clint64_acknowledgePK15chi_interrupt_ti">
+<span id="_CPPv319clint64_acknowledgePK15chi_interrupt_ti"></span><span id="_CPPv219clint64_acknowledgePK15chi_interrupt_ti"></span><span id="clint64_acknowledge__chi_interrupt_tCP.i"></span><span class="target" id="group__drivers__clint__64_1gaa18e44e68cd451119b26c4c9d2dc1f18"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint64_acknowledge</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419clint64_acknowledgePK15chi_interrupt_ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416clint64_dispatchPK15chi_interrupt_t">
+<span id="_CPPv316clint64_dispatchPK15chi_interrupt_t"></span><span id="_CPPv216clint64_dispatchPK15chi_interrupt_t"></span><span id="clint64_dispatch__chi_interrupt_tCP"></span><span class="target" id="group__drivers__clint__64_1gaa776ded6a84f50f484715a45c38656e1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint64_dispatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416clint64_dispatchPK15chi_interrupt_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="id1">
+<h2>32-bit CLINT Driver<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>The 32-bit CLINT driver adapts the timer and sleep functionalities for 32-bit platforms by representing the mtime register as a structure with two 32-bit members (<cite>low</cite> and <cite>high</cite>). This approach maintains compatibility with 32-bit systems while delivering equivalent performance and functionality as the 64-bit version.</p>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__drivers__clint__32"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">32-bit</span> <span class="pre">CLINT</span> <span class="pre">Driver</span></span></dt>
+<dd><p>32-bit CLINT driver implementation for Chimera-SDK. </p>
+<p>This file provides the implementation of the 32-bit CLINT driver. It includes functions for reading the current time, comparing times, spinning until a target time, and sleeping until a target time.</p>
+<p>This header provides the declarations for the 32-bit CLINT driver. The generic CLINT HAL API functions (declared in hal/inc/clint.h) are aliased to the 32-bit implementations in this driver. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412clint32_initPK15chi_interrupt_t">
+<span id="_CPPv312clint32_initPK15chi_interrupt_t"></span><span id="_CPPv212clint32_initPK15chi_interrupt_t"></span><span id="clint32_init__chi_interrupt_tCP"></span><span class="target" id="group__drivers__clint__32_1gaa188204166b9beabf83feaf5c65f780c"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint32_init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412clint32_initPK15chi_interrupt_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424clint32_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv">
+<span id="_CPPv324clint32_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv"></span><span id="_CPPv224clint32_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv"></span><span id="clint32_register_handler__chi_interrupt_tCP.i.chi_irq_handler_t.voidP"></span><span class="target" id="group__drivers__clint__32_1ga3af4e762943bed3f49758c57573e72f6"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint32_register_handler</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span>, <a class="reference internal" href="../api_hal/api_hal_interrupt.html#_CPPv417chi_irq_handler_t" title="chi_irq_handler_t"><span class="n"><span class="pre">chi_irq_handler_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">handler</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">arg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424clint32_register_handlerPK15chi_interrupt_ti17chi_irq_handler_tPv" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418clint32_enable_irqPK15chi_interrupt_ti">
+<span id="_CPPv318clint32_enable_irqPK15chi_interrupt_ti"></span><span id="_CPPv218clint32_enable_irqPK15chi_interrupt_ti"></span><span id="clint32_enable_irq__chi_interrupt_tCP.i"></span><span class="target" id="group__drivers__clint__32_1ga39e4d51561992d00ba63b25cb333ff03"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint32_enable_irq</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418clint32_enable_irqPK15chi_interrupt_ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419clint32_disable_irqPK15chi_interrupt_ti">
+<span id="_CPPv319clint32_disable_irqPK15chi_interrupt_ti"></span><span id="_CPPv219clint32_disable_irqPK15chi_interrupt_ti"></span><span id="clint32_disable_irq__chi_interrupt_tCP.i"></span><span class="target" id="group__drivers__clint__32_1ga549f4aabf3607451765c07badc7991d3"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint32_disable_irq</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419clint32_disable_irqPK15chi_interrupt_ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420clint32_set_priorityPK15chi_interrupt_tii">
+<span id="_CPPv320clint32_set_priorityPK15chi_interrupt_tii"></span><span id="_CPPv220clint32_set_priorityPK15chi_interrupt_tii"></span><span id="clint32_set_priority__chi_interrupt_tCP.i.i"></span><span class="target" id="group__drivers__clint__32_1ga413a28489e7703faa2048c699816c588"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint32_set_priority</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">prio</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420clint32_set_priorityPK15chi_interrupt_tii" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419clint32_acknowledgePK15chi_interrupt_ti">
+<span id="_CPPv319clint32_acknowledgePK15chi_interrupt_ti"></span><span id="_CPPv219clint32_acknowledgePK15chi_interrupt_ti"></span><span id="clint32_acknowledge__chi_interrupt_tCP.i"></span><span class="target" id="group__drivers__clint__32_1ga3767dadfb22bb22855043e434980a26f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint32_acknowledge</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">irq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419clint32_acknowledgePK15chi_interrupt_ti" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv416clint32_dispatchPK15chi_interrupt_t">
+<span id="_CPPv316clint32_dispatchPK15chi_interrupt_t"></span><span id="_CPPv216clint32_dispatchPK15chi_interrupt_t"></span><span id="clint32_dispatch__chi_interrupt_tCP"></span><span class="target" id="group__drivers__clint__32_1gac83c6de13a5eaf7181a9dcebbc4d907a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">clint32_dispatch</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">chi_interrupt_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ctrl</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv416clint32_dispatchPK15chi_interrupt_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_ll_drivers_uart.html" class="btn btn-neutral float-left" title="UART" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_ll_drivers_cluster.html" class="btn btn-neutral float-right" title="Snitch Clusters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

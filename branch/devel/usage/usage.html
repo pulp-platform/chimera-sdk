@@ -1,0 +1,223 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Folder Structure" href="structure.html" />
+    <link rel="prev" title="Chimera SDK Documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#building-the-sdk">Building the SDK</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#generic-environment">Generic Environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#iis-workstations">IIS Workstations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#targets">Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visual-studio-code-integration">Visual Studio Code Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<section id="building-the-sdk">
+<h2>Building the SDK<a class="headerlink" href="#building-the-sdk" title="Link to this heading"></a></h2>
+<p>The applications are built with RISC-V LLVM 12.0.1 or later to ensure compatibility.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>For LLVM versions less than 15, linker relaxation is not supported and thus disabled.</p>
+</div>
+<section id="generic-environment">
+<h3>Generic Environment<a class="headerlink" href="#generic-environment" title="Link to this heading"></a></h3>
+<p>To build the SDK and all tests contained in the SDK, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-DTARGET_PLATFORM<span class="o">=</span>&lt;target&gt;<span class="w"> </span>-B<span class="w"> </span>build
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+<p>where you should replace <code class="docutils literal notranslate"><span class="pre">[YOURTARGETPLATFORM]</span></code> by one of the platforms defined in <code class="docutils literal notranslate"><span class="pre">targets/CMakeLists.txt</span></code> under <code class="docutils literal notranslate"><span class="pre">AVAILABLE_TARGETS</span></code>.
+The resulting binaries will be stored in <code class="docutils literal notranslate"><span class="pre">build/bin</span></code>, and can be used within the <code class="docutils literal notranslate"><span class="pre">chimera</span></code> repo as tests.</p>
+<p>If you did not globally install the toolchain, you need to specify the <code class="docutils literal notranslate"><span class="pre">TOOLCHAIN_DIR</span></code> parameter when running cmake.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-DTARGET_PLATFORM<span class="o">=</span>&lt;target&gt;<span class="w"> </span>-DTOOLCHAIN_DIR<span class="o">=</span>&lt;path-to-toolchain&gt;<span class="w"> </span>../
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+</section>
+<section id="iis-workstations">
+<h3>IIS Workstations<a class="headerlink" href="#iis-workstations" title="Link to this heading"></a></h3>
+<p>On IIS systems, users can use the pre-installed LLVM compiler by activating the riscv environment with the <code class="docutils literal notranslate"><span class="pre">riscv</span></code> command.
+This command sets the necessary environment variables for the toolchain.
+To build the SDK, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>riscv<span class="w"> </span>zsh<span class="w"> </span><span class="c1"># Setup the default riscv environment (modifies PATH and LD_LIBRARY_PATH)</span>
+cmake-3.28.3<span class="w"> </span>-DTARGET_PLATFORM<span class="o">=</span>&lt;target&gt;<span class="w"> </span>-DTOOLCHAIN_DIR<span class="o">=</span>/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0<span class="w"> </span>-B<span class="w"> </span>build
+cmake-3.28.3<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+</section>
+</section>
+<section id="targets">
+<h2>Targets<a class="headerlink" href="#targets" title="Link to this heading"></a></h2>
+<p>The SDK supports multiple targets, each with a different configuration. The available targets are defined in <code class="docutils literal notranslate"><span class="pre">targets/CMakeLists.txt</span></code> under <code class="docutils literal notranslate"><span class="pre">AVAILABLE_TARGETS</span></code>. The following targets are currently available:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera-convolve</span></code>: Target for the CONVOLVE project.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera-host</span></code>: Target with a single host core without clusters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera-open</span></code>: Default target with multiple clusters.</p></li>
+</ul>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading"></a></h2>
+<p>You can test the functional correctness of your code with the event-based simulator <a class="reference external" href="https://github.com/gvsoc/gvsoc">GVSoC</a>. To install GVSoC, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>gvsoc
+</pre></div>
+</div>
+<p>By default, this Makefile will install GVSoC in the <code class="docutils literal notranslate"><span class="pre">install/gvsoc</span></code> folder. If you want to change the install location, you can define the <code class="docutils literal notranslate"><span class="pre">GVSOC_INSTALL_DIR</span></code> symbol pointing at the desired install location.</p>
+<p>Finally, you can execute the tests by running the following command from GVSoC’s root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./install/bin/gvsoc<span class="w"> </span>--target<span class="o">=</span>chimera<span class="w"> </span>--binary<span class="w"> </span>&lt;path-to-binary&gt;<span class="w"> </span>run
+</pre></div>
+</div>
+</section>
+<section id="visual-studio-code-integration">
+<h2>Visual Studio Code Integration<a class="headerlink" href="#visual-studio-code-integration" title="Link to this heading"></a></h2>
+<p>To enable automatic configuration of the C/C++ extension and support for the integrated cMake build flow on the IIS workstations, add the following content to <code class="docutils literal notranslate"><span class="pre">.vscode/settings.json</span></code>:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;cmake.configureSettings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;TOOLCHAIN_DIR&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;TARGET_PLATFORM&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;chimera-convolve&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;cmake.cmakePath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cmake-3.28.3&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you are not on an IIS system, you need to adjust the paths according to your local installation.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Chimera SDK Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="structure.html" class="btn btn-neutral float-right" title="Folder Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

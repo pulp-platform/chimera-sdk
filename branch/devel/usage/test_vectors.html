@@ -1,0 +1,232 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Vectors &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CI System" href="ci.html" />
+    <link rel="prev" title="CMake Build System" href="build.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">CMake Build System</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Test Vectors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#test-vector-sources">Test Vector Sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#regenerating-from-the-build">Regenerating from the build</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#selecting-a-shape">Selecting a shape</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-new-generator">Adding a new generator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Test Vectors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/test_vectors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="test-vectors">
+<h1>Test Vectors<a class="headerlink" href="#test-vectors" title="Link to this heading"></a></h1>
+<p>The input and golden tensors used by the tests have to be <strong>generated</strong>. A fresh clone therefore has no test data, and the build will stop with a
+message telling you to generate it.</p>
+<p>Generate everything with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">scripts</span><span class="o">/</span><span class="n">generate_test_vectors</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Run it once after cloning, and again whenever a generator changes.</p>
+<p>This includes the per-shape <code class="docutils literal notranslate"><span class="pre">ITA_dims_*.h</span></code> headers, which declare which
+shapes exist and drive the shape selection described below. Nothing under a
+test’s <code class="docutils literal notranslate"><span class="pre">include/</span></code> or <code class="docutils literal notranslate"><span class="pre">src_cluster/</span></code> is tracked once it is generated.</p>
+<section id="test-vector-sources">
+<h2>Test Vector Sources<a class="headerlink" href="#test-vector-sources" title="Link to this heading"></a></h2>
+<p>The vectors come from two places:</p>
+<p><strong>Per-test generators.</strong> Most tests ship a <code class="docutils literal notranslate"><span class="pre">generate_vectors.py</span></code> next to their
+sources. These need only <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, seed it, and write the same files every
+time. They also encode the kernel’s reference model, so they double as
+executable documentation of what the test checks.</p>
+<p><strong>ITA’s test-vector generator.</strong> The <code class="docutils literal notranslate"><span class="pre">ITA_MatMul_L1</span></code>, <code class="docutils literal notranslate"><span class="pre">ITA_MatMul_L2</span></code> and
+<code class="docutils literal notranslate"><span class="pre">ITA_SHA_L2</span></code> tests use data laid out in the tiled order the ITA accelerator
+consumes. That layout is produced by <code class="docutils literal notranslate"><span class="pre">testGenerator.py</span></code> in
+<a class="reference external" href="https://github.com/pulp-platform/ITA">pulp-platform/ITA</a>, which is also what
+feeds ITA’s own RTL testbench. <code class="docutils literal notranslate"><span class="pre">scripts/generate_test_vectors.py</span></code> clones ITA into a temporary
+directory, runs its generator for each required shape, and rewrites the
+per-shape <code class="docutils literal notranslate"><span class="pre">ITA_mem_&lt;shape&gt;.c</span></code> files.</p>
+<p>If you already have a checkout, point at it to skip the clone:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">scripts</span><span class="o">/</span><span class="n">generate_test_vectors</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">ita</span><span class="o">-</span><span class="nb">dir</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">ITA</span>
+</pre></div>
+</div>
+<p>To build only the tests that need no ITA checkout:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">scripts</span><span class="o">/</span><span class="n">generate_test_vectors</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">skip</span><span class="o">-</span><span class="n">ita</span>
+</pre></div>
+</div>
+<p>Both sources are deterministic: the per-test generators seed numpy, and ITA’s
+<code class="docutils literal notranslate"><span class="pre">testGenerator.py</span></code> seeds it too (<code class="docutils literal notranslate"><span class="pre">--seed</span></code>, default <code class="docutils literal notranslate"><span class="pre">0</span></code>). Re-running
+produces byte-identical output.</p>
+</section>
+<section id="regenerating-from-the-build">
+<h2>Regenerating from the build<a class="headerlink" href="#regenerating-from-the-build" title="Link to this heading"></a></h2>
+<p>Tests whose generator is registered with CMake can also be refreshed from the
+build directory:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="o">&lt;</span><span class="n">build</span><span class="o">-</span><span class="nb">dir</span><span class="o">&gt;</span> <span class="o">--</span><span class="n">target</span> <span class="n">regenerate</span><span class="o">-</span><span class="n">test</span><span class="o">-</span><span class="n">vectors</span>
+</pre></div>
+</div>
+<p>This covers the per-test generators only; the ITA data needs the script above.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This target cannot bootstrap a fresh clone. Configuring stops as soon as it
+finds a missing vector, so the target does not exist yet at that point. Run
+<code class="docutils literal notranslate"><span class="pre">scripts/generate_test_vectors.py</span></code> first; the target is for refreshing
+vectors afterwards.</p>
+</div>
+</section>
+<section id="selecting-a-shape">
+<h2>Selecting a shape<a class="headerlink" href="#selecting-a-shape" title="Link to this heading"></a></h2>
+<p>Tests that ship several problem sizes pick one at configure time rather than by
+commenting includes in and out:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cmake</span> <span class="o">-</span><span class="n">DITA_MATMUL_L1_SHAPE</span><span class="o">=</span><span class="mi">64</span><span class="n">x512x64</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>Available shapes are discovered from the <code class="docutils literal notranslate"><span class="pre">ITA_dims_*.h</span></code> (or
+<code class="docutils literal notranslate"><span class="pre">testinputs_*.h</span></code>) headers a generator has written into the test, so adding a
+new shape is a matter of teaching the generator about it. An unknown shape, or
+one whose header and source disagree, triggers a configure-time error.</p>
+</section>
+<section id="adding-a-new-generator">
+<h2>Adding a new generator<a class="headerlink" href="#adding-a-new-generator" title="Link to this heading"></a></h2>
+<p>Write a <code class="docutils literal notranslate"><span class="pre">generate_vectors.py</span></code> in the test directory that takes <code class="docutils literal notranslate"><span class="pre">--output-*</span></code>
+arguments defaulting to the paths the test includes, then register it in the
+test’s <code class="docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>chimera_test_vector_generator(
+  GENERATOR ${CMAKE_CURRENT_SOURCE_DIR}/generate_vectors.py
+  OUTPUTS
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testinputs_16x16x16.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/testoutputs_16x16x16.h
+)
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">OUTPUTS</span></code> lists the files the generator writes; they are checked at configure
+time and refreshed by the target above. Finally add the test directory to
+<code class="docutils literal notranslate"><span class="pre">NUMPY_TESTS</span></code> in <code class="docutils literal notranslate"><span class="pre">scripts/generate_test_vectors.py</span></code> and make sure the new
+outputs are covered by the <code class="docutils literal notranslate"><span class="pre">.gitignore</span></code> patterns.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="build.html" class="btn btn-neutral float-left" title="CMake Build System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ci.html" class="btn btn-neutral float-right" title="CI System" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

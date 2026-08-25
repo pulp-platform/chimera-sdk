@@ -1,0 +1,211 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Device API Reference &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="CMake API Reference" href="../api_cmake/api_cmake.html" />
+    <link rel="prev" title="Memory Allocation" href="../api_ll/api_ll_runtime_alloc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_ll/api_ll.html">Host Runtime API Reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Device API Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#snitch-cluster">Snitch Cluster</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411_trampolinev"><code class="docutils literal notranslate"><span class="pre">_trampoline()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c._SETUP_GP"><code class="docutils literal notranslate"><span class="pre">_SETUP_GP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.__CLUSTER_ID_ASM"><code class="docutils literal notranslate"><span class="pre">__CLUSTER_ID_ASM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c._SET_CLUSTER_BUSY"><code class="docutils literal notranslate"><span class="pre">_SET_CLUSTER_BUSY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c._CLEAR_CLUSTER_BUSY"><code class="docutils literal notranslate"><span class="pre">_CLEAR_CLUSTER_BUSY</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+      <li class="breadcrumb-item active">Device API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_device/api_device.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="device-api-reference">
+<h1>Device API Reference<a class="headerlink" href="#device-api-reference" title="Link to this heading"></a></h1>
+<section id="snitch-cluster">
+<h2>Snitch Cluster<a class="headerlink" href="#snitch-cluster" title="Link to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv411_trampolinev">
+<span id="_CPPv311_trampolinev"></span><span id="_CPPv211_trampolinev"></span><span id="_trampoline"></span><span class="target" id="group__device__snitchCluster_1ga6c98f06718675670297012ba2f23418f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_trampoline</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv411_trampolinev" title="Link to this definition"></a><br /></dt>
+<dd><p>Trampoline function for the cluster core. This function will set up the stack pointer and call the function. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Make sure that this function is compiled with ISA for the Snitch cores (RV32IM) </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c._SETUP_GP">
+<span class="target" id="group__device__snitchCluster_1gac66b99da34fd585a3b99fb18a9664a50"></span><span class="sig-name descname"><span class="n"><span class="pre">_SETUP_GP</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c._SETUP_GP" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup the core to a known state. </p>
+<p>This function will set up the global pointer and thread pointer for the core. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.__CLUSTER_ID_ASM">
+<span class="target" id="group__device__snitchCluster_1ga6296155fe071452aa161d0b6ae833a05"></span><span class="sig-name descname"><span class="n"><span class="pre">__CLUSTER_ID_ASM</span></span></span><a class="headerlink" href="#c.__CLUSTER_ID_ASM" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate the cluster ID from mhartid and set busy flag. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a string fragment intended to be used inside an asm volatile block. It reqires the following operands: %0: Base address of the busy register for cluster 0 %1: Threshold for cluster 1 %2: Threshold for cluster 2 %3: Threshold for cluster 3 %4: Threshold for cluster 4 </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c._SET_CLUSTER_BUSY">
+<span class="target" id="group__device__snitchCluster_1ga6b3b9bc6a815107440040ae6dacf2de4"></span><span class="sig-name descname"><span class="n"><span class="pre">_SET_CLUSTER_BUSY</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c._SET_CLUSTER_BUSY" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute cluster id form the hartid adn set busy flag. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a naked-friendly macro intended to be used inside an asm volatile block. </p>
+</div>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c._CLEAR_CLUSTER_BUSY">
+<span class="target" id="group__device__snitchCluster_1gad02796da1af1352f626686cc91ab6f02"></span><span class="sig-name descname"><span class="n"><span class="pre">_CLEAR_CLUSTER_BUSY</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#c._CLEAR_CLUSTER_BUSY" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute cluster id from <code class="docutils literal notranslate"><span class="pre">mhartid</span></code> and clear busy. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a naked-friendly macro intended to be used inside an asm volatile block. </p>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api_ll/api_ll_runtime_alloc.html" class="btn btn-neutral float-left" title="Memory Allocation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api_cmake/api_cmake.html" class="btn btn-neutral float-right" title="CMake API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

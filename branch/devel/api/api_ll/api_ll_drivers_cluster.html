@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snitch Clusters &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="FLL" href="api_ll_drivers_fll.html" />
+    <link rel="prev" title="CLINT" href="api_ll_drivers_clint.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api_ll.html">Host Runtime API Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_uart.html">UART</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_clint.html">CLINT</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Snitch Clusters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv420_trampoline_function"><code class="docutils literal notranslate"><span class="pre">_trampoline_function</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416_trampoline_args"><code class="docutils literal notranslate"><span class="pre">_trampoline_args</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417_trampoline_stack"><code class="docutils literal notranslate"><span class="pre">_trampoline_stack</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv420_generate_trampoline8uint32_tPFvPvEPvPv"><code class="docutils literal notranslate"><span class="pre">_generate_trampoline()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412_get_hart_id8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">_get_hart_id()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv436setup_snitchCluster_interruptHandlerPv"><code class="docutils literal notranslate"><span class="pre">setup_snitchCluster_interruptHandler()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv426generate_snitchCluster_SPs7uint8_tPvP8uint32_tPPv"><code class="docutils literal notranslate"><span class="pre">generate_snitchCluster_SPs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv434generate_snitchCluster_SPs_uniform7uint8_tPv8uint32_tPPv"><code class="docutils literal notranslate"><span class="pre">generate_snitchCluster_SPs_uniform()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv426offload_snitchCluster_corePvPvPv7uint8_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">offload_snitchCluster_core()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv421offload_snitchClusterPvPvPPv7uint8_t"><code class="docutils literal notranslate"><span class="pre">offload_snitchCluster()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418snitchCluster_busy7uint8_t"><code class="docutils literal notranslate"><span class="pre">snitchCluster_busy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423wait_snitchCluster_busy7uint8_t"><code class="docutils literal notranslate"><span class="pre">wait_snitchCluster_busy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv425wait_snitchCluster_return7uint8_t"><code class="docutils literal notranslate"><span class="pre">wait_snitchCluster_return()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv429set_snitchCluster_clockGating7uint8_tb"><code class="docutils literal notranslate"><span class="pre">set_snitchCluster_clockGating()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv432setAll_snitchCluster_clockGatingb"><code class="docutils literal notranslate"><span class="pre">setAll_snitchCluster_clockGating()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423set_snitchCluster_reset7uint8_tb"><code class="docutils literal notranslate"><span class="pre">set_snitchCluster_reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv426setAll_snitchCluster_resetb"><code class="docutils literal notranslate"><span class="pre">setAll_snitchCluster_reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418snitchcluster_openP12chi_device_t"><code class="docutils literal notranslate"><span class="pre">snitchcluster_open()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv419snitchcluster_closeP12chi_device_t"><code class="docutils literal notranslate"><span class="pre">snitchcluster_close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418snitchcluster_readP12chi_device_tPv8uint32_t21chi_device_callback_t"><code class="docutils literal notranslate"><span class="pre">snitchcluster_read()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_fll.html">FLL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_alloc.html">Memory Allocation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="api_ll.html">Host Runtime API Reference</a></li>
+      <li class="breadcrumb-item active">Snitch Clusters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_ll/api_ll_drivers_cluster.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="snitch-clusters">
+<h1>Snitch Clusters<a class="headerlink" href="#snitch-clusters" title="Link to this heading"></a></h1>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv420_trampoline_function">
+<span id="_CPPv320_trampoline_function"></span><span id="_CPPv220_trampoline_function"></span><span class="target" id="group__drivers__snitch__cluster_1ga1f65ed3121aab450d961781c7ae79d1e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">_trampoline_function</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">NUM_CLUSTER_CORES</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="n"><span class="pre">NULL</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv420_trampoline_function" title="Link to this definition"></a><br /></dt>
+<dd><p>Persistent trampoline function pointers for each cluster core. </p>
+<p>Each entry holds the function to be called by the trampoline on the corresponding core. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv416_trampoline_args">
+<span id="_CPPv316_trampoline_args"></span><span id="_CPPv216_trampoline_args"></span><span id="_trampoline_args__voidPA"></span><span class="target" id="group__drivers__snitch__cluster_1gacc3ed7f99ea2bd9977b27ec7dbd83df1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">_trampoline_args</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">NUM_CLUSTER_CORES</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="n"><span class="pre">NULL</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv416_trampoline_args" title="Link to this definition"></a><br /></dt>
+<dd><p>Persistent argument storage for each cluster core’s trampoline function. </p>
+<p>Each entry holds the <code class="docutils literal notranslate"><span class="pre">void*</span></code> argument passed to the trampoline on the corresponding core. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv417_trampoline_stack">
+<span id="_CPPv317_trampoline_stack"></span><span id="_CPPv217_trampoline_stack"></span><span id="_trampoline_stack__voidPA"></span><span class="target" id="group__drivers__snitch__cluster_1gac71b2ead45680a19fe3e83b9bc757200"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">_trampoline_stack</span></span></span><span class="p"><span class="pre">[</span></span><span class="n"><span class="pre">NUM_CLUSTER_CORES</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="n"><span class="pre">NULL</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv417_trampoline_stack" title="Link to this definition"></a><br /></dt>
+<dd><p>Persistent stack pointer storage for each cluster core’s trampoline context. </p>
+<p>Each entry holds the stack pointer to be loaded by the trampoline on the corresponding core. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420_generate_trampoline8uint32_tPFvPvEPvPv">
+<span id="_CPPv320_generate_trampoline8uint32_tPFvPvEPvPv"></span><span id="_CPPv220_generate_trampoline8uint32_tPFvPvEPvPv"></span><span class="target" id="group__drivers__snitch__cluster_1ga97fe98a075c0e02def1c574fae7cc346"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">_generate_trampoline</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">hartID</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">function</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="kt"><span class="pre">void</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">)</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">args</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stack</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420_generate_trampoline8uint32_tPFvPvEPvPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate a trampoline function for the cluster core. The trampoline function will set up the stack pointer and call the function. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hartID</strong> – hart ID of the core to offload to </p></li>
+<li><p><strong>function</strong> – Function pointer to offload </p></li>
+<li><p><strong>args</strong> – Arguments to pass to the function </p></li>
+<li><p><strong>stack</strong> – Stack pointer for core </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A pointer to the persistent trampoline function </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv412_get_hart_id8uint32_t8uint32_t">
+<span id="_CPPv312_get_hart_id8uint32_t8uint32_t"></span><span id="_CPPv212_get_hart_id8uint32_t8uint32_t"></span><span id="_get_hart_id__uint32_t.uint32_t"></span><span class="target" id="group__drivers__snitch__cluster_1ga532d2713ecbe5e958053b71b39b365c3"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">_get_hart_id</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">core_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv412_get_hart_id8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the hart ID of a core within a cluster. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clusterId</strong> – ID of the cluster </p></li>
+<li><p><strong>core_id</strong> – ID of the core</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>uint32_t Hart ID of the core </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv436setup_snitchCluster_interruptHandlerPv">
+<span id="_CPPv336setup_snitchCluster_interruptHandlerPv"></span><span id="_CPPv236setup_snitchCluster_interruptHandlerPv"></span><span id="setup_snitchCluster_interruptHandler__voidP"></span><span class="target" id="group__drivers__snitch__cluster_1ga88b5393b1dc7b6a9865e7b9abb8db3b1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setup_snitchCluster_interruptHandler</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">handler</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv436setup_snitchCluster_interruptHandlerPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Setup the interrupt handler for the cluster cores. All cores in all clusters will jump to the handler when an interrupt is triggered. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>handler</strong> – Function pointer to the interrupt handler </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426generate_snitchCluster_SPs7uint8_tPvP8uint32_tPPv">
+<span id="_CPPv326generate_snitchCluster_SPs7uint8_tPvP8uint32_tPPv"></span><span id="_CPPv226generate_snitchCluster_SPs7uint8_tPvP8uint32_tPPv"></span><span id="generate_snitchCluster_SPs__uint8_t.voidP.uint32_tP.voidPP"></span><span class="target" id="group__drivers__snitch__cluster_1gaf2e6c7fc7b082f012153f691a7f1b1be"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">generate_snitchCluster_SPs</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">sp</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stack_size</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stack_ptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426generate_snitchCluster_SPs7uint8_tPvP8uint32_tPPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate the stack pointers for all cores a given cluster using given stack sizes passed on a per-core bases. The stack pointers are generated compliant to the RISCV-ABI and are aligned to 16-Byte boundaries and assumed to grow downwards. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clusterId</strong> – ID of the cluster to generate the stack pointers for </p></li>
+<li><p><strong>sp</strong> – The memory address that serves as a base for the stack pointer </p></li>
+<li><p><strong>stack_size</strong> – <strong>[in]</strong> An array containing the requested stack sizes in Bytes. Must reference an array whose length matches the number of cores in the specified cluster. </p></li>
+<li><p><strong>stack_ptr</strong> – <strong>[out]</strong> An array to hold the generated stack pointers. Must reference an array whose length matches the number of cores in the specified cluster.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The pointer to the end of available memory after allocating all stacks. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434generate_snitchCluster_SPs_uniform7uint8_tPv8uint32_tPPv">
+<span id="_CPPv334generate_snitchCluster_SPs_uniform7uint8_tPv8uint32_tPPv"></span><span id="_CPPv234generate_snitchCluster_SPs_uniform7uint8_tPv8uint32_tPPv"></span><span id="generate_snitchCluster_SPs_uniform__uint8_t.voidP.uint32_t.voidPP"></span><span class="target" id="group__drivers__snitch__cluster_1gaebbd8f995b1b0cff78f2442594f38952"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">generate_snitchCluster_SPs_uniform</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">sp</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">stack_size</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stack_ptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434generate_snitchCluster_SPs_uniform7uint8_tPv8uint32_tPPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Generate the stack pointers for all cores a given cluster using the given stack size equal for all cores. The stack pointers are generated compliant to the RISCV-ABI and are aligned to 16-Byte boundaries and assumed to grow downwards. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clusterId</strong> – ID of the cluster to generate the stack pointers for </p></li>
+<li><p><strong>sp</strong> – The memory address that serves as a base for the stack pointer </p></li>
+<li><p><strong>stack_size</strong> – The stack size per core in the cluster in bytes. </p></li>
+<li><p><strong>stack_ptr</strong> – <strong>[out]</strong> An array to hold the generated stack pointers. Must reference an array whose length matches the number of cores in the specified cluster.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The pointer to the end of available memory after allocating all stacks. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426offload_snitchCluster_corePvPvPv7uint8_t8uint32_t">
+<span id="_CPPv326offload_snitchCluster_corePvPvPv7uint8_t8uint32_t"></span><span id="_CPPv226offload_snitchCluster_corePvPvPv7uint8_t8uint32_t"></span><span id="offload_snitchCluster_core__voidP.voidP.voidP.uint8_t.uint32_t"></span><span class="target" id="group__drivers__snitch__cluster_1gae1a2e2d5553f57d647c70cfecd1eaa1c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">offload_snitchCluster_core</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">function</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">args</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stack_ptr</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">core_id</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426offload_snitchCluster_corePvPvPv7uint8_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Offload a void function pointer to a cluster’s core. The function will be executed on the specified core of the cluster. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> – Function pointer to offload </p></li>
+<li><p><strong>args</strong> – Arguments to pass to the function </p></li>
+<li><p><strong>stack_ptr</strong> – Stack pointer for the core </p></li>
+<li><p><strong>clusterId</strong> – ID of the cluster to offload to </p></li>
+<li><p><strong>core_id</strong> – ID of the core to offload to (cores are 0-indexed for each cluster) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421offload_snitchClusterPvPvPPv7uint8_t">
+<span id="_CPPv321offload_snitchClusterPvPvPPv7uint8_t"></span><span id="_CPPv221offload_snitchClusterPvPvPPv7uint8_t"></span><span id="offload_snitchCluster__voidP.voidP.voidPP.uint8_t"></span><span class="target" id="group__drivers__snitch__cluster_1ga4e789ca5bf006a8fb44f60b79d573cf9"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">offload_snitchCluster</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">function</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">args</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">stack_ptr</span></span>, <span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421offload_snitchClusterPvPvPPv7uint8_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Offload a void function pointer to a cluster. The function will be executed on all cores of the cluster. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>function</strong> – Function pointer to offload </p></li>
+<li><p><strong>args</strong> – Arguments to pass to the function </p></li>
+<li><p><strong>stack_ptr</strong> – Array containing the stack pointers for the cores. The length must equal the number of cores in the cluster </p></li>
+<li><p><strong>clusterId</strong> – ID of the cluster to offload to </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418snitchCluster_busy7uint8_t">
+<span id="_CPPv318snitchCluster_busy7uint8_t"></span><span id="_CPPv218snitchCluster_busy7uint8_t"></span><span id="snitchCluster_busy__uint8_t"></span><span class="target" id="group__drivers__snitch__cluster_1ga42288a9be36801c6698189b62a330d85"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">snitchCluster_busy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418snitchCluster_busy7uint8_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Check if the cluster is busy. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>clusterId</strong> – ID of the cluster to check </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Return 1 if the cluster is busy, 0 if it is idle, -1 if the cluster ID is invalid </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423wait_snitchCluster_busy7uint8_t">
+<span id="_CPPv323wait_snitchCluster_busy7uint8_t"></span><span id="_CPPv223wait_snitchCluster_busy7uint8_t"></span><span id="wait_snitchCluster_busy__uint8_t"></span><span class="target" id="group__drivers__snitch__cluster_1ga7e9daa75e90d7bb9f07c3b45c02c22a7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">wait_snitchCluster_busy</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423wait_snitchCluster_busy7uint8_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Blocking wait for the cluster to become idle. The function busy waits until the cluster is ready. </p>
+<p><dl>
+<dt class="sig sig-object cpp">
+<em><span class="pre">Todo:</span></em></dt>
+<dd><p>Fix the bootrom after adding synchornization primitives for the Snitch cores.</p>
+</dd></dl>
+
+</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>In the current Snitch bootrom implementation each cores clears the busy flag as soon as is returned. Hence the busy flag does not reflect the actual status of the cluster.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>clusterId</strong> – ID of the cluster to wait for. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425wait_snitchCluster_return7uint8_t">
+<span id="_CPPv325wait_snitchCluster_return7uint8_t"></span><span id="_CPPv225wait_snitchCluster_return7uint8_t"></span><span id="wait_snitchCluster_return__uint8_t"></span><span class="target" id="group__drivers__snitch__cluster_1ga966e074b9b7fdb3f890f8d95dbb29c24"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">wait_snitchCluster_return</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425wait_snitchCluster_return7uint8_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Wait for the cluster to return a value. The return value is written by the last core of the cluster. The function busy waits until the cluster returns a non-zero value. </p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The return values must be non-zero, otherwise the function will busy wait forever!</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>clusterId</strong> – ID of the cluster to wait for. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>uint32_t Return value of the cluster. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv429set_snitchCluster_clockGating7uint8_tb">
+<span id="_CPPv329set_snitchCluster_clockGating7uint8_tb"></span><span id="_CPPv229set_snitchCluster_clockGating7uint8_tb"></span><span id="set_snitchCluster_clockGating__uint8_t.b"></span><span class="target" id="group__drivers__snitch__cluster_1ga72804eb6ec84286e57c760e9b8f10349"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_snitchCluster_clockGating</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enable</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429set_snitchCluster_clockGating7uint8_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set Clock Gating on specified cluster. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clusterId</strong> – ID of the cluster to set clock gating for </p></li>
+<li><p><strong>enable</strong> – true to enable clock gating, false to disable </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv432setAll_snitchCluster_clockGatingb">
+<span id="_CPPv332setAll_snitchCluster_clockGatingb"></span><span id="_CPPv232setAll_snitchCluster_clockGatingb"></span><span id="setAll_snitchCluster_clockGating__b"></span><span class="target" id="group__drivers__snitch__cluster_1gaa289c325c3287c374c98394f6f3559b0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAll_snitchCluster_clockGating</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enable</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv432setAll_snitchCluster_clockGatingb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set Clock Gating on all clusters. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>enable</strong> – true to enable clock gating, false to disable </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423set_snitchCluster_reset7uint8_tb">
+<span id="_CPPv323set_snitchCluster_reset7uint8_tb"></span><span id="_CPPv223set_snitchCluster_reset7uint8_tb"></span><span id="set_snitchCluster_reset__uint8_t.b"></span><span class="target" id="group__drivers__snitch__cluster_1ga52671f8bd1ae92ad75996fefcae9a11a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_snitchCluster_reset</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint8_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">clusterId</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enable</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423set_snitchCluster_reset7uint8_tb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set Soft Reset on specified cluster. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>clusterId</strong> – ID of the cluster to set soft reset for </p></li>
+<li><p><strong>enable</strong> – true to enable soft reset, false to disable </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426setAll_snitchCluster_resetb">
+<span id="_CPPv326setAll_snitchCluster_resetb"></span><span id="_CPPv226setAll_snitchCluster_resetb"></span><span id="setAll_snitchCluster_reset__b"></span><span class="target" id="group__drivers__snitch__cluster_1ga59c4840b4be1c52705d2c310a37da789"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setAll_snitchCluster_reset</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">enable</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426setAll_snitchCluster_resetb" title="Link to this definition"></a><br /></dt>
+<dd><p>Set Soft Reset on all clusters. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>enable</strong> – true to enable soft reset, false to disable </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418snitchcluster_openP12chi_device_t">
+<span id="_CPPv318snitchcluster_openP12chi_device_t"></span><span id="_CPPv218snitchcluster_openP12chi_device_t"></span><span id="snitchcluster_open__chi_device_tP"></span><span class="target" id="group__drivers__snitch__cluster_1gac5a4099c40926eb2af2441675be1a4f8"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">snitchcluster_open</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../api_hal/api_hal_device.html#_CPPv412chi_device_t" title="chi_device_t"><span class="n"><span class="pre">chi_device_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dev</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418snitchcluster_openP12chi_device_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv419snitchcluster_closeP12chi_device_t">
+<span id="_CPPv319snitchcluster_closeP12chi_device_t"></span><span id="_CPPv219snitchcluster_closeP12chi_device_t"></span><span id="snitchcluster_close__chi_device_tP"></span><span class="target" id="group__drivers__snitch__cluster_1gacf36270d6d57159bfe66bbe6965d0719"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">snitchcluster_close</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../api_hal/api_hal_device.html#_CPPv412chi_device_t" title="chi_device_t"><span class="n"><span class="pre">chi_device_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dev</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv419snitchcluster_closeP12chi_device_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418snitchcluster_readP12chi_device_tPv8uint32_t21chi_device_callback_t">
+<span id="_CPPv318snitchcluster_readP12chi_device_tPv8uint32_t21chi_device_callback_t"></span><span id="_CPPv218snitchcluster_readP12chi_device_tPv8uint32_t21chi_device_callback_t"></span><span id="snitchcluster_read__chi_device_tP.voidP.uint32_t.chi_device_callback_t"></span><span class="target" id="group__drivers__snitch__cluster_1ga19dd0a25f22697a9dbf0c254b6c68317"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">snitchcluster_read</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../api_hal/api_hal_device.html#_CPPv412chi_device_t" title="chi_device_t"><span class="n"><span class="pre">chi_device_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">dev</span></span>, <span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">buf</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">len</span></span>, <a class="reference internal" href="../api_hal/api_hal_device.html#_CPPv421chi_device_callback_t" title="chi_device_callback_t"><span class="n"><span class="pre">chi_device_callback_t</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">cb</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418snitchcluster_readP12chi_device_tPv8uint32_t21chi_device_callback_t" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_ll_drivers_clint.html" class="btn btn-neutral float-left" title="CLINT" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_ll_drivers_fll.html" class="btn btn-neutral float-right" title="FLL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

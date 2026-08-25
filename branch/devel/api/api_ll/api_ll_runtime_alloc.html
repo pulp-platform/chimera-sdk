@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Allocation &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Device API Reference" href="../api_device/api_device.html" />
+    <link rel="prev" title="FLL" href="api_ll_drivers_fll.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api_ll.html">Host Runtime API Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_uart.html">UART</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_clint.html">CLINT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_cluster.html">Snitch Clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_fll.html">FLL</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Memory Allocation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#c.ALLOC_ALIGNMENT"><code class="docutils literal notranslate"><span class="pre">ALLOC_ALIGNMENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.ALLOC_ALIGN"><code class="docutils literal notranslate"><span class="pre">ALLOC_ALIGN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv420memory_island_malloc6size_t"><code class="docutils literal notranslate"><span class="pre">memory_island_malloc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418memory_island_freePv"><code class="docutils literal notranslate"><span class="pre">memory_island_free()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv420memory_island_calloc6size_t6size_t"><code class="docutils literal notranslate"><span class="pre">memory_island_calloc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv421memory_island_reallocPv6size_t"><code class="docutils literal notranslate"><span class="pre">memory_island_realloc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423memory_island_heap_sizev"><code class="docutils literal notranslate"><span class="pre">memory_island_heap_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423memory_island_heap_freev"><code class="docutils literal notranslate"><span class="pre">memory_island_heap_free()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423memory_island_heap_usedv"><code class="docutils literal notranslate"><span class="pre">memory_island_heap_used()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423memory_island_ptr_validPv"><code class="docutils literal notranslate"><span class="pre">memory_island_ptr_valid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv424memory_island_heap_checkv"><code class="docutils literal notranslate"><span class="pre">memory_island_heap_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv411MemoryBlock"><code class="docutils literal notranslate"><span class="pre">MemoryBlock</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="api_ll.html">Host Runtime API Reference</a></li>
+      <li class="breadcrumb-item active">Memory Allocation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_ll/api_ll_runtime_alloc.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="memory-allocation">
+<h1>Memory Allocation<a class="headerlink" href="#memory-allocation" title="Link to this heading"></a></h1>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__runtime__alloc"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">Memory</span> <span class="pre">Allocator</span></span></dt>
+<dd><p>Memory allocation subsystem for Chimera-SDK. </p>
+<p>This module provides dynamic memory allocation functionality for the memory island. It implements a simple linked-list based allocator that manages heap memory regions.</p>
+<p>The allocator uses a first-fit algorithm with a freelist to track available memory blocks. Memory is aligned to 4-byte boundaries for optimal performance. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ALLOC_ALIGNMENT">
+<span class="target" id="group__runtime__alloc_1ga0350ac285136ae5a49abecf8c6616fed"></span><span class="sig-name descname"><span class="n"><span class="pre">ALLOC_ALIGNMENT</span></span></span><a class="headerlink" href="#c.ALLOC_ALIGNMENT" title="Link to this definition"></a><br /></dt>
+<dd><p>Memory alignment value in bytes. </p>
+<p>All allocated memory blocks are aligned to this boundary for optimal access performance. </p>
+</dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.ALLOC_ALIGN">
+<span class="target" id="group__runtime__alloc_1ga037cd0a5c77154ff784b200705e7b58f"></span><span class="sig-name descname"><span class="n"><span class="pre">ALLOC_ALIGN</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#c.ALLOC_ALIGN" title="Link to this definition"></a><br /></dt>
+<dd><p>Macro to align a size to the memory alignment boundary. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> – Size in bytes to align. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Aligned size in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420memory_island_malloc6size_t">
+<span id="_CPPv320memory_island_malloc6size_t"></span><span id="_CPPv220memory_island_malloc6size_t"></span><span id="memory_island_malloc__s"></span><span class="target" id="group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_malloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420memory_island_malloc6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Allocates memory from the memory island heap. </p>
+<p>This function allocates a block of memory of the specified size from the memory island heap. The allocated memory is aligned to ALLOC_ALIGNMENT bytes. The memory is not initialized.</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#group__runtime__alloc_1ga5b9af2ee4f0346ea3981957937f2e651"><span class="std std-ref">memory_island_free()</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The allocated memory should be freed using <a class="reference internal" href="#group__runtime__alloc_1ga5b9af2ee4f0346ea3981957937f2e651"><span class="std std-ref">memory_island_free()</span></a> when no longer needed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> – Number of bytes to allocate. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pointer to the allocated memory block, or NULL if allocation fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418memory_island_freePv">
+<span id="_CPPv318memory_island_freePv"></span><span id="_CPPv218memory_island_freePv"></span><span id="memory_island_free__voidP"></span><span class="target" id="group__runtime__alloc_1ga5b9af2ee4f0346ea3981957937f2e651"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_free</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418memory_island_freePv" title="Link to this definition"></a><br /></dt>
+<dd><p>Frees memory previously allocated by <a class="reference internal" href="#group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"><span class="std std-ref">memory_island_malloc()</span></a>. </p>
+<p>This function returns a memory block to the free list, making it available for future allocations. The memory block is added to the head of the freelist for efficient reuse.</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"><span class="std std-ref">memory_island_malloc()</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The pointer must have been returned by a previous call to <a class="reference internal" href="#group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"><span class="std std-ref">memory_island_malloc()</span></a>. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>After calling this function, the memory pointed to by ptr should not be accessed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ptr</strong> – Pointer to the memory block to free. If NULL, the function does nothing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420memory_island_calloc6size_t6size_t">
+<span id="_CPPv320memory_island_calloc6size_t6size_t"></span><span id="_CPPv220memory_island_calloc6size_t6size_t"></span><span id="memory_island_calloc__s.s"></span><span class="target" id="group__runtime__alloc_1ga68b69c7d82ae4b70fadc1f393821268b"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_calloc</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420memory_island_calloc6size_t6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Allocates and zero-initializes memory from the memory island heap. </p>
+<p>This function allocates memory for an array of num elements, each of size bytes, and initializes all bytes to zero.</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"><span class="std std-ref">memory_island_malloc()</span></a></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#group__runtime__alloc_1ga5b9af2ee4f0346ea3981957937f2e651"><span class="std std-ref">memory_island_free()</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The allocated memory should be freed using <a class="reference internal" href="#group__runtime__alloc_1ga5b9af2ee4f0346ea3981957937f2e651"><span class="std std-ref">memory_island_free()</span></a> when no longer needed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num</strong> – Number of elements to allocate. </p></li>
+<li><p><strong>size</strong> – Size of each element in bytes. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pointer to the allocated and zero-initialized memory block, or NULL if allocation fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421memory_island_reallocPv6size_t">
+<span id="_CPPv321memory_island_reallocPv6size_t"></span><span id="_CPPv221memory_island_reallocPv6size_t"></span><span id="memory_island_realloc__voidP.s"></span><span class="target" id="group__runtime__alloc_1ga52ce685a76b0d3f6efef0325a54c146a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_realloc</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span>, <span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421memory_island_reallocPv6size_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Reallocates memory from the memory island heap. </p>
+<p>This function changes the size of the memory block pointed to by ptr to size bytes. The contents are unchanged up to the minimum of the old and new sizes. If the new size is larger, the additional memory is uninitialized.</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"><span class="std std-ref">memory_island_malloc()</span></a></p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#group__runtime__alloc_1ga5b9af2ee4f0346ea3981957937f2e651"><span class="std std-ref">memory_island_free()</span></a></p>
+</div>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If reallocation fails, the original memory block is unchanged. </p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The returned pointer may be different from the input pointer.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ptr</strong> – Pointer to the memory block to reallocate. If NULL, behaves like <a class="reference internal" href="#group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"><span class="std std-ref">memory_island_malloc()</span></a>. </p></li>
+<li><p><strong>size</strong> – New size in bytes. If 0 and ptr is not NULL, behaves like <a class="reference internal" href="#group__runtime__alloc_1ga5b9af2ee4f0346ea3981957937f2e651"><span class="std std-ref">memory_island_free()</span></a>. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Pointer to the reallocated memory block, or NULL if reallocation fails.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423memory_island_heap_sizev">
+<span id="_CPPv323memory_island_heap_sizev"></span><span id="_CPPv223memory_island_heap_sizev"></span><span id="memory_island_heap_size__void"></span><span class="target" id="group__runtime__alloc_1ga042e1b0e8e85748ed6a1e0f3fb7e6c04"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_heap_size</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423memory_island_heap_sizev" title="Link to this definition"></a><br /></dt>
+<dd><p>Gets the total size of the memory island heap. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Total heap size in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423memory_island_heap_freev">
+<span id="_CPPv323memory_island_heap_freev"></span><span id="_CPPv223memory_island_heap_freev"></span><span id="memory_island_heap_free__void"></span><span class="target" id="group__runtime__alloc_1gab35e6e3d851b52c0a9d50413905428e0"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_heap_free</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423memory_island_heap_freev" title="Link to this definition"></a><br /></dt>
+<dd><p>Gets the amount of free memory available in the memory island heap. </p>
+<p>This function calculates the total amount of free memory by traversing the freelist and summing the sizes of all free blocks, plus any remaining unallocated heap space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Amount of free memory in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423memory_island_heap_usedv">
+<span id="_CPPv323memory_island_heap_usedv"></span><span id="_CPPv223memory_island_heap_usedv"></span><span id="memory_island_heap_used__void"></span><span class="target" id="group__runtime__alloc_1gac44750ab2e118a61c6e05221163ba1b4"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_heap_used</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423memory_island_heap_usedv" title="Link to this definition"></a><br /></dt>
+<dd><p>Gets the amount of allocated memory in the memory island heap. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Amount of allocated memory in bytes. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423memory_island_ptr_validPv">
+<span id="_CPPv323memory_island_ptr_validPv"></span><span id="_CPPv223memory_island_ptr_validPv"></span><span id="memory_island_ptr_valid__voidP"></span><span class="target" id="group__runtime__alloc_1ga63520abaa735a10a7e342c49d398b89a"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_ptr_valid</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">ptr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423memory_island_ptr_validPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Checks if a pointer was allocated by the memory island allocator. </p>
+<p>This function verifies if the given pointer points to a memory block that was allocated by <a class="reference internal" href="#group__runtime__alloc_1ga4b0f9be4e70367a66b5552e818084e1b"><span class="std std-ref">memory_island_malloc()</span></a> and is within the heap bounds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ptr</strong> – Pointer to check. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if the pointer is valid and within heap bounds, false otherwise. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424memory_island_heap_checkv">
+<span id="_CPPv324memory_island_heap_checkv"></span><span id="_CPPv224memory_island_heap_checkv"></span><span id="memory_island_heap_check__void"></span><span class="target" id="group__runtime__alloc_1ga6f70e0ec89823d2504e8f5f420ea1a7e"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">memory_island_heap_check</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424memory_island_heap_checkv" title="Link to this definition"></a><br /></dt>
+<dd><p>Performs a consistency check on the memory island heap. </p>
+<p>This function validates the integrity of the heap data structures, including:<ul class="simple">
+<li><p>Freelist consistency</p></li>
+<li><p>Memory block header validity</p></li>
+<li><p>Heap boundary checks</p></li>
+</ul>
+</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function is intended for debugging and should not be used in production code due to its performance impact. </p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>true if the heap is consistent, false if corruption is detected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411MemoryBlock">
+<span id="_CPPv311MemoryBlock"></span><span id="_CPPv211MemoryBlock"></span><span id="MemoryBlock"></span><span class="target" id="structMemoryBlock"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemoryBlock</span></span></span><a class="headerlink" href="#_CPPv411MemoryBlock" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;alloc.h&gt;</em></div>
+<p>Memory block structure for the freelist allocator. </p>
+<p>This structure is used internally to track free memory blocks in a linked list. Each allocated block has this header prepended to store metadata. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryBlock4nextE">
+<span id="_CPPv3N11MemoryBlock4nextE"></span><span id="_CPPv2N11MemoryBlock4nextE"></span><span id="MemoryBlock::next__MemoryBlockP"></span><span class="target" id="structMemoryBlock_1aead31940b4b95725f6f580e2db3cfb87"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv411MemoryBlock" title="MemoryBlock"><span class="n"><span class="pre">MemoryBlock</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">next</span></span></span><a class="headerlink" href="#_CPPv4N11MemoryBlock4nextE" title="Link to this definition"></a><br /></dt>
+<dd><p>Pointer to the next free block in the list. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11MemoryBlock4sizeE">
+<span id="_CPPv3N11MemoryBlock4sizeE"></span><span id="_CPPv2N11MemoryBlock4sizeE"></span><span id="MemoryBlock::size__s"></span><span class="target" id="structMemoryBlock_1a1d0be8990a795dfe51c99d3ea0ac774e"></span><span class="n"><span class="pre">size_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">size</span></span></span><a class="headerlink" href="#_CPPv4N11MemoryBlock4sizeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Size of the memory block in bytes. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_ll_drivers_fll.html" class="btn btn-neutral float-left" title="FLL" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api_device/api_device.html" class="btn btn-neutral float-right" title="Device API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
