@@ -31,4 +31,4 @@ extern "C" {
 }
 #endif
 
-/** @} */ // End of drivers_clint_32 group
+/** @} */

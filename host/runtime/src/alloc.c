@@ -1,6 +1,23 @@
 // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * Memory island allocator implementation.
+ *
+ * region_malloc() implements a first-fit free-list allocator:
+ *  1. Walk the free list looking for a block whose stored size >= requested size.
+ *     If found, unlink it from the list and return the payload pointer.
+ *  2. If nothing fits, advance the bump pointer (*ptr) by
+ *     ALLOC_ALIGN(size + sizeof(MemoryBlock)) and return the new block's payload.
+ *  3. Return NULL if the bump pointer would exceed 'end'.
+ *
+ * region_free() prepends the block to the free list head — O(1) but does not
+ * coalesce adjacent free blocks (acceptable for the small heap sizes in this SDK).
+ *
+ * memory_island_malloc/free are thin wrappers around region_malloc/region_free
+ * using the __l2_heap_start / __l2_heap_end linker symbols as the heap bounds.
+ */
+
 // Include Standard Libraries
 #include <stdint.h>
 #include <stddef.h>

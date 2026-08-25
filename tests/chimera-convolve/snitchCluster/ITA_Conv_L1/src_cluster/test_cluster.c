@@ -22,7 +22,8 @@
 #include "test.h"
 
 // Include Driver Headers
-#include "trampoline_snitchCluster.h"
+#include "macros.h"
+#include "trampoline.h"
 
 // Include Runtime Headers
 #include "snrt.h"
@@ -149,7 +150,7 @@ void PrintMatrix_s8_NCHW(int8_t const *__restrict__ pSrcA, uint32_t N, uint32_t 
  *
  * @warning Stack, thread and global pointer might not yet be set up!
  */
-__attribute__((naked)) void clusterInterruptHandler() {
+__attribute__((naked)) KEEP void clusterInterruptHandler() {
     _SET_CLUSTER_BUSY();
     _SETUP_GP();
 
@@ -190,7 +191,7 @@ void ita_set_tiles_fix(uint8_t m_tiles, uint8_t k_tiles, uint8_t n_tiles) {
  * @brief Convolution with IM2COL parallelized over compute cores. IM2COL tiles are prepared while
  * the ITA accelerator processes the previous tile (ping-pong buffering).
  */
-int32_t ita_conv_l1_test(void *args) {
+KEEP int32_t ita_conv_l1_test(void *args) {
     test_cluster_args_t *test_args = (test_cluster_args_t *)args;
     test_cluster_result_t *test_retVal = (test_cluster_result_t *)(test_args->result);
 

@@ -7,82 +7,126 @@ Usage
 Building the SDK
 ----------------
 
-The applications are built with RISC-V LLVM 12.0.1 or later to ensure compatibility.
+The applications are built with RISC-V LLVM 18 or later.
 
 .. important::
     For LLVM versions less than 15, linker relaxation is not supported and thus disabled.
 
+.. tip::
+    **Recommended for new users:** use the pre-built container (Docker or Singularity, see
+    below).  The container ships with the correct LLVM toolchain, picolibc, and all Python
+    dependencies pre-installed — no manual toolchain setup needed.
 
-Generic Environment
-^^^^^^^^^^^^^^^^^^^
+CMake Variables
+^^^^^^^^^^^^^^^
 
-To build the SDK and all tests contained in the SDK, run:
+All build methods use the same CMake variables:
+
+- ``TARGET_PLATFORM`` – hardware target to build for (required; see `Targets`_)
+- ``TOOLCHAIN_DIR`` – path to the LLVM installation root (required if not on ``PATH``)
+- ``PICOLIBC_DIR`` – path to the prebuilt picolibc installation (required;
+  see ``make picolibc-multilib``)
+- ``HARDWARE_BACKEND`` – simulation back-end: ``RTL`` (default), ``GVSOC`` or ``ASIC``
+- ``CHIMERA_UNIFIED_ELF`` – when ``ON``, merges device and host ELFs into a single
+  mixed-ISA file suitable for simulation (requires ``lief``; default ``OFF``)
+
+Docker (Recommended)
+^^^^^^^^^^^^^^^^^^^^
+
+The pre-built container at ``ghcr.io/pulp-platform/chimera:devel`` ships with a
+PULP-flavoured RISC-V LLVM toolchain and all required dependencies.
 
 .. code-block:: bash
 
-    cmake -DTARGET_PLATFORM=<target> -B build
+    # Pull the container (one-time)
+    docker pull ghcr.io/pulp-platform/chimera:devel
+
+    # Start an interactive shell with the repository mounted at /app/chimera
+    docker run -it --rm \
+        -v $(pwd):/app/work \
+        ghcr.io/pulp-platform/chimera:devel \
+        zsh
+
+    # Inside the container — configure and build
+    cd /app/work
+    cmake -D TARGET_PLATFORM=chimera-open \
+          -D TOOLCHAIN_DIR=/app/install/llvm-18.1.4-pulp \
+          -D PICOLIBC_DIR=/app/install/picolibc \
+          -D HARDWARE_BACKEND=RTL \
+          -D CHIMERA_UNIFIED_ELF=ON \
+          -B build
     cmake --build build -j
 
-where you should replace ``[YOURTARGETPLATFORM]`` by one of the platforms defined in ``targets/CMakeLists.txt`` under ``AVAILABLE_TARGETS``.
-The resulting binaries will be stored in ``build/bin``, and can be used within the ``chimera`` repo as tests.
+Singularity (Recommended)
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you did not globally install the toolchain, you need to specify the ``TOOLCHAIN_DIR`` parameter when running cmake.
+Singularity (or Apptainer) is available on IIS workstations and HPC clusters where Docker
+is not permitted.
 
 .. code-block:: bash
 
-    cmake -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=<path-to-toolchain> ../
+    # Pull the container (creates chimera_devel.sif in the current directory)
+    singularity pull docker://ghcr.io/pulp-platform/chimera:devel
+
+    # Start a clean shell with environment isolation (-e) inside the container
+    singularity shell -e -s /bin/zsh chimera_devel.sif
+
+    # Inside the container — configure and build
+    cd /path/to/chimera-sdk
+    cmake -D TARGET_PLATFORM=chimera-open \
+          -D TOOLCHAIN_DIR=/app/install/llvm-18.1.4-pulp \
+          -D PICOLIBC_DIR=/app/install/picolibc \
+          -D HARDWARE_BACKEND=RTL \
+          -D CHIMERA_UNIFIED_ELF=ON \
+          -B build
     cmake --build build -j
 
-IIS Workstations
-^^^^^^^^^^^^^^^^
+.. note::
+    The ``-e`` flag to ``singularity shell`` cleans the host environment so the container's
+    tool paths take precedence.  Without it, host shell aliases or ``PATH`` entries can
+    shadow the container's CMake or Python installations.
 
-On IIS systems, users can use the pre-installed LLVM compiler by activating the riscv environment with the ``riscv`` command.
-This command sets the necessary environment variables for the toolchain.
-To build the SDK, run:
+Generic Environment (Not Recommended)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you prefer a native installation, build the toolchain with ``make llvm`` and picolibc
+with ``make picolibc-multilib``, then run:
 
 .. code-block:: bash
 
-    riscv zsh # Setup the default riscv environment (modifies PATH and LD_LIBRARY_PATH)
-    cmake-3.28.3 -DTARGET_PLATFORM=<target> -DTOOLCHAIN_DIR=/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0 -B build
-    cmake-3.28.3 --build build -j
-
+    cmake -D TARGET_PLATFORM=chimera-open \
+          -D TOOLCHAIN_DIR=<path-to-llvm> \
+          -D PICOLIBC_DIR=<path-to-picolibc> \
+          -D HARDWARE_BACKEND=RTL \
+          -D CHIMERA_UNIFIED_ELF=ON \
+          -B build
+    cmake --build build -j
 
 Targets
 -------
-The SDK supports multiple targets, each with a different configuration. The available targets are defined in ``targets/CMakeLists.txt`` under ``AVAILABLE_TARGETS``. The following targets are currently available:
 
-- ``chimera-convolve``: Target for the CONVOLVE project.
-- ``chimera-host``: Target with a single host core without clusters.
-- ``chimera-open``: Default target with multiple clusters.
+The SDK supports multiple hardware targets.  Available targets are defined in
+``targets/CMakeLists.txt`` under ``AVAILABLE_TARGETS``:
+
+- ``chimera-convolve`` – target for the CONVOLVE project (RV64IMC host + RV32IMAFD cluster)
+- ``chimera-host`` – host-only target (no cluster devices)
+- ``chimera-open`` – default target with multiple Snitch clusters
 
 Testing
 -------
-You can test the functional correctness of your code with the event-based simulator `GVSoC <https://github.com/gvsoc/gvsoc>`_. To install GVSoC, run:
+
+You can test functional correctness with the event-based simulator
+`GVSoC <https://github.com/gvsoc/gvsoc>`_.  To install GVSoC:
 
 .. code-block:: bash
 
     make gvsoc
 
-By default, this Makefile will install GVSoC in the ``install/gvsoc`` folder. If you want to change the install location, you can define the ``GVSOC_INSTALL_DIR`` symbol pointing at the desired install location.
+By default, GVSoC is installed in ``install/gvsoc``.  Override with ``GVSOC_INSTALL_DIR``.
 
-Finally, you can execute the tests by running the following command from GVSoC's root:
+Run a test with the unified ELF:
 
 .. code-block:: bash
 
-    ./install/bin/gvsoc --target=chimera --binary <path-to-binary> run
-
-Visual Studio Code Integration
-------------------------------
-To enable automatic configuration of the C/C++ extension and support for the integrated cMake build flow on the IIS workstations, add the following content to ``.vscode/settings.json``:
-
-.. code-block:: json
-
-    {
-        "cmake.configureSettings": {
-            "TOOLCHAIN_DIR": "/usr/pack/riscv-1.0-kgf/pulp-llvm-0.12.0",
-            "TARGET_PLATFORM": "chimera-convolve",
-        },
-        "cmake.cmakePath": "cmake-3.28.3",
-    }
-
-If you are not on an IIS system, you need to adjust the paths according to your local installation.
+    ./install/bin/gvsoc --target=chimera \
+        --binary build/bin/chimera_unified_<test>.elf run

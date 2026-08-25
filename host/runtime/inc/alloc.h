@@ -15,6 +15,11 @@
 // Include Runtime Headers
 
 /**
+ * @defgroup runtime Runtime
+ * @brief Host runtime library for Chimera-SDK.
+ */
+
+/**
  * \defgroup runtime_alloc Memory Allocator
  * @ingroup runtime
  * @brief Memory allocation subsystem for Chimera-SDK.
@@ -179,4 +184,4 @@ bool memory_island_heap_check(void);
 }
 #endif
 
-/** @} */ // end defgroup runtime_alloc
+/** @} */

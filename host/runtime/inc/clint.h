@@ -134,6 +134,6 @@ void default_trap_vector(void);
 }
 #endif
 
-/** @} */ // end defgroup drivers_clint
+/** @} */
 
 #endif // CHIMERA_DRIVER_CLINT

@@ -129,4 +129,4 @@ struct chi_interrupt_api {
 
 #endif // INTERRUPT_API_H
 
-/** @} */ // end defgroup hal_interrupt
+/** @} */

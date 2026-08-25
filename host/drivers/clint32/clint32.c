@@ -1,20 +1,17 @@
 // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
-//
-// This file provides the strong (driver-specific) implementations for the
-// CLINT functions using a 32-bit representation (a struct with 'low' and 'high').
-// These functions will override the weak HAL symbols.
 
-/**
- * \defgroup drivers_clint_32 32-bit CLINT Driver
- * @ingroup drivers
- * @brief 32-bit CLINT driver implementation for Chimera-SDK.
- * @{
+/*
+ * 32-bit CLINT driver implementation.
  *
- * This file provides the implementation of the 32-bit CLINT driver.
- * It includes functions for reading the current time, comparing times,
- * spinning until a target time, and sleeping until a target time.
+ * The 64-bit mtime counter is split into two 32-bit registers (MTIME_HIGH / MTIME_LOW).
+ * clint_get_mtime() uses a double-read: read high, then low, then high again — if the
+ * high word changed between the two reads the values straddle a carry and the read is
+ * retried.  This makes the combined 64-bit read atomic without needing a critical section.
  *
+ * clint32_init and related interrupt-API stubs are no-ops because the CLINT does not
+ * support per-IRQ enable/disable at the controller level; all control goes through
+ * mie/mip CSRs in the CPU core.
  */
 
 // Include Standard Libraries
@@ -34,22 +31,11 @@
 // Import HAL Headers
 #include "interrupt_api.h"
 
-// VIVIANEP: Need to skip doxygen generation for these functions
-// to avoid duplicated defintion errors in the generated documentation
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-
 /*---------------------------------------------------------------------------*/
 /* 32‑bit CLINT core routines                                                */
 /*---------------------------------------------------------------------------*/
 
-/**
- * @brief Retrieves the current CLINT `mtime` value.
- *
- * This function safely reads the 64-bit timer value from two 32-bit registers,
- * ensuring atomicity by checking that the high register did not change between reads.
- *
- * @return The current CLINT time as a clint_mtime_t structure.
- */
+/* Reads the 64-bit mtime counter atomically by retrying if the high word changes between reads. */
 clint_mtime_t clint_get_mtime(void) {
     clint_mtime_t mtime;
     uint32_t high_check;
@@ -61,33 +47,19 @@ clint_mtime_t clint_get_mtime(void) {
     return mtime;
 }
 
-/**
- * @brief Compares two CLINT `mtime` values.
- *
- * @param a First CLINT time value.
- * @param b Second CLINT time value.
- * @return 1 if a is smaller than b, 0 otherwise.
- */
+/* Returns 1 if a is less than b, 0 otherwise. */
 int clint_mtime_less_than(clint_mtime_t a, clint_mtime_t b) {
     return (a.high < b.high) || (a.high == b.high && a.low < b.low);
 }
 
-/**
- * @brief Spins (busy-waits) until the specified CLINT `mtime` value is reached.
- *
- * @param tgt_mtime Target CLINT time value.
- */
+/* Busy-waits until mtime reaches tgt_mtime. */
 void clint_spin_until(clint_mtime_t tgt_mtime) {
     while (clint_mtime_less_than(clint_get_mtime(), tgt_mtime)) {
         ; // Busy wait
     }
 }
 
-/**
- * @brief Spins (busy-waits) for a given number of ticks.
- *
- * @param ticks Number of clock cycles to wait.
- */
+/* Busy-waits for the given number of mtime ticks. */
 void clint_spin_ticks(uint32_t ticks) {
     clint_mtime_t start = clint_get_mtime();
     clint_mtime_t target = {start.low + ticks, start.high};
@@ -97,17 +69,10 @@ void clint_spin_ticks(uint32_t ticks) {
     clint_spin_until(target);
 }
 
-/**
- * @brief Estimates the core frequency based on a reference measurement period.
- *
- * The relative error of the measurement is approximately ref_time_inv / ref_freq.
- * Hence, to achieve a certain relative error, ref_time_inv should be chosen as
- * ref_freq * desired_relative_error.
- *
- *
- * @param ref_freq Reference frequency in Hz.
- * @param ref_time_inv Inverse of the measurement period.
- * @return Estimated core frequency in Hz.
+/*
+ * Estimates core frequency by counting mcycle ticks over a reference mtime interval.
+ * The relative error is approximately ref_time_inv / ref_freq; choose ref_time_inv as
+ * ref_freq * desired_relative_error to control accuracy.
  */
 uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
     uint32_t start_mcycle, end_mcycle;
@@ -129,26 +94,15 @@ uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
     return (uint32_t)(duration / ticks);
 }
 
-/**
- * @brief Sets the CLINT `mtimecmp` register for a specific timer index.
- *
- * @param timer_idx Timer index to configure.
- * @param value Target `mtimecmp` value.
- */
+/* Writes the mtimecmp register pair for the given timer index. */
 void clint_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
     uint32_t offs = timer_idx << 3;
     *reg32(&__base_clint, CLINT_MTIMECMP_HIGH0_REG_OFFSET + offs) = value.high;
     *reg32(&__base_clint, CLINT_MTIMECMP_LOW0_REG_OFFSET + offs) = value.low;
 }
 
-/**
- * @brief Puts the core into sleep mode until the specified CLINT `mtime` value is reached.
- *
- * Before sleeping, this function programs the mtimecmp register and enables interrupts.
- *
- * @param timer_idx Timer index.
- * @param tgt_mtime Target CLINT time value.
- */
+/* Programs mtimecmp, enables the timer interrupt, and issues wfi; returns immediately if tgt_mtime
+ * is already past. */
 void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
     if (clint_mtime_less_than(tgt_mtime, clint_get_mtime())) return;
     clint_set_mtimecmpx(timer_idx, tgt_mtime);
@@ -158,12 +112,7 @@ void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
     wfi();
 }
 
-/**
- * @brief Puts the core into sleep mode for a specified number of ticks.
- *
- * @param timer_idx Timer index.
- * @param ticks Number of clock cycles to sleep.
- */
+/* Sleeps for the given number of mtime ticks using wfi. */
 void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
     clint_mtime_t start = clint_get_mtime();
     clint_mtime_t target = {start.low + ticks, start.high};
@@ -172,8 +121,6 @@ void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
     }
     clint_sleep_until(timer_idx, target);
 }
-
-/// @endcond
 
 /*---------------------------------------------------------------------------*/
 /* Provide driver-specific chi_interrupt_api_t for CLINT                     */
@@ -215,9 +162,6 @@ static void clint32_dispatch(const chi_interrupt_t *ctrl) {
     (void)ctrl;
 }
 
-// VIVIANEP: Skip Doxygen generation for these alias functions to avoid duplicate definitions
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-
 /* Export the CLINT-specific interrupt API */
 const chi_interrupt_api_t default_clint_api = {.init = clint32_init,
                                                .register_handler = clint32_register_handler,
@@ -226,6 +170,3 @@ const chi_interrupt_api_t default_clint_api = {.init = clint32_init,
                                                .set_priority = clint32_set_priority,
                                                .acknowledge = clint32_acknowledge,
                                                .dispatch = clint32_dispatch};
-/// @endcond
-
-/** @} */ // end drivers_clint_32 group

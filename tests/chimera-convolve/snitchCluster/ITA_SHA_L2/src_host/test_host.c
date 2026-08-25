@@ -7,7 +7,14 @@
 #include <string.h>
 
 // Include Application Headers
-#include "test_cluster.h"
+#include "test_snitchCluster_ITA_SHA_L2_device1_symbols.h"
+
+// The matrix shape is selected at configure time; see this test's
+// CMakeLists.txt. The fallback keeps the file self-contained.
+#ifndef ITA_DIMS_HEADER
+#define ITA_DIMS_HEADER "ITA_dims_S128_E128_P64.h"
+#endif
+#include ITA_DIMS_HEADER
 #include "test_host.h"
 
 // Include Target Specific Headers
@@ -26,13 +33,6 @@
 
 // Import HAL Headers
 #include "interface_api.h"
-
-extern const int8_t golden_interm_Pq[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
-extern const int8_t golden_interm_Pk[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
-extern const int8_t golden_interm_Pv[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
-extern const int8_t golden_interm_attention[1][SEQUENCE_LENGTH * SEQUENCE_LENGTH];
-extern const int8_t golden_interm_head_output[1][SEQUENCE_LENGTH * PROJECTION_SPACE];
-extern const int8_t golden_output[1][SEQUENCE_LENGTH * EMBEDDING_SPACE];
 
 #define STACK_ADDRESS_0 (_chimera_clusterBase[0] + 0x20000 - 1)
 static uint32_t stack_size_0[CLUSTER_0_NUMCORES] = {0x1000, 0x4000};
@@ -118,8 +118,9 @@ int main(void) {
         .clusterIds = {4},
         .stack_start = {(void *)STACK_ADDRESS_4},
         .stack_sizes = {stack_size_4},
-        .function_test = (void *)ita_sha_l2_test,
-        .function_interrupt = (void *)clusterInterruptHandler,
+        .function_test = (void *)device1_ita_sha_l2_test,
+        .function_trampoline = (void *)device1_trampoline,
+        .function_interrupt = (void *)device1_clusterInterruptHandler,
     };
 
     for (int i = 0; i < _chimera_numClusters; i++) {
@@ -135,12 +136,12 @@ int main(void) {
         // args[id].interm_qk = (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * SEQUENCE_LENGTH);
         // args[id].interm_attention =
         //     (int8_t *)memory_island_malloc(SEQUENCE_LENGTH * PROJECTION_SPACE);
-        args[id].interm_Pq = (int8_t *)golden_interm_Pq;
-        args[id].interm_Pk = (int8_t *)golden_interm_Pk;
-        args[id].interm_Pv = (int8_t *)golden_interm_Pv;
-        args[id].interm_qk = (int8_t *)golden_interm_attention;
-        args[id].interm_attention = (int8_t *)golden_interm_head_output;
-        args[id].interm_output = (int8_t *)golden_output;
+        args[id].interm_Pq = (int8_t *)device1_golden_interm_Pq;
+        args[id].interm_Pk = (int8_t *)device1_golden_interm_Pk;
+        args[id].interm_Pv = (int8_t *)device1_golden_interm_Pv;
+        args[id].interm_qk = (int8_t *)device1_golden_interm_attention;
+        args[id].interm_attention = (int8_t *)device1_golden_interm_head_output;
+        args[id].interm_output = (int8_t *)device1_golden_output;
     }
 
     /*

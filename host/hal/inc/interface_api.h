@@ -170,4 +170,4 @@ int iface_flush(const chi_interface_t *iface);
 
 #endif // INTERFACE_API_H
 
-/** @} */ // end defgroup hal_interface
+/** @} */

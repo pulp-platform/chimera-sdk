@@ -7,7 +7,7 @@
 #include <string.h>
 
 // Include Application Headers
-#include "test_cluster.h"
+#include "test_snitchCluster_sleep_device1_symbols.h"
 #include "test_host.h"
 
 // Include Target Specific Headers
@@ -191,7 +191,7 @@ int main(void) {
     void *stack_cluster_ptr[NUM_CLUSTER_CORES];
     generate_snitchCluster_SPs_uniform(CLUSTER, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
 
-    setup_snitchCluster_interruptHandler(clusterInterruptHandler);
+    setup_snitchCluster_interruptHandler(device1_clusterInterruptHandler);
 
     set_snitchCluster_clockGating(CLUSTER, 0);
 
@@ -199,7 +199,7 @@ int main(void) {
     for (volatile int i = 0; i < 10; i++);
     set_snitchCluster_reset(CLUSTER, 0);
 
-    offload_snitchCluster(wfi_test, NULL, stack_cluster_ptr, CLUSTER);
+    offload_snitchCluster(device1_wfi_test, device1_trampoline, NULL, stack_cluster_ptr, CLUSTER);
 
     if (mode == TEST_MODE_DUTCTL) {
         // For 500 iterations, computation should last at least 1s even at 400MHz

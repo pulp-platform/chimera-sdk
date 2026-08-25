@@ -1,6 +1,27 @@
 // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * FLL runtime: parameter calculation and full frequency-switch sequence.
+ *
+ * calculate_fll_params() converts a target frequency into the (mult, div) pair
+ * expected by the FLL hardware:
+ *   Fout = Fref * mult / 2^(div-1)
+ * The algorithm chooses the largest power-of-2 output divider (Dout = 2^(div-1))
+ * that keeps Fout below the 3.3 GHz hardware ceiling, then rounds the multiplier
+ * to the nearest integer for minimum frequency error.
+ *
+ * configure_fll() performs a supervised clock switch:
+ *   1. Enable FLL bypass (chimera-convolve only — GPIO pin 2).
+ *   2. Write the new (mult, div) to both SOC and cluster FLLs.
+ *   3. Wait 1000 cycles for the FLL to lock.
+ *   4. Disable bypass.
+ *   5. Re-measure the core frequency via CLINT and reopen UART.
+ *
+ * restore_default_freq() skips steps 1–4 (no FLL reprogramming) and only
+ * re-measures the clock and updates the UART baud rate.
+ */
+
 // Include Standard Libraries
 #include <stdint.h>
 #include <stddef.h>
@@ -50,10 +71,10 @@ int calculate_fll_params(uint32_t target_freq, uint32_t rtc_freq, uint32_t *mult
 #ifdef TRACE
     // Optional quick check:
     uint32_t fout = (rtc_freq * (*mult)) / (1u << (*div - 1));
-    // printf_log("target=%u, div=%u, dout=%u, mult=%u, fout=%u\n", target_freq, *div, dout,
-    *mult, fout); printf_log("Calculated FLL params: mult=%u, div=%u => fout=%u Hz (error: %+d
-    ppm)\n",
-               *mult, *div, fout,
+    printf_log("target=%u, div=%u, dout=%u, mult=%u, fout=%u\n", target_freq, *div, dout, *mult,
+               fout);
+    printf_log("Calculated FLL params: mult=%u, div=%u => fout=%u Hz (error: %+d ppm)\n", *mult,
+               *div, fout,
                (int32_t)(((int64_t)fout - (int64_t)target_freq) * 1000000 / target_freq));
 #endif
 

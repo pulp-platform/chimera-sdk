@@ -22,6 +22,7 @@ extensions = [
     'sphinx.ext.intersphinx',  # Link to other projects
     'sphinx.ext.todo',  # Support for todo items
     'sphinx.ext.autosectionlabel',  # Automatic section labels
+    'sphinx_design',  # Design elements like tabs and cards
     # Python Extensions
     # 'sphinx.ext.napoleon', # Support for NumPy and Google style docstrings
     # 'sphinx.ext.autodoc',

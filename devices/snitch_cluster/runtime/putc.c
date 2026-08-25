@@ -1,6 +1,24 @@
 // SPDX-FileCopyrightText: 2020 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * Snitch cluster character output via HTIF semihosting.
+ *
+ * Each core owns a per-core putc_buffer_t in .noinit (not zeroed at startup
+ * to avoid a dependency on runtime init before the first print).  Characters
+ * are buffered until either the buffer is full (PUTC_BUFFER_LEN = 1023 bytes)
+ * or a newline is encountered.
+ *
+ * On flush, the core fills a syscall_mem[8] header (sys_write, fd, buf, len)
+ * and writes its address to shared_data.device_to_host.  It then sets the
+ * CLINT MSIP bit to trigger a machine-software interrupt on the host (hart 0),
+ * which the host trap handler services and signals completion by writing a
+ * non-zero value back to shared_data.host_to_device.
+ *
+ * A TTAS mutex (_snrt_printf_mutex_ptr, allocated in L1 by snrt_printf_init)
+ * serialises concurrent flushes across cores so that lines are not interleaved.
+ */
+
 // Include Standard Libraries
 #include <stddef.h>
 #include <stdint.h>
@@ -8,8 +26,8 @@
 #include <stdarg.h>
 
 #include "snrt.h"
-
 #include "soc.h"
+#include "shared.h"
 
 volatile uint32_t *_snrt_printf_mutex_ptr;
 
@@ -27,10 +45,10 @@ int snrt_printf_log(const char *fmt, ...) {
     int core_id = snrt_cluster_core_idx();
     int cluster_id = snrt_cluster_idx();
 
-    fprintf(snrt_stdout, "[%02d:%02d] ", cluster_id, core_id);
+    fprintf(stdout, "[%02d:%02d] ", cluster_id, core_id);
 
     va_start(args, fmt);
-    ret = vfprintf(snrt_stdout, fmt, args);
+    ret = vfprintf(stdout, fmt, args);
     va_end(args);
 
     return ret;
@@ -41,13 +59,11 @@ int snrt_printf(const char *fmt, ...) {
     va_list args;
 
     va_start(args, fmt);
-    ret = vfprintf(snrt_stdout, fmt, args);
+    ret = vfprintf(stdout, fmt, args);
     va_end(args);
 
     return ret;
 }
-
-extern uintptr_t volatile tohost, fromhost;
 
 // Rudimentary string buffer for putc calls.
 #define PUTC_BUFFER_LEN (1024 - sizeof(size_t))
@@ -77,20 +93,14 @@ int snrt_putchar(char c, FILE *file) {
         buf->hdr.syscall_mem[3] = buf->hdr.size;         // Length
 
         snrt_mutex_ttas_acquire(_snrt_printf_mutex_ptr);
-        tohost = (uintptr_t)buf->hdr.syscall_mem;
+        shared_data.device_to_host = (uintptr_t)buf->hdr.syscall_mem;
 
         // Trigger MSIP (machine software interrupt) on host (core 0)
         *reg32(&__base_clint, CLINT_MSIP_REG_OFFSET) = 1;
-        while (fromhost == 0);
-        fromhost = 0;
+        while (shared_data.host_to_device == 0);
+        shared_data.host_to_device = 0;
         buf->hdr.size = 0;
         snrt_mutex_release(_snrt_printf_mutex_ptr);
     }
     return c;
 }
-
-static FILE __stdio_snitch = FDEV_SETUP_STREAM(snrt_putchar, NULL, NULL, _FDEV_SETUP_WRITE);
-
-FILE *const snrt_stdin = &__stdio_snitch;
-FILE *const snrt_stdout = &__stdio_snitch;
-FILE *const snrt_stderr = &__stdio_snitch;

@@ -1,17 +1,19 @@
 // SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * \defgroup drivers_uart_apb UART APB Driver
- * @ingroup drivers_uart
- * @ingroup drivers
- * @{
- * @brief APB UART driver implementation for Chimera-SDK.
+/*
+ * APB UART driver implementation.
  *
- * This file provides the implementation of UART initialization, read, and write
- * functions for an APB-based UART peripheral. It includes blocking read and write
- * operations along with basic configuration.
+ * uart_apb_open() calculates the baud-rate divisor from cfg->clk_freq_hz / baud_rate,
+ * then programs the UART_CTRL register with data-bits, parity, stop-bits, and the
+ * enable bit in a single write.
  *
+ * uart_apb_write() spins on the TX FIFO full flag before writing each byte;
+ * uart_apb_read() spins on the RX FIFO empty flag before reading.  Both are
+ * blocking — no timeout or DMA path is provided.
+ *
+ * The chi_interface_api_t vtable (default_uart_api) is defined at the bottom and
+ * referenced by default_uart_inst in uart.c.
  */
 
 // Include Standard Libraries
@@ -33,45 +35,25 @@
 // Import HAL Headers
 #include "interface_api.h"
 
-/**
- * @brief Checks if data is available to read from the UART receiver.
- *
- * @param base Base address of the UART peripheral.
- * @return 1 if data is ready, 0 otherwise.
- */
+/* Returns 1 if the RX FIFO contains data ready to read, 0 otherwise. */
 static inline int rx_ready(uint32_t base) {
     uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
     return (status & (1 << UART_LINE_STATUS_DATA_READY_BIT)) != 0;
 }
 
-/**
- * @brief Checks if the transmitter is ready to accept new data.
- *
- * @param base Base address of the UART peripheral.
- * @return 1 if the transmitter is ready, 0 otherwise.
- */
+/* Returns 1 if the TX holding register is empty and ready for a new byte, 0 otherwise. */
 static inline int tx_ready(uint32_t base) {
     uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
     return (status & (1 << UART_LINE_STATUS_THR_EMPTY_BIT)) != 0;
 }
 
-/**
- * @brief Checks if the transmitter is completely empty.
- *
- * @param base Base address of the UART peripheral.
- * @return 1 if the transmitter is empty, 0 otherwise.
- */
+/* Returns 1 if both the TX holding register and TX shift register are empty, 0 otherwise. */
 static inline int tx_empty(uint32_t base) {
     uint8_t status = reg8_read(base, UART_LINE_STATUS_REG_OFFSET);
     return (status & (1 << UART_LINE_STATUS_TMIT_EMPTY_BIT)) != 0;
 }
 
-/**
- * @brief Flushes the UART transmitter, ensuring all data is sent.
- *
- * @param iface UART interface instance.
- * @return 0 on success, -1 on failure.
- */
+/* Blocks until the TX shift register is fully empty, ensuring all bytes have been transmitted. */
 int uart_apb_flush(const chi_interface_t *iface) {
     if (!iface || !iface->base) {
         return -1;
@@ -84,12 +66,7 @@ int uart_apb_flush(const chi_interface_t *iface) {
     return 0;
 }
 
-/**
- * @brief Opens and initializes the UART interface.
- *
- * @param iface UART interface instance.
- * @return 0 on success, -1 on failure.
- */
+/* Configures baud rate, line control (8N1), FIFO, and flow control registers. */
 int uart_apb_open(const chi_interface_t *iface) {
     if (!iface || !iface->base) {
         return -1;
@@ -121,12 +98,7 @@ int uart_apb_open(const chi_interface_t *iface) {
     return 0;
 }
 
-/**
- * @brief Closes the UART interface.
- *
- * @param iface UART interface instance.
- * @return 0 on success, -1 on failure.
- */
+/* Resets all UART control registers to disable the peripheral. */
 int uart_apb_close(const chi_interface_t *iface) {
     if (!iface || !iface->base) {
         return -1;
@@ -143,15 +115,7 @@ int uart_apb_close(const chi_interface_t *iface) {
     return 0;
 }
 
-/**
- * @brief Reads data from the UART receiver (blocking mode).
- *
- * @param iface UART interface instance.
- * @param buffer Buffer to store received data.
- * @param size Number of bytes to read.
- * @param cb Optional callback function (set to NULL if not needed).
- * @return Number of bytes read on success, -1 on failure.
- */
+/* Blocking read of size bytes into buffer; polls RX ready before each byte. */
 ssize_t uart_apb_read(const chi_interface_t *iface, void *buffer, uint32_t size,
                       chi_interface_callback_t cb) {
     if (!iface || !iface->base || !buffer || size == 0) {
@@ -174,15 +138,7 @@ ssize_t uart_apb_read(const chi_interface_t *iface, void *buffer, uint32_t size,
     return (ssize_t)size;
 }
 
-/**
- * @brief Writes data to the UART transmitter (blocking mode).
- *
- * @param iface UART interface instance.
- * @param buffer Data to send.
- * @param size Number of bytes to write.
- * @param cb Optional callback function (set to NULL if not needed).
- * @return Number of bytes written on success, -1 on failure.
- */
+/* Blocking write of size bytes from buffer; polls TX ready before each byte. */
 ssize_t uart_apb_write(const chi_interface_t *iface, const void *buffer, uint32_t size,
                        chi_interface_callback_t cb) {
     if (!iface || !iface->base || !buffer || size == 0) {
@@ -208,14 +164,8 @@ ssize_t uart_apb_write(const chi_interface_t *iface, const void *buffer, uint32_
     return (ssize_t)size;
 }
 
-// VIVIANEP: Need to skip doxygen generation for these functions
-// to avoid duplicated defintion errors in the generated documentation
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
 const chi_interface_api_t default_uart_api = {.open = uart_apb_open,
                                               .close = uart_apb_close,
                                               .read = uart_apb_read,
                                               .write = uart_apb_write,
                                               .flush = uart_apb_flush};
-/// @endcond
-
-/** @} */ // End of drivers_uart_apb group

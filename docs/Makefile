@@ -16,7 +16,7 @@ help:
 .PHONY: help Makefile doxygen
 
 doxygen:
-	@echo "Building Doxygen documentation"
+	@echo "[Chimera] Building Doxygen documentation"
 	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_HOST_HAL.in
 	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_HOST_LL.in
 	@$(DOXYGENBUILD) $(DOXYOGENPOTS) Doxyfile_DEVICES.in
@@ -27,5 +27,6 @@ doxygen:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR_SPHINX)" "$(BUILDDIR_SPHINX)" $(SPHINXOPTS) $(O)
 
 clean:
-	rm -rf _build_*
+	@echo "[Chimera] Cleaning Sphinx build artifacts"
+	@rm -rf _build_*
 	@$(SPHINXBUILD) -M clean "$(SOURCEDIR_SPHINX)" "$(BUILDDIR_SPHINX)" $(SPHINXOPTS) $(O)

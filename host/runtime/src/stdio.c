@@ -1,6 +1,16 @@
 // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * Standard I/O stream setup for the host (picolibc).
+ *
+ * picolibc's printf/vfprintf require stdin/stdout/stderr to be defined as
+ * FILE* globals.  FDEV_SETUP_STREAM wires them to uart_putc/uart_getc/uart_flush,
+ * which are resolved at link time to the backend-appropriate implementations
+ * in putc.c.  All three streams share the same backing FILE so that flushing
+ * stdout also flushes stderr.
+ */
+
 // Include Standard Libraries
 #include <stdio.h>
 

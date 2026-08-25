@@ -7,7 +7,14 @@
 #include <string.h>
 
 // Include Application Headers
-#include "test_cluster.h"
+#include "test_snitchCluster_ITA_MatMul_L2_device1_symbols.h"
+
+// The matrix shape is selected at configure time; see this test's
+// CMakeLists.txt. The fallback keeps the file self-contained.
+#ifndef ITA_DIMS_HEADER
+#define ITA_DIMS_HEADER "ITA_dims_64x128x64.h"
+#endif
+#include ITA_DIMS_HEADER
 #include "test_host.h"
 
 // Include Target Specific Headers
@@ -111,8 +118,9 @@ int main(void) {
         .clusterIds = {4},
         .stack_start = {(void *)STACK_ADDRESS_4},
         .stack_sizes = {stack_size_4},
-        .function_test = (void *)ita_matmul_l2_test,
-        .function_interrupt = (void *)clusterInterruptHandler,
+        .function_test = (void *)device1_ita_matmul_l2_test,
+        .function_trampoline = (void *)device1_trampoline,
+        .function_interrupt = (void *)device1_clusterInterruptHandler,
     };
 
     for (int i = 0; i < _chimera_numClusters; i++) {

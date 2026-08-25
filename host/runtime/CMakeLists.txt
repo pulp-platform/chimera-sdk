@@ -2,25 +2,22 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-target_include_directories(runtime_host
-  PUBLIC
-  ${CMAKE_CURRENT_LIST_DIR}/inc
-)
+set_property(GLOBAL APPEND PROPERTY CHIMERA_HOST_RUNTIME_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/inc)
 
 if(HARDWARE_BACKEND STREQUAL "RTL")
-  target_compile_definitions(runtime_host PUBLIC HARDWARE_BACKEND_RTL)
+    set_property(GLOBAL APPEND PROPERTY CHIMERA_HOST_RUNTIME_DEFINES HARDWARE_BACKEND_RTL)
 elseif(HARDWARE_BACKEND STREQUAL "GVSoC")
-  target_compile_definitions(runtime_host PUBLIC HARDWARE_BACKEND_GVSOC)
+    set_property(GLOBAL APPEND PROPERTY CHIMERA_HOST_RUNTIME_DEFINES HARDWARE_BACKEND_GVSOC)
 elseif(HARDWARE_BACKEND STREQUAL "ASIC")
-  target_compile_definitions(runtime_host PUBLIC HARDWARE_BACKEND_ASIC)
+    set_property(GLOBAL APPEND PROPERTY CHIMERA_HOST_RUNTIME_DEFINES HARDWARE_BACKEND_ASIC)
 endif()
 
-target_sources(runtime_host PRIVATE
-  src/putc.c
-  src/alloc.c
-  src/stdio.c
-  src/uart.c
-  src/clint.c
-  src/log.c
-  src/fll.c
+set_property(GLOBAL APPEND PROPERTY CHIMERA_HOST_RUNTIME_SOURCES
+    ${CMAKE_CURRENT_LIST_DIR}/src/putc.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/alloc.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/stdio.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/uart.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/clint.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/log.c
+    ${CMAKE_CURRENT_LIST_DIR}/src/fll.c
 )

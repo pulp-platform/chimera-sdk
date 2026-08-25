@@ -1,0 +1,244 @@
+/* SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/*
+ * Snitch Cluster device linker script template for chimera-convolve.
+ *
+ * cmake/Chimera.cmake calls configure_file() on this template to produce
+ * the actual linker script used at link time.  The two placeholders below are
+ * substituted automatically based on the PREV_DEVICE argument passed to
+ * add_device_binary():
+ *
+ *   @CHIMERA_PREV_INCLUDE@
+ *       Empty when this is the first device in the chain, or
+ *       "INCLUDE <prev>_placement.ldh" otherwise.
+ *
+ *   @CHIMERA_RESERVED_SECTION@
+ *       Empty when this is the first device, or a NOLOAD .reserved section
+ *       that advances the location counter past the previous device's memory
+ *       region so this device's sections are placed immediately after it.
+ *
+ * Memory layout in memisl (ORIGIN = 0x48000000, LENGTH = 256K):
+ *
+ *   0x48000000              ┌─ .common    (NOLOAD – host initialises here)
+ *   [prev device end]       ├─ .init / .text / .rodata / .data
+ *                           ├─ .bss       (NOLOAD)
+ *                           ├─ .tdata / .tbss
+ *   __device_end            └─ 4 KiB-aligned end → ${TARGET}_placement.ldh
+ *
+ * The host sets __stack_pointer$ and __global_pointer$ in the cluster control
+ * registers before releasing the core; crt0.S does NOT initialise them.
+ *
+ * Note: rv32ima_xdma has no F/D extensions; no FP-related sections are needed.
+ *
+ * Note: This file INCLUDEs common.ldh for the shared MEMORY block and
+ * base-address symbols.  The device defines its own __global_pointer$ using
+ * ADDR(.data), not ADDR(.misc), so there is no conflict with the host script.
+ */
+
+INCLUDE common.ldh
+@CHIMERA_PREV_INCLUDE@
+
+/* GP sits in the middle of .data for GP-relative addressing */
+__global_pointer$ = ADDR(.data) + SIZEOF(.data) / 2;
+
+SECTIONS {
+  /*
+   * Shared communication area mapped at the start of memisl (0x48000000).
+   * NOLOAD: the host binary owns and initialises this memory; the device
+   * accesses it via the AXI interconnect at the same physical address.
+   */
+  .common (NOLOAD) : ALIGN(64) {
+    __common_start = .;
+    *(.common)
+    *(.common.*)
+    . = ALIGN(64);
+    __common_end = .;
+  } > memisl
+
+@CHIMERA_RESERVED_SECTION@
+
+  .init : ALIGN(0x1000) {
+    *(.init)
+    *(.init.*)
+  } > memisl
+
+  .text : {
+    *(.text._start)
+    *(.text)
+    *(.text.*)
+  } > memisl
+
+  .rodata : ALIGN(32) {
+    *(.rodata)
+    *(.rodata.*)
+    *(.srodata)
+    *(.srodata.*)
+  } > memisl
+
+  .data : ALIGN(32) {
+    *(.data)
+    *(.data.*)
+    *(.sdata)
+    *(.sdata.*)
+  } > memisl
+
+  .bss (NOLOAD) : {
+    . = ALIGN(32);
+    __bss_start = .;
+    *(.bss)
+    *(.bss.*)
+    *(.sbss)
+    *(.sbss.*)
+    . = ALIGN(32);
+    __bss_end = .;
+  } > memisl
+
+  /* Thread Local Storage sections */
+  .tdata : {
+    . = ALIGN(32);
+    __tdata_start = .;
+    *(.tdata .tdata.* .gnu.linkonce.td.*)
+    . = ALIGN(32);
+    __tdata_end = .;
+  } > memisl
+
+  .tbss (NOLOAD) : {
+    . = ALIGN(32);
+    __tbss_start = .;
+    *(.tbss .tbss.* .gnu.linkonce.tb.*)
+    *(.tcommon)
+    . = ALIGN(32);
+    __tbss_end = .;
+  } > memisl
+
+  /* Cluster Local Storage sections */
+  .cdata :
+  {
+    . = ALIGN(32);
+    __cdata_start = .;
+    *(.cdata .cdata.*)
+    . = ALIGN(32);
+    __cdata_end = .;
+  } > l1_alias AT > memisl
+  /* Provide symbols for the load address (LMA) of the .cdata section so
+     runtime code can copy the initialized contents from flash/main memory
+     instead of using the VMA which points into L1. */
+  __cdata_lma_start = LOADADDR(.cdata);
+  __cdata_lma_end = LOADADDR(.cdata) + SIZEOF(.cdata);
+
+  .cbss (NOLOAD) :
+  {
+    . = ALIGN(32);
+    __cbss_start = .;
+    *(.cbss .cbss.*)
+    . = ALIGN(32);
+    __cbss_end = .;
+  } > l1_alias AT > memisl
+
+  /* NOTE: .cbss is NOLOAD, so no bytes are written to the LMA by the loader.
+   * Zero-init is performed via the hardware zero-memory region
+   * (see snrt_zero_memory_ptr()). */
+  __cbss_lma_start = LOADADDR(.cbss);
+  __cbss_lma_end = LOADADDR(.cbss) + SIZEOF(.cbss);
+
+  /* Total cluster-local storage (CLS) reserved at the base of every cluster's
+   * L1 TCDM.  Must not exceed the l1_alias window (= L1 size per cluster). */
+  __cls_reserved_size = SIZEOF(.cdata) + SIZEOF(.cbss);
+
+  .l1_c0_cls  (NOLOAD): ALIGN(32) {
+    . += __cls_reserved_size;
+  } > l1_c0
+  .l1_c1_cls  (NOLOAD): ALIGN(32) {
+    . += __cls_reserved_size;
+  } > l1_c1
+  .l1_c2_cls  (NOLOAD): ALIGN(32) {
+    . += __cls_reserved_size;
+  } > l1_c2
+  .l1_c3_cls  (NOLOAD): ALIGN(32) {
+    . += __cls_reserved_size;
+  } > l1_c3
+  .l1_c4_cls  (NOLOAD): ALIGN(32) {
+    . += __cls_reserved_size;
+  } > l1_c4
+
+  /* Provide LMA symbols for the .l1_cX sections so the runtime DMA init code
+   * can copy cluster-private initialized data from memisl (LMA) to each
+   * cluster's L1 TCDM (VMA).  Two reasons the LMA copy is necessary:
+   *  1. The binary loader places data at the LMA (memisl); the VMA points
+   *     into cluster L1 which is not reachable by the loader.
+   *  2. Some debug probes (JTAG) cannot reliably access cluster L1 during
+   *     early boot, so the DMA copy from memisl is the only safe path.
+   *
+   * LMA symbols are assigned inside the section body so that lld only
+   * evaluates LOADADDR/SIZEOF when the section actually has input sections.
+   * PROVIDE(...= 0) outside gives a safe fallback: the runtime sees
+   * lma_end - lma_start = 0 and skips the DMA for empty sections. */
+  .l1_c0 : ALIGN(32) {
+    __l1_c0_start = .;
+    __l1_c0_lma_start = LOADADDR(.l1_c0);
+    KEEP(*(.l1_c0 .l1_c0.*))
+    __l1_c0_end = .;
+    __l1_c0_lma_end = LOADADDR(.l1_c0) + SIZEOF(.l1_c0);
+    . = ALIGN(32);
+    __l1_c0_heap_start = .;
+    __l1_c0_heap_end = ORIGIN(l1_c0) + LENGTH(l1_c0);
+  } > l1_c0 AT > memisl
+  PROVIDE(__l1_c0_lma_start = 0);
+  PROVIDE(__l1_c0_lma_end = 0);
+
+  .l1_c1 : ALIGN(32) {
+    __l1_c1_start = .;
+    __l1_c1_lma_start = LOADADDR(.l1_c1);
+    KEEP(*(.l1_c1 .l1_c1.*))
+    __l1_c1_end = .;
+    __l1_c1_lma_end = LOADADDR(.l1_c1) + SIZEOF(.l1_c1);
+    . = ALIGN(32);
+    __l1_c1_heap_start = .;
+    __l1_c1_heap_end = ORIGIN(l1_c1) + LENGTH(l1_c1);
+  } > l1_c1 AT > memisl
+  PROVIDE(__l1_c1_lma_start = 0);
+  PROVIDE(__l1_c1_lma_end = 0);
+
+  .l1_c2 : ALIGN(32) {
+    __l1_c2_start = .;
+    __l1_c2_lma_start = LOADADDR(.l1_c2);
+    KEEP(*(.l1_c2 .l1_c2.*))
+    __l1_c2_end = .;
+    __l1_c2_lma_end = LOADADDR(.l1_c2) + SIZEOF(.l1_c2);
+    . = ALIGN(32);
+    __l1_c2_heap_start = .;
+    __l1_c2_heap_end = ORIGIN(l1_c2) + LENGTH(l1_c2);
+  } > l1_c2 AT > memisl
+  PROVIDE(__l1_c2_lma_start = 0);
+  PROVIDE(__l1_c2_lma_end = 0);
+
+  .l1_c3 : ALIGN(32) {
+    __l1_c3_start = .;
+    __l1_c3_lma_start = LOADADDR(.l1_c3);
+    KEEP(*(.l1_c3 .l1_c3.*))
+    __l1_c3_end = .;
+    __l1_c3_lma_end = LOADADDR(.l1_c3) + SIZEOF(.l1_c3);
+    . = ALIGN(32);
+    __l1_c3_heap_start = .;
+    __l1_c3_heap_end = ORIGIN(l1_c3) + LENGTH(l1_c3);
+  } > l1_c3 AT > memisl
+  PROVIDE(__l1_c3_lma_start = 0);
+  PROVIDE(__l1_c3_lma_end = 0);
+
+  .l1_c4 : ALIGN(32) {
+    __l1_c4_start = .;
+    __l1_c4_lma_start = LOADADDR(.l1_c4);
+    KEEP(*(.l1_c4 .l1_c4.*))
+    __l1_c4_end = .;
+    __l1_c4_lma_end = LOADADDR(.l1_c4) + SIZEOF(.l1_c4);
+    . = ALIGN(32);
+    __l1_c4_heap_start = .;
+    __l1_c4_heap_end = ORIGIN(l1_c4) + LENGTH(l1_c4);
+  } > l1_c4 AT > memisl
+  PROVIDE(__l1_c4_lma_start = 0);
+  PROVIDE(__l1_c4_lma_end = 0);
+
+  /* First free address in memisl (VMA usage and LMA payload usage). */
+  __device_end = MAX(__tbss_end, MAX(__cdata_lma_end, __cbss_lma_end));
+}

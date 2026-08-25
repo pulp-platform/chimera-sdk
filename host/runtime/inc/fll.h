@@ -13,6 +13,18 @@
 // Include Runtime Headers
 
 /**
+ * @defgroup runtime_fll FLL Runtime
+ * @ingroup runtime
+ * @brief Host-side FLL parameter calculation and frequency switching utilities.
+ *
+ * These functions operate above the low-level FLL driver (`drivers_fll`) and
+ * handle the higher-level tasks: computing multiplier/divider values, switching
+ * both the SOC and cluster FLLs in concert, and reconfiguring the UART baud
+ * rate after a frequency change.
+ * @{
+ */
+
+/**
  * @brief Calculate FLL parameters for a target frequency.
  *
  * @param target_freq Target frequency in Hz
@@ -32,4 +44,16 @@ int calculate_fll_params(uint32_t target_freq, uint32_t rtc_freq, uint32_t *mult
  */
 uint32_t configure_fll(uint32_t target_freq, uint32_t rtc_freq);
 
+/**
+ * @brief Restore the core frequency to its reset value and reconfigure UART.
+ *
+ * Measures the actual reset-domain clock frequency using the CLINT as a
+ * reference, then reopens the UART with the measured frequency so that
+ * the baud rate remains correct after an FLL is switched off.
+ *
+ * @param rtc_freq  Reference RTC frequency in Hz (used as timing reference).
+ * @return          Measured core frequency in Hz, or 0 on error.
+ */
 uint32_t restore_default_freq(uint32_t rtc_freq);
+
+/** @} */

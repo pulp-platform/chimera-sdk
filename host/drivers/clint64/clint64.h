@@ -35,4 +35,4 @@ extern "C" {
 }
 #endif
 
-/** @} */ // End of drivers_clint_64 group
+/** @} */

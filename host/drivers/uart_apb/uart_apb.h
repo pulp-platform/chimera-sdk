@@ -34,7 +34,7 @@
 #define UART_MODEM_STATUS_REG_OFFSET 24  /**< Modem Status Register (MSR) Offset. */
 #define UART_DLAB_LSB_REG_OFFSET 0       /**< Divisor Latch LSB Register (DLAB_LSB) Offset. */
 #define UART_DLAB_MSB_REG_OFFSET 4       /**< Divisor Latch MSB Register (DLAB_MSB) Offset. */
-/** @} */                                // End of UART Register Offsets
+/** @} */
 
 /**
  * @name UART Line Status Register (LSR) Bit Definitions
@@ -45,9 +45,9 @@
     0 /**< Data Ready (DR) bit. Set when data is available in RBR. */
 #define UART_LINE_STATUS_THR_EMPTY_BIT 5 /**< Transmitter Holding Register (THR) empty bit. */
 #define UART_LINE_STATUS_TMIT_EMPTY_BIT \
-    6     /**< Transmitter empty bit. Set when both THR and shift register are empty. */
-/** @} */ // End of UART LSR Bit Definitions
+    6 /**< Transmitter empty bit. Set when both THR and shift register are empty. */
+/** @} */
 
 #endif // UART_APB_H
 
-/** @} */ // End of drivers_uart_apb group
+/** @} */
