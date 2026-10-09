@@ -1,0 +1,442 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMake API Reference &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="prev" title="Device API Reference" href="../api_device/api_device.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">Multi-Binary Compilation Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/asic.html">ASIC Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_ll/api_ll.html">Host Runtime API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CMake API Reference</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chimera-build-system">Chimera Build System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#utility-modules">Utility Modules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+      <li class="breadcrumb-item active">CMake API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_cmake/api_cmake.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cmake-api-reference">
+<h1>CMake API Reference<a class="headerlink" href="#cmake-api-reference" title="Link to this heading"></a></h1>
+<p>Below you find a list of CMake Modules included in this project.</p>
+<section id="chimera-build-system">
+<h2>Chimera Build System<a class="headerlink" href="#chimera-build-system" title="Link to this heading"></a></h2>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:add_device_binary(target_name)">
+<span class="sig-name descname"><span class="pre">add_device_binary(TARGET_NAME)</span></span><a class="headerlink" href="#command:add_device_binary(target_name)" title="Link to this definition"></a></dt>
+<dd><p>Compile a device binary for one execution domain (e.g. a Snitch cluster)
+and expose its public symbols for the host to link against.</p>
+<p>This function drives the first two stages of the three-stage heterogeneous
+compilation pipeline:</p>
+<ul class="simple">
+<li><p><strong>Stage 1</strong> — Compile the device ELF with the device ISA/ABI.</p></li>
+<li><p><strong>Stage 2</strong> — Extract public symbols with <code class="docutils literal notranslate"><span class="pre">llvm-nm</span></code> and write an
+assembly stub (<code class="docutils literal notranslate"><span class="pre">_symbols.s</span></code>) and C header (<code class="docutils literal notranslate"><span class="pre">_symbols.h</span></code>) that the
+host links against.  A placement header (<code class="docutils literal notranslate"><span class="pre">_placement.ldh</span></code>) recording
+the 4 KiB-aligned end address of the device binary is also written.</p></li>
+</ul>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}_symbols</span></code> INTERFACE library is consumed by
+<span class="target" id="index-0-command:add_host_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_host_binary()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param TARGET_NAME<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CMake target name for this device binary.</p>
+</dd>
+<dt class="field-even">Param DEVICE_NAME<span class="colon">:</span></dt>
+<dd class="field-even"><p>Short prefix applied to every exported symbol,
+e.g. <code class="docutils literal notranslate"><span class="pre">device</span></code> produces <code class="docutils literal notranslate"><span class="pre">device_main</span></code>.  Must be unique across all
+devices in a build to avoid host link-time collisions.</p>
+</dd>
+<dt class="field-odd">Param TARGET_DIR<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Directory containing <code class="docutils literal notranslate"><span class="pre">common.ldh</span></code> and other
+target-wide shared files (e.g. <code class="docutils literal notranslate"><span class="pre">targets/&lt;target&gt;/</span></code>).</p>
+</dd>
+<dt class="field-even">Param DEVICE_DIR<span class="colon">:</span></dt>
+<dd class="field-even"><p>Directory containing the device linker script template
+<code class="docutils literal notranslate"><span class="pre">link.ld.in</span></code> and device-specific startup code
+(e.g. <code class="docutils literal notranslate"><span class="pre">targets/&lt;target&gt;/devices/snitch_cluster/</span></code>).</p>
+</dd>
+<dt class="field-odd">Param ISA<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RISC-V march string for the device (e.g. <code class="docutils literal notranslate"><span class="pre">rv32imafd</span></code>).</p>
+</dd>
+<dt class="field-even">Param ABI<span class="colon">:</span></dt>
+<dd class="field-even"><p>RISC-V mabi string for the device (e.g. <code class="docutils literal notranslate"><span class="pre">ilp32d</span></code>).</p>
+</dd>
+<dt class="field-odd">Param COMPILER<span class="colon">:</span></dt>
+<dd class="field-odd"><p>LLVM target triple for the device
+(e.g. <code class="docutils literal notranslate"><span class="pre">riscv32-unknown-elf</span></code>).</p>
+</dd>
+<dt class="field-even">Param COMPIERT_RT<span class="colon">:</span></dt>
+<dd class="field-even"><p>compiler-rt baremetal subdirectory for this ABI
+(e.g. <code class="docutils literal notranslate"><span class="pre">rv32imafd</span></code>).</p>
+</dd>
+<dt class="field-odd">Param SOURCES<span class="colon">:</span></dt>
+<dd class="field-odd"><p>C and assembly source files compiled into the device ELF.</p>
+</dd>
+<dt class="field-even">Param PREV_DEVICE<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>(optional)</em> CMake target name of the preceding device
+in memisl order.  When set, the generated linker script INCLUDEs that
+device’s placement header so this binary starts immediately after it.</p>
+</dd>
+<dt class="field-odd">Param PICOLIBC<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>(optional)</em> Picolibc library variant to link
+(e.g. <code class="docutils literal notranslate"><span class="pre">rv32imafd</span></code>).</p>
+</dd>
+</dl>
+<p>Linker script template placeholders substituted by this function:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;CHIMERA_PREV_INCLUDE&#64;</span></code> — empty, or <code class="docutils literal notranslate"><span class="pre">INCLUDE</span> <span class="pre">&lt;prev&gt;_placement.ldh</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;CHIMERA_RESERVED_SECTION&#64;</span></code> — empty, or a NOLOAD <code class="docutils literal notranslate"><span class="pre">.reserved</span></code> section
+advancing the location counter past the previous device’s memory region</p></li>
+</ul>
+<p>Build outputs (all in <code class="docutils literal notranslate"><span class="pre">CMAKE_CURRENT_BINARY_DIR</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}.elf</span></code> — device ELF</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}.dump</span></code> — disassembly</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}.sections</span></code> — section headers (input for overlap checker)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}.symbols</span></code> — full symbol table</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}_symbols.s</span></code> — absolute-address assembly for the host linker</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}_symbols.h</span></code> — <code class="docutils literal notranslate"><span class="pre">extern</span></code> declarations for host C code</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}_symbols</span></code> — INTERFACE library consumed by <span class="target" id="index-1-command:add_host_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_host_binary()</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}_placement.ldh</span></code> — placement header read by the next binary</p></li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Example Usage</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">add_device_binary(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="w">    </span><span class="no">DEVICE_NAME</span><span class="w">  </span><span class="nb">device</span>
+<span class="w">    </span><span class="no">ISA</span><span class="w">          </span><span class="o">${</span><span class="nt">ISA_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ABI</span><span class="w">          </span><span class="o">${</span><span class="nt">ABI_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPILER</span><span class="w">     </span><span class="o">${</span><span class="nt">CROSS_COMPILE_DEVICE_SNITCH_CLUSTER</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPIERT_RT</span><span class="w">  </span><span class="o">${</span><span class="nt">COMPILERRT_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">PICOLIBC</span><span class="w">     </span><span class="o">${</span><span class="nt">PICOLIB_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">TARGET_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span><span class="na">/devices/snitch_cluster</span>
+<span class="w">    </span><span class="no">SOURCES</span><span class="w">      </span><span class="o">${</span><span class="nt">TEST_SNITCH_SRCS</span><span class="o">}</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:add_host_binary(target_name)">
+<span class="sig-name descname"><span class="pre">add_host_binary(TARGET_NAME)</span></span><a class="headerlink" href="#command:add_host_binary(target_name)" title="Link to this definition"></a></dt>
+<dd><p>Compile the host binary and link the device symbol stubs produced by
+<span class="target" id="index-0-command:add_device_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_device_binary()</span></code>.</p>
+<p>This function drives Stage 3 of the three-stage heterogeneous compilation
+pipeline: the host ELF is compiled with the host ISA/ABI and linked with
+the absolute-address symbol stubs from every attached device.  A post-build
+step runs the section-overlap checker and, when <code class="docutils literal notranslate"><span class="pre">CHIMERA_UNIFIED_ELF</span></code> is
+enabled, merges all ELFs into a single mixed-ISA file for simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param TARGET_NAME<span class="colon">:</span></dt>
+<dd class="field-odd"><p>CMake target name for this host binary.</p>
+</dd>
+<dt class="field-even">Param TARGET_DIR<span class="colon">:</span></dt>
+<dd class="field-even"><p>Directory containing <code class="docutils literal notranslate"><span class="pre">common.ldh</span></code> and other
+target-wide shared files (e.g. <code class="docutils literal notranslate"><span class="pre">targets/&lt;target&gt;/</span></code>).</p>
+</dd>
+<dt class="field-odd">Param DEVICE_DIR<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Directory containing the host linker script template
+<code class="docutils literal notranslate"><span class="pre">link.ld.in</span></code> and host-specific startup code
+(e.g. <code class="docutils literal notranslate"><span class="pre">targets/&lt;target&gt;/host/</span></code>).</p>
+</dd>
+<dt class="field-even">Param ISA<span class="colon">:</span></dt>
+<dd class="field-even"><p>RISC-V march string for the host (e.g. <code class="docutils literal notranslate"><span class="pre">rv64imc</span></code>).</p>
+</dd>
+<dt class="field-odd">Param ABI<span class="colon">:</span></dt>
+<dd class="field-odd"><p>RISC-V mabi string for the host (e.g. <code class="docutils literal notranslate"><span class="pre">lp64</span></code>).</p>
+</dd>
+<dt class="field-even">Param COMPILER<span class="colon">:</span></dt>
+<dd class="field-even"><p>LLVM target triple for the host
+(e.g. <code class="docutils literal notranslate"><span class="pre">riscv64-unknown-elf</span></code>).</p>
+</dd>
+<dt class="field-odd">Param COMPIERT_RT<span class="colon">:</span></dt>
+<dd class="field-odd"><p>compiler-rt baremetal subdirectory for this ABI
+(e.g. <code class="docutils literal notranslate"><span class="pre">rv64imc</span></code>).</p>
+</dd>
+<dt class="field-even">Param SOURCES<span class="colon">:</span></dt>
+<dd class="field-even"><p>C and assembly source files compiled into the host ELF.</p>
+</dd>
+<dt class="field-odd">Param DEVICE_DEPS<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>(optional)</em> Device ELF targets that must finish
+building before symbol extraction begins.  Used for build ordering only;
+no object code is pulled from these targets.</p>
+</dd>
+<dt class="field-even">Param DEVICE_SYMBOLS<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>(optional)</em> <code class="docutils literal notranslate"><span class="pre">${dev}_symbols</span></code> INTERFACE libraries
+produced by <span class="target" id="index-1-command:add_device_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_device_binary()</span></code>.  Their compiled object
+files (the <code class="docutils literal notranslate"><span class="pre">.set</span></code> stubs) are linked into the host ELF so that device
+symbols resolve to their correct absolute addresses.</p>
+</dd>
+<dt class="field-odd">Param LAST_DEVICE<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>(optional)</em> Name of the device at the tail of the
+placement chain.  Its <code class="docutils literal notranslate"><span class="pre">_placement.ldh</span></code> is included by the host linker
+script so host <code class="docutils literal notranslate"><span class="pre">.text</span></code> is placed immediately after all device code.
+Omit or leave empty for host-only builds.</p>
+</dd>
+<dt class="field-even">Param PICOLIBC<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>(optional)</em> Picolibc library variant to link
+(e.g. <code class="docutils literal notranslate"><span class="pre">rv64imc</span></code>).</p>
+</dd>
+</dl>
+<p>Linker script template placeholders substituted by this function:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;CHIMERA_PLACEMENT_INCLUDE&#64;</span></code> — empty when <code class="docutils literal notranslate"><span class="pre">LAST_DEVICE</span></code> is unset,
+or <code class="docutils literal notranslate"><span class="pre">INCLUDE</span> <span class="pre">&lt;last_device&gt;_placement.ldh</span></code> otherwise</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&#64;CHIMERA_RESERVED_SECTION&#64;</span></code> — empty when <code class="docutils literal notranslate"><span class="pre">LAST_DEVICE</span></code> is unset,
+or a NOLOAD <code class="docutils literal notranslate"><span class="pre">.reserved</span></code> section advancing the LC past all device memory</p></li>
+</ul>
+<p>Post-build targets created:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera_check_overlaps</span></code> — memory map printer and VMA conflict checker
+(<code class="docutils literal notranslate"><span class="pre">scripts/check_section_overlaps.py</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera_merge_elf</span></code> — <em>(optional, requires</em> <code class="docutils literal notranslate"><span class="pre">CHIMERA_UNIFIED_ELF=ON</span></code> <em>)</em> merges
+device + host ELFs into one mixed-ISA file via <code class="docutils literal notranslate"><span class="pre">lief</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera_footer</span></code> — prints the build summary</p></li>
+</ul>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Example Usage</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">add_host_binary(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ISA</span><span class="w">          </span><span class="o">${</span><span class="nt">ISA_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ABI</span><span class="w">          </span><span class="o">${</span><span class="nt">ABI_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPILER</span><span class="w">     </span><span class="o">${</span><span class="nt">CROSS_COMPILE_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPIERT_RT</span><span class="w">  </span><span class="o">${</span><span class="nt">COMPILERRT_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">PICOLIBC</span><span class="w">     </span><span class="o">${</span><span class="nt">PICOLIB_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">TARGET_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span><span class="na">/host</span>
+<span class="w">    </span><span class="no">SOURCES</span><span class="w">      </span><span class="o">${</span><span class="nt">TEST_HOST_SRCS</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DEPS</span><span class="w">    </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="w">    </span><span class="no">DEVICE_SYMBOLS</span><span class="w"> </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device_symbols</span>
+<span class="w">    </span><span class="no">LAST_DEVICE</span><span class="w">    </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+</section>
+<section id="utility-modules">
+<h2>Utility Modules<a class="headerlink" href="#utility-modules" title="Link to this heading"></a></h2>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:chimera_select_shape(option &lt;var&gt; default &lt;shape&gt; header_prefixes &lt;prefix&gt;...)">
+<span class="sig-name descname"><span class="pre">chimera_select_shape(OPTION</span> <span class="pre">&lt;var&gt;</span> <span class="pre">DEFAULT</span> <span class="pre">&lt;shape&gt;</span> <span class="pre">HEADER_PREFIXES</span> <span class="pre">&lt;prefix&gt;...)</span></span><a class="headerlink" href="#command:chimera_select_shape(option <var> default <shape> header_prefixes <prefix>...)" title="Link to this definition"></a></dt>
+<dd><p>Pick one data shape for a test at configure time. Shapes are discovered from
+the headers matching the first <code class="docutils literal notranslate"><span class="pre">HEADER_PREFIXES</span></code> entry, so adding
+<code class="docutils literal notranslate"><span class="pre">&lt;prefix&gt;&lt;shape&gt;.h</span></code> is enough to make a new shape selectable.</p>
+<p>Sets <code class="docutils literal notranslate"><span class="pre">SELECTED_SHAPE</span></code> and <code class="docutils literal notranslate"><span class="pre">SELECTED_SHAPE_SOURCE</span></code> in the caller’s scope.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param OPTION<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Cache variable exposed to the user. Required.</p>
+</dd>
+<dt class="field-even">Param DEFAULT<span class="colon">:</span></dt>
+<dd class="field-even"><p>Shape used when <code class="docutils literal notranslate"><span class="pre">OPTION</span></code> is unset. Required.</p>
+</dd>
+<dt class="field-odd">Param HEADER_PREFIXES<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Prefixes of the per-shape headers. The first discovers
+the shapes; all must exist for the selected one. Required.</p>
+</dd>
+<dt class="field-even">Param HEADER_DIR<span class="colon">:</span></dt>
+<dd class="field-even"><p>Where the headers live. Defaults to <code class="docutils literal notranslate"><span class="pre">include</span></code>.</p>
+</dd>
+<dt class="field-odd">Param SOURCE_PREFIX<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If given, also select <code class="docutils literal notranslate"><span class="pre">&lt;SOURCE_DIR&gt;/&lt;prefix&gt;&lt;shape&gt;.c</span></code>.</p>
+</dd>
+<dt class="field-even">Param SOURCE_DIR<span class="colon">:</span></dt>
+<dd class="field-even"><p>Where the sources live. Defaults to <code class="docutils literal notranslate"><span class="pre">src_cluster</span></code>.</p>
+</dd>
+</dl>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Example Usage</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">chimera_select_shape(</span>
+<span class="w">  </span><span class="no">OPTION</span><span class="w">          </span><span class="no">ITA_MATMUL_L1_SHAPE</span>
+<span class="w">  </span><span class="no">DEFAULT</span><span class="w">         </span><span class="m">64</span><span class="nb">x128x64</span>
+<span class="w">  </span><span class="no">HEADER_PREFIXES</span><span class="w"> </span><span class="nb">ITA_dims_</span>
+<span class="w">  </span><span class="no">SOURCE_PREFIX</span><span class="w">   </span><span class="nb">ITA_mem_</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:chimera_test_vector_generator(generator &lt;script&gt; outputs &lt;file&gt;...)">
+<span class="sig-name descname"><span class="pre">chimera_test_vector_generator(GENERATOR</span> <span class="pre">&lt;script&gt;</span> <span class="pre">OUTPUTS</span> <span class="pre">&lt;file&gt;...)</span></span><a class="headerlink" href="#command:chimera_test_vector_generator(generator <script> outputs <file>...)" title="Link to this definition"></a></dt>
+<dd><p>Register a test’s <code class="docutils literal notranslate"><span class="pre">generate_vectors.py</span></code>. Fails configure with an actionable
+message when the vectors have not been generated yet, and adds them to the
+<code class="docutils literal notranslate"><span class="pre">regenerate-test-vectors</span></code> target.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param GENERATOR<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Path to the generator script. Required.</p>
+</dd>
+<dt class="field-even">Param OUTPUTS<span class="colon">:</span></dt>
+<dd class="field-even"><p>Files the generator writes. Required. Used for the
+missing-vector check and as the target’s byproducts.</p>
+</dd>
+<dt class="field-odd">Param ARGS<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional generator arguments. Omit when the generator already
+defaults to the right paths, which is the usual case.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:add_chimera_subdirectories(target_platform, category, mappings)">
+<span class="sig-name descname"><span class="pre">add_chimera_subdirectories(target_platform,</span> <span class="pre">category,</span> <span class="pre">mappings)</span></span><a class="headerlink" href="#command:add_chimera_subdirectories(target_platform, category, mappings)" title="Link to this definition"></a></dt>
+<dd><p>Add subdirectories based on a mapping of target platforms to folders.
+The mappings are expected to be in the format <code class="docutils literal notranslate"><span class="pre">target_platform:folder1,folder2,...</span></code>.
+:param target_platform: The target platform to build for.
+:param category: The category of the subdirectories.
+:param mappings: A list of mappings from target platforms to folders. Make sure to wrap the list in quotes!</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Example Usage</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">set(</span><span class="no">MAPPINGS</span>
+<span class="w">    </span><span class="nb">chimera-convolve</span><span class="o">:</span><span class="nb">snitch_cluster</span>
+<span class="w">    </span><span class="nb">chimera-open</span><span class="o">:</span><span class="nb">snitch_cluster</span>
+<span class="w">    </span><span class="nb">chimera-host</span><span class="o">:</span>
+<span class="nf">)</span>
+<span class="nf">add_chimera_subdirectories(</span><span class="o">${</span><span class="nt">TARGET_PLATFORM</span><span class="o">}</span><span class="w"> </span><span class="s">&quot;Device&quot;</span><span class="w"> </span><span class="s">&quot;${MAPPINGS}&quot;</span><span class="nf">)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api_device/api_device.html" class="btn btn-neutral float-left" title="Device API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

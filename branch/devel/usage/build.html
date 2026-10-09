@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multi-Binary Compilation Flow &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Folder Structure" href="structure.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Multi-Binary Compilation Flow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#motivation">Motivation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#architecture-overview">Architecture Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-three-stage-pipeline">The Three-Stage Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#shared-communication-the-common-section">Shared Communication: The <code class="docutils literal notranslate"><span class="pre">.common</span></code> Section</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#memory-placement-the-placement-chain">Memory Placement: The Placement Chain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#symbol-extraction-pipeline">Symbol Extraction Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cmake-build-configuration">CMake Build Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-device-binary"><code class="docutils literal notranslate"><span class="pre">add_device_binary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-host-binary"><code class="docutils literal notranslate"><span class="pre">add_host_binary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-test-cmakelists-txt">Minimal Test CMakeLists.txt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trampoline-and-naked-functions">Trampoline and Naked Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#key-design-decisions">Key Design Decisions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/asic.html">ASIC Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Multi-Binary Compilation Flow</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/build.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="multi-binary-compilation-flow">
+<h1>Multi-Binary Compilation Flow<a class="headerlink" href="#multi-binary-compilation-flow" title="Link to this heading"></a></h1>
+<p>Chimera-SDK compiles <strong>one ELF per execution domain</strong>.  The CVA6 host core and
+each Snitch cluster are built with their own ISA, ABI, and linker script, then
+placed at non-overlapping regions of a shared address space (<code class="docutils literal notranslate"><span class="pre">memisl</span></code>).</p>
+<section id="motivation">
+<h2>Motivation<a class="headerlink" href="#motivation" title="Link to this heading"></a></h2>
+<p>The original chimera-sdk compiled host and all cluster code into a <strong>single ELF</strong>.
+This creates two real problems:</p>
+<ol class="arabic simple">
+<li><p><strong>ISA/ABI mismatch risk.</strong> The CVA6 host runs RV64IMC; a Snitch cluster runs
+RV32IMAFD.  Linking into one binary requires a common-denominator ISA, which
+restricts optimisations and can silently produce incorrect code for one domain.</p></li>
+<li><p><strong>No clean separation.</strong> Host code must not call cluster functions directly
+(wrong ISA), yet a shared link namespace makes such accidents easy and hard to
+detect at compile time.</p></li>
+</ol>
+<p>The new approach produces one ELF per domain and uses a thin symbol-stub layer so
+the host can reference cluster code by name without any ISA confusion.</p>
+</section>
+<section id="architecture-overview">
+<h2>Architecture Overview<a class="headerlink" href="#architecture-overview" title="Link to this heading"></a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>┌───────────────────────────────────────────────┐
+│                 memisl (shared SRAM)          │
+│  0x48000000                                    │
+│  ┌──────────────┐                             │
+│  │  .common     │  chimera_shared_data_t       │
+│  │  (64-byte    │  host owns / initialises;   │
+│  │   aligned)   │  devices access via AXI     │
+│  ├──────────────┤                             │
+│  │ Device 0 ELF │  RV32IMAFD  (Snitch)        │
+│  ├──────────────┤ ← __device0_end (4K-aligned)│
+│  │  Host ELF    │  RV64IMC    (CVA6)          │
+│  └──────────────┘                             │
+│  ORIGIN + LENGTH  ← host stack (grows down)   │
+└───────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p>Both domains access the <code class="docutils literal notranslate"><span class="pre">.common</span></code> section at the same physical address
+(<code class="docutils literal notranslate"><span class="pre">0x48000000</span></code>).  The host binary loads and initialises it; device binaries
+mark it <code class="docutils literal notranslate"><span class="pre">NOLOAD</span></code> and read it over the AXI interconnect.</p>
+</section>
+<section id="the-three-stage-pipeline">
+<h2>The Three-Stage Pipeline<a class="headerlink" href="#the-three-stage-pipeline" title="Link to this heading"></a></h2>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│  Stage 1: Compile device binary                                 │
+│                                                                 │
+│  device sources + crt0.S + runtime ──[clang rv32imafd]──►      │
+│                  device.elf   (position-independent, rv32)      │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Stage 2: Extract public symbols                                │
+│                                                                 │
+│  llvm-nm device.elf ──► ChimeraBuildHelpers.cmake              │
+│                          ├─► device_symbols.s                  │
+│                          │     .global device_main             │
+│                          │     .set    device_main, 0x48001234 │
+│                          ├─► device_symbols.h                  │
+│                          │     extern char device_main[];      │
+│                          └─► device_placement.ldh              │
+│                                __device_end = 0x48010000;      │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  Stage 3: Compile host binary                                   │
+│                                                                 │
+│  host sources + crt0.S + runtime + device_symbols.s            │
+│  ──[clang rv64imc]──► host.elf                                  │
+│                                                                 │
+│  Host linker script INCLUDEs device_placement.ldh so host      │
+│  .text is placed immediately after device code.                 │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p>Stages 1 and 2 are driven by <span class="target" id="index-0-command:add_device_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_device_binary()</span></code>; Stage 3 is
+driven by <span class="target" id="index-0-command:add_host_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_host_binary()</span></code>.  CMake dependency tracking ensures
+the stages run in order and that the host ELF relinks whenever the device
+changes.</p>
+</section>
+<section id="shared-communication-the-common-section">
+<h2>Shared Communication: The <code class="docutils literal notranslate"><span class="pre">.common</span></code> Section<a class="headerlink" href="#shared-communication-the-common-section" title="Link to this heading"></a></h2>
+<p>All binaries map the same physical address (<code class="docutils literal notranslate"><span class="pre">0x48000000</span></code>) for shared state.
+The layout is defined by a single C struct compiled into every binary:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cm">/* targets/&lt;target&gt;/shared/inc/shared.h */</span>
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">__attribute__</span><span class="p">((</span><span class="n">packed</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">host_to_device</span><span class="p">;</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">device_to_host</span><span class="p">;</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">host_to_device_flag</span><span class="p">[</span><span class="n">NUM_CLUSTERS</span><span class="p">];</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">device_to_host_flag</span><span class="p">[</span><span class="n">NUM_CLUSTERS</span><span class="p">];</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">trampoline_function</span><span class="p">[</span><span class="n">NUM_CLUSTER_CORES</span><span class="p">];</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">trampoline_args</span><span class="p">[</span><span class="n">NUM_CLUSTER_CORES</span><span class="p">];</span>
+<span class="w">    </span><span class="k">volatile</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">trampoline_stack</span><span class="p">[</span><span class="n">NUM_CLUSTER_CORES</span><span class="p">];</span>
+<span class="p">}</span><span class="w"> </span><span class="n">chimera_shared_data_t</span><span class="p">;</span>
+
+<span class="k">extern</span><span class="w"> </span><span class="n">chimera_shared_data_t</span><span class="w"> </span><span class="n">shared_data</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The instance is defined in <code class="docutils literal notranslate"><span class="pre">shared.c</span></code>, placed in <code class="docutils literal notranslate"><span class="pre">.common</span></code> at 64-byte
+alignment.  The host linker script loads this section normally:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.common : ALIGN(64) { KEEP(*(.common)) } &gt; memisl AT &gt; memisl
+</pre></div>
+</div>
+<p>Device linker scripts mark it <code class="docutils literal notranslate"><span class="pre">NOLOAD</span></code> — the memory is already initialised by
+the host and must not be overwritten:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.common (NOLOAD) : ALIGN(64) { KEEP(*(.common)) } &gt; memisl
+</pre></div>
+</div>
+<p>Because all binaries compile the same <code class="docutils literal notranslate"><span class="pre">shared.c</span></code> with the same struct
+definition, <code class="docutils literal notranslate"><span class="pre">offsetof()</span></code> values are identical.  The trampoline code uses
+<code class="docutils literal notranslate"><span class="pre">offsetof</span></code> to access struct fields before the global pointer is set up.</p>
+</section>
+<section id="memory-placement-the-placement-chain">
+<h2>Memory Placement: The Placement Chain<a class="headerlink" href="#memory-placement-the-placement-chain" title="Link to this heading"></a></h2>
+<p>After each device ELF is linked, <code class="docutils literal notranslate"><span class="pre">ChimeraBuildHelpers.cmake</span></code> writes a small
+linker header recording its 4 KiB-aligned end address:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>/* device_placement.ldh — auto-generated */
+__device_end = 0x48010000;
+</pre></div>
+</div>
+<p>The next binary INCLUDEs this file and skips over the occupied region with a
+NOLOAD <code class="docutils literal notranslate"><span class="pre">.reserved</span></code> section.  This forms a <strong>placement chain</strong>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Device 0 → device0_placement.ldh → Device 1 → device1_placement.ldh → Host
+</pre></div>
+</div>
+<p>CMake builds this chain automatically from the <code class="docutils literal notranslate"><span class="pre">PREV_DEVICE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">LAST_DEVICE</span></code> arguments to <span class="target" id="index-1-command:add_device_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_device_binary()</span></code> and
+<span class="target" id="index-1-command:add_host_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_host_binary()</span></code>.</p>
+</section>
+<section id="symbol-extraction-pipeline">
+<h2>Symbol Extraction Pipeline<a class="headerlink" href="#symbol-extraction-pipeline" title="Link to this heading"></a></h2>
+<p>After Stage 1, <code class="docutils literal notranslate"><span class="pre">ChimeraBuildHelpers.cmake</span></code> runs <code class="docutils literal notranslate"><span class="pre">llvm-nm</span></code> on the device ELF
+and applies the following filter rules:</p>
+<ul class="simple">
+<li><p>Only TEXT (<code class="docutils literal notranslate"><span class="pre">T</span></code>/<code class="docutils literal notranslate"><span class="pre">t</span></code>), DATA (<code class="docutils literal notranslate"><span class="pre">D</span></code>/<code class="docutils literal notranslate"><span class="pre">d</span></code>), BSS (<code class="docutils literal notranslate"><span class="pre">B</span></code>/<code class="docutils literal notranslate"><span class="pre">b</span></code>), and RODATA
+(<code class="docutils literal notranslate"><span class="pre">R</span></code>/<code class="docutils literal notranslate"><span class="pre">r</span></code>) symbols are exported.</p></li>
+<li><p>Symbols whose name starts with <code class="docutils literal notranslate"><span class="pre">__</span></code> (double underscore) are skipped — these
+are linker-internal bookkeeping symbols (<code class="docutils literal notranslate"><span class="pre">__bss_start</span></code>, <code class="docutils literal notranslate"><span class="pre">__device_end</span></code>,
+etc.) that must not appear in the host’s link namespace.</p></li>
+<li><p>Undefined and weak symbols are not exported.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">DEVICE_NAME</span></code> prefix (e.g. <code class="docutils literal notranslate"><span class="pre">device</span></code>) is prepended to every exported
+symbol name.  This prevents link-time collisions when multiple devices define
+the same symbol (e.g. <code class="docutils literal notranslate"><span class="pre">main</span></code>).</p>
+<p>The generated assembly stub is assembled with the <strong>host</strong> toolchain and
+wrapped in a CMake INTERFACE library (<code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}_symbols</span></code>) for use with
+<span class="target" id="index-2-command:add_host_binary"></span><code class="xref cmake cmake-command docutils literal notranslate"><span class="pre">add_host_binary()</span></code>.</p>
+</section>
+<section id="cmake-build-configuration">
+<h2>CMake Build Configuration<a class="headerlink" href="#cmake-build-configuration" title="Link to this heading"></a></h2>
+<p>ISA and ABI settings are established by target-specific CMake variables (set in
+<code class="docutils literal notranslate"><span class="pre">targets/&lt;target&gt;/CMakeLists.txt</span></code>):</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ISA_HOST</span></code> – host march string (e.g. <code class="docutils literal notranslate"><span class="pre">rv64imc</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ABI_HOST</span></code> – host mabi string (e.g. <code class="docutils literal notranslate"><span class="pre">lp64</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ISA_CLUSTER_SNITCH</span></code> – device march string (e.g. <code class="docutils literal notranslate"><span class="pre">rv32imafd</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ABI_CLUSTER_SNITCH</span></code> – device mabi string (e.g. <code class="docutils literal notranslate"><span class="pre">ilp32d</span></code>)</p></li>
+</ul>
+</section>
+<section id="add-device-binary">
+<h2><code class="docutils literal notranslate"><span class="pre">add_device_binary()</span></code><a class="headerlink" href="#add-device-binary" title="Link to this heading"></a></h2>
+<p>Compiles a device binary and creates the <code class="docutils literal notranslate"><span class="pre">${TARGET_NAME}_symbols</span></code> INTERFACE library
+consumed by <code class="docutils literal notranslate"><span class="pre">add_host_binary()</span></code>.</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">add_device_binary(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="w">    </span><span class="no">DEVICE_NAME</span><span class="w">  </span><span class="nb">device</span>
+<span class="w">    </span><span class="no">ISA</span><span class="w">          </span><span class="o">${</span><span class="nt">ISA_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ABI</span><span class="w">          </span><span class="o">${</span><span class="nt">ABI_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPILER</span><span class="w">     </span><span class="o">${</span><span class="nt">CROSS_COMPILE_DEVICE_SNITCH_CLUSTER</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPIERT_RT</span><span class="w">  </span><span class="o">${</span><span class="nt">COMPILERRT_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">PICOLIBC</span><span class="w">     </span><span class="o">${</span><span class="nt">PICOLIB_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">TARGET_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span><span class="na">/devices/snitch_cluster</span>
+<span class="w">    </span><span class="no">SOURCES</span><span class="w">      </span><span class="o">${</span><span class="nt">TEST_SNITCH_SRCS</span><span class="o">}</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Key arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DEVICE_NAME</span></code> – short name prepended to every exported symbol (e.g. <code class="docutils literal notranslate"><span class="pre">device_main</span></code>).
+Must be unique across all devices in a build to avoid link-time collisions in the host.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TARGET_DIR</span></code> / <code class="docutils literal notranslate"><span class="pre">DEVICE_DIR</span></code> – directories containing <code class="docutils literal notranslate"><span class="pre">common.ldh</span></code> and the
+<code class="docutils literal notranslate"><span class="pre">link.ld.in</span></code> linker script template respectively.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PREV_DEVICE</span></code> – optional; name of the preceding device in memisl order.  When set, this
+device is placed immediately after it via the placement chain.</p></li>
+</ul>
+</section>
+<section id="add-host-binary">
+<h2><code class="docutils literal notranslate"><span class="pre">add_host_binary()</span></code><a class="headerlink" href="#add-host-binary" title="Link to this heading"></a></h2>
+<p>Compiles the host binary, links the device symbol stubs, and runs post-build checks.</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">add_host_binary(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ISA</span><span class="w">          </span><span class="o">${</span><span class="nt">ISA_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ABI</span><span class="w">          </span><span class="o">${</span><span class="nt">ABI_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPILER</span><span class="w">     </span><span class="o">${</span><span class="nt">CROSS_COMPILE_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPIERT_RT</span><span class="w">  </span><span class="o">${</span><span class="nt">COMPILERRT_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">PICOLIBC</span><span class="w">     </span><span class="o">${</span><span class="nt">PICOLIB_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">TARGET_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span><span class="na">/host</span>
+<span class="w">    </span><span class="no">SOURCES</span><span class="w">      </span><span class="o">${</span><span class="nt">TEST_HOST_SRCS</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DEPS</span><span class="w">    </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="w">    </span><span class="no">DEVICE_SYMBOLS</span><span class="w"> </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device_symbols</span>
+<span class="w">    </span><span class="no">LAST_DEVICE</span><span class="w">    </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Key arguments:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DEVICE_DEPS</span></code> – device ELF targets that must finish building before symbol extraction
+runs (build ordering only; no code is pulled from these).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DEVICE_SYMBOLS</span></code> – <code class="docutils literal notranslate"><span class="pre">${dev}_symbols</span></code> INTERFACE libraries produced by
+<code class="docutils literal notranslate"><span class="pre">add_device_binary()</span></code>.  Their compiled object files (the <code class="docutils literal notranslate"><span class="pre">.set</span></code> stubs) are linked into
+the host ELF so device symbols resolve to their absolute addresses.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LAST_DEVICE</span></code> – the device at the tail of the placement chain.  Its
+<code class="docutils literal notranslate"><span class="pre">_placement.ldh</span></code> is included by the host linker script via
+<code class="docutils literal notranslate"><span class="pre">&#64;CHIMERA_PLACEMENT_INCLUDE&#64;</span></code>, so host code is placed immediately after all device
+code.  Leave empty or omit for host-only builds (the placeholder becomes an empty string).</p></li>
+</ul>
+</section>
+<section id="minimal-test-cmakelists-txt">
+<h2>Minimal Test CMakeLists.txt<a class="headerlink" href="#minimal-test-cmakelists-txt" title="Link to this heading"></a></h2>
+<p>A new test in <code class="docutils literal notranslate"><span class="pre">tests/snitchCluster/&lt;testName&gt;/</span></code> typically looks like:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">set(</span><span class="no">TEST_NAME</span><span class="w"> </span><span class="nb">test_snitchCluster_myTest</span><span class="nf">)</span>
+
+<span class="nf">file(</span><span class="no">GLOB_RECURSE</span><span class="w"> </span><span class="no">TEST_SNITCH_SRCS</span><span class="w"> </span><span class="s">&quot;src_cluster/*.c&quot;</span><span class="nf">)</span>
+<span class="nf">file(</span><span class="no">GLOB_RECURSE</span><span class="w"> </span><span class="no">TEST_HOST_SRCS</span><span class="w">   </span><span class="s">&quot;src_host/*.c&quot;</span><span class="nf">)</span>
+
+<span class="nf">add_device_binary(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="w">    </span><span class="no">DEVICE_NAME</span><span class="w">  </span><span class="nb">device</span>
+<span class="w">    </span><span class="no">ISA</span><span class="w">          </span><span class="o">${</span><span class="nt">ISA_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ABI</span><span class="w">          </span><span class="o">${</span><span class="nt">ABI_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPILER</span><span class="w">     </span><span class="o">${</span><span class="nt">CROSS_COMPILE_DEVICE_SNITCH_CLUSTER</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPIERT_RT</span><span class="w">  </span><span class="o">${</span><span class="nt">COMPILERRT_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">PICOLIBC</span><span class="w">     </span><span class="o">${</span><span class="nt">PICOLIB_CLUSTER_SNITCH</span><span class="o">}</span>
+<span class="w">    </span><span class="no">TARGET_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span><span class="na">/devices/snitch_cluster</span>
+<span class="w">    </span><span class="no">SOURCES</span><span class="w">      </span><span class="o">${</span><span class="nt">TEST_SNITCH_SRCS</span><span class="o">}</span>
+<span class="nf">)</span>
+
+<span class="nf">add_host_binary(</span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ISA</span><span class="w">          </span><span class="o">${</span><span class="nt">ISA_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">ABI</span><span class="w">          </span><span class="o">${</span><span class="nt">ABI_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPILER</span><span class="w">     </span><span class="o">${</span><span class="nt">CROSS_COMPILE_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">COMPIERT_RT</span><span class="w">  </span><span class="o">${</span><span class="nt">COMPILERRT_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">PICOLIBC</span><span class="w">     </span><span class="o">${</span><span class="nt">PICOLIB_HOST</span><span class="o">}</span>
+<span class="w">    </span><span class="no">TARGET_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DIR</span><span class="w">   </span><span class="o">${</span><span class="nt">CHIMERA_TARGET_DIR</span><span class="o">}</span><span class="na">/host</span>
+<span class="w">    </span><span class="no">SOURCES</span><span class="w">      </span><span class="o">${</span><span class="nt">TEST_HOST_SRCS</span><span class="o">}</span>
+<span class="w">    </span><span class="no">DEVICE_DEPS</span><span class="w">    </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="w">    </span><span class="no">DEVICE_SYMBOLS</span><span class="w"> </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device_symbols</span>
+<span class="w">    </span><span class="no">LAST_DEVICE</span><span class="w">    </span><span class="o">${</span><span class="nt">TEST_NAME</span><span class="o">}</span><span class="nb">_device</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>See <code class="docutils literal notranslate"><span class="pre">tests/snitchCluster/simpleOffload/CMakeLists.txt</span></code> for a complete working example.</p>
+</section>
+<section id="trampoline-and-naked-functions">
+<h2>Trampoline and Naked Functions<a class="headerlink" href="#trampoline-and-naked-functions" title="Link to this heading"></a></h2>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Functions that execute before the cluster core is fully initialised — such as the
+trampoline entry point and interrupt handlers — run before the stack pointer and global
+pointer are set up.  These must be implemented as <strong>naked functions</strong> so the compiler
+does not generate a stack frame prologue or epilogue.</p>
+</div>
+<p>The trampoline is a naked C function in the <strong>device</strong> binary that the host uses to
+launch workloads on a cluster core.  It reads <code class="docutils literal notranslate"><span class="pre">sp</span></code>, <code class="docutils literal notranslate"><span class="pre">fn</span></code>, and <code class="docutils literal notranslate"><span class="pre">args</span></code> from
+<code class="docutils literal notranslate"><span class="pre">shared_data</span></code> fields using <code class="docutils literal notranslate"><span class="pre">offsetof()</span></code>-computed offsets, which avoids any reliance on
+GP-relative addressing:</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">__attribute__</span><span class="p">((</span><span class="kr">naked</span><span class="p">))</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">_trampoline</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">asm</span><span class="w"> </span><span class="k">volatile</span><span class="p">(</span>
+<span class="w">        </span><span class="s">&quot;lw  sp, %0(a0)</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">        </span><span class="s">&quot;lw  t0, %1(a0)</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">        </span><span class="s">&quot;jalr t0</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="w">        </span><span class="o">:</span>
+<span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;i&quot;</span><span class="p">(</span><span class="n">offsetof</span><span class="p">(</span><span class="n">chimera_shared_data_t</span><span class="p">,</span><span class="w"> </span><span class="n">trampoline_stack</span><span class="p">)),</span>
+<span class="w">          </span><span class="s">&quot;i&quot;</span><span class="p">(</span><span class="n">offsetof</span><span class="p">(</span><span class="n">chimera_shared_data_t</span><span class="p">,</span><span class="w"> </span><span class="n">trampoline_function</span><span class="p">))</span>
+<span class="w">    </span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The trampoline lives in the <strong>device</strong> binary only and is never linked into the host.</p>
+</section>
+<section id="key-design-decisions">
+<h2>Key Design Decisions<a class="headerlink" href="#key-design-decisions" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Decision</p></th>
+<th class="head"><p>Rationale</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Separate ELFs, not libraries</p></td>
+<td><p>A static library compiled for <code class="docutils literal notranslate"><span class="pre">rv32imafd</span></code> cannot be safely linked into
+an <code class="docutils literal notranslate"><span class="pre">rv64imc</span></code> host — the linker accepts it, but the instructions are
+wrong.  Separate ELFs make the ISA boundary explicit and enforced.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">.common</span></code> is NOLOAD on device</p></td>
+<td><p>The host initialises <code class="docutils literal notranslate"><span class="pre">.common</span></code> at startup.  If devices also loaded it,
+the initialisation would be overwritten.  NOLOAD means the device never
+zeros that region.</p></td>
+</tr>
+<tr class="row-even"><td><p>Symbol stubs, not <code class="docutils literal notranslate"><span class="pre">EXTERN</span></code> in linker scripts</p></td>
+<td><p>Absolute <code class="docutils literal notranslate"><span class="pre">.set</span></code> symbols in a compiled object resolve at final link
+without relocation.  <code class="docutils literal notranslate"><span class="pre">EXTERN</span></code> only pulls in a symbol if it is otherwise
+unreferenced, which is order-dependent.  The stub approach is reliable
+regardless of link order.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DEVICE_NAME</span></code> prefix</p></td>
+<td><p>Two devices both export <code class="docutils literal notranslate"><span class="pre">main</span></code>.  Without a prefix the host link
+resolves both to the same symbol.  The prefix makes each symbol unique
+in the host namespace.</p></td>
+</tr>
+<tr class="row-even"><td><p>4 KiB-aligned <code class="docutils literal notranslate"><span class="pre">__device_end</span></code></p></td>
+<td><p>Page-aligned boundaries simplify MPU/PMP configuration and prevent
+accidental cache-line sharing between adjacent binaries.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="structure.html" class="btn btn-neutral float-right" title="Folder Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

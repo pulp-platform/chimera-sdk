@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ASIC Tutorial &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API References" href="../api/api.html" />
+    <link rel="prev" title="CI System" href="../usage/ci.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/build.html">Multi-Binary Compilation Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ASIC Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#one-time-setup">One-Time Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-openocd">Install OpenOCD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-the-repository">Get the Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-the-docker-container">Get the Docker Container</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#building-and-running">Building and Running</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#start-the-container">Start the Container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-for-asic">Build for ASIC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connect-via-jtag">Connect via JTAG</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#open-a-serial-terminal">Open a Serial Terminal</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#flash-and-debug">Flash and Debug</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">ASIC Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorial/asic.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="asic-tutorial">
+<h1>ASIC Tutorial<a class="headerlink" href="#asic-tutorial" title="Link to this heading"></a></h1>
+<p>This tutorial is specific to the Chimera Convolve SoC, which is the first Chimera design tape-out.</p>
+<p>This guide walks through building, flashing, and debugging a Chimera application on real
+hardware.  The <strong>One-Time Setup</strong> section only needs to be done once per development machine.
+After that you can jump straight to <a class="reference internal" href="#building-and-running">Building and Running</a>.</p>
+<section id="one-time-setup">
+<h2>One-Time Setup<a class="headerlink" href="#one-time-setup" title="Link to this heading"></a></h2>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h3>
+<p>Install the host tools needed to communicate with the board.</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+macOS</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew<span class="w"> </span>install<span class="w"> </span>pipx<span class="w"> </span>automake
+pipx<span class="w"> </span>install<span class="w"> </span>pyserial
+pipx<span class="w"> </span>ensurepath
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+Ubuntu</label><div class="sd-tab-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-pip<span class="w"> </span>git<span class="w"> </span>build-essential<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>pkg-config<span class="w"> </span>libtool<span class="w"> </span>autoconf<span class="w"> </span>automake<span class="w"> </span>texinfo
+pip<span class="w"> </span>install<span class="w"> </span>pyserial
+</pre></div>
+</div>
+</div>
+</div>
+<p>Make sure Docker is installed and running.  Installation instructions are available on the
+<a class="reference external" href="https://docs.docker.com/get-docker/">Docker website</a>.  On Docker Desktop, enable host
+networking under <strong>Settings → Resources → Enable host networking</strong>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Set <code class="docutils literal notranslate"><span class="pre">CHIMERA_ROOT</span></code> once and add it to your shell profile so every command below works
+without modification:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>chimera<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>chimera
+<span class="nb">export</span><span class="w"> </span><span class="nv">CHIMERA_ROOT</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span><span class="w">   </span><span class="c1"># add to ~/.zshrc or ~/.bashrc</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="install-openocd">
+<h3>Install OpenOCD<a class="headerlink" href="#install-openocd" title="Link to this heading"></a></h3>
+<p>OpenOCD communicates with the Chimera board over JTAG.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$CHIMERA_ROOT</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/openocd-org/openocd.git
+<span class="nb">cd</span><span class="w"> </span>openocd
+git<span class="w"> </span>checkout<span class="w"> </span>v0.12.0
+./bootstrap
+./configure<span class="w"> </span>--prefix<span class="o">=</span><span class="nv">$CHIMERA_ROOT</span>/install<span class="w"> </span>--disable-werror<span class="w"> </span>--enable-remote-bitbang
+make<span class="w"> </span>-j<span class="k">$(</span>nproc<span class="k">)</span>
+make<span class="w"> </span>install
+</pre></div>
+</div>
+<p>Add <code class="docutils literal notranslate"><span class="pre">$CHIMERA_ROOT/install/bin</span></code> to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code> if you used a local prefix.</p>
+</section>
+<section id="get-the-repository">
+<h3>Get the Repository<a class="headerlink" href="#get-the-repository" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$CHIMERA_ROOT</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/pulp-platform/chimera-sdk.git
+<span class="nb">cd</span><span class="w"> </span>chimera-sdk
+git<span class="w"> </span>submodule<span class="w"> </span>update<span class="w"> </span>--init<span class="w"> </span>--recursive
+</pre></div>
+</div>
+</section>
+<section id="get-the-docker-container">
+<h3>Get the Docker Container<a class="headerlink" href="#get-the-docker-container" title="Link to this heading"></a></h3>
+<p>Pull the pre-built container and create a named instance with the repository mounted:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>pull<span class="w"> </span>ghcr.io/pulp-platform/chimera:devel
+
+docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--name<span class="w"> </span>chimera<span class="w"> </span>--net<span class="o">=</span>host<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-v<span class="w"> </span><span class="nv">$CHIMERA_ROOT</span>/chimera-sdk:/app/chimera<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ghcr.io/pulp-platform/chimera:devel<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>zsh
+</pre></div>
+</div>
+<p>The container ships with the LLVM toolchain, picolibc, ccache, Oh My ZSH (cypher theme),
+<code class="docutils literal notranslate"><span class="pre">gdb-multiarch</span></code>, and all required Python dependencies.  No additional setup is needed.</p>
+</section>
+</section>
+<section id="building-and-running">
+<h2>Building and Running<a class="headerlink" href="#building-and-running" title="Link to this heading"></a></h2>
+<section id="start-the-container">
+<h3>Start the Container<a class="headerlink" href="#start-the-container" title="Link to this heading"></a></h3>
+<p>If the container is not running, start it and open a shell:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>start<span class="w"> </span>chimera
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>chimera<span class="w"> </span>zsh
+</pre></div>
+</div>
+</section>
+<section id="build-for-asic">
+<h3>Build for ASIC<a class="headerlink" href="#build-for-asic" title="Link to this heading"></a></h3>
+<p>Inside the container, configure for the <code class="docutils literal notranslate"><span class="pre">chimera-convolve</span></code> target with
+<code class="docutils literal notranslate"><span class="pre">HARDWARE_BACKEND=ASIC</span></code> and build:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/app/chimera
+cmake<span class="w"> </span>-D<span class="w"> </span><span class="nv">TARGET_PLATFORM</span><span class="o">=</span>chimera-convolve<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">TOOLCHAIN_DIR</span><span class="o">=</span>/app/install/llvm-18.1.4-pulp<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">PICOLIBC_DIR</span><span class="o">=</span>/app/install/picolibc<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">HARDWARE_BACKEND</span><span class="o">=</span>ASIC<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">CHIMERA_UNIFIED_ELF</span><span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-B<span class="w"> </span>build
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+<p>Binaries land in <code class="docutils literal notranslate"><span class="pre">build/bin/</span></code> and additional build artifacts are in <code class="docutils literal notranslate"><span class="pre">build/tests/</span></code>.</p>
+</section>
+<section id="connect-via-jtag">
+<h3>Connect via JTAG<a class="headerlink" href="#connect-via-jtag" title="Link to this heading"></a></h3>
+<p>In a <strong>separate terminal on the host</strong>, run OpenOCD to establish a JTAG connection:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span><span class="nv">$CHIMERA_ROOT</span>/chimera-sdk
+openocd<span class="w"> </span>-f<span class="w"> </span>targets/chimera-convolve/chimera.openocd.hs2.tcl
+</pre></div>
+</div>
+<p>A successful connection prints:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Info : Listening on port 3333 for gdb connections
+Ready for Remote Connections.
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you see <code class="docutils literal notranslate"><span class="pre">Error:</span> <span class="pre">Fatal:</span> <span class="pre">Hart</span> <span class="pre">0</span> <span class="pre">failed</span> <span class="pre">to</span> <span class="pre">halt</span> <span class="pre">during</span> <span class="pre">examine()</span></code>, reset the chip and
+retry OpenOCD.</p>
+</div>
+</section>
+<section id="open-a-serial-terminal">
+<h3>Open a Serial Terminal<a class="headerlink" href="#open-a-serial-terminal" title="Link to this heading"></a></h3>
+<p>In another <strong>host terminal</strong>, open the serial port to see program output:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyserial-miniterm<span class="w"> </span>-<span class="w"> </span><span class="m">9600</span>
+</pre></div>
+</div>
+</section>
+<section id="flash-and-debug">
+<h3>Flash and Debug<a class="headerlink" href="#flash-and-debug" title="Link to this heading"></a></h3>
+<p>With OpenOCD running, use <code class="docutils literal notranslate"><span class="pre">gdb-multiarch</span></code> <strong>inside the container</strong> to flash and debug:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gdb-multiarch<span class="w"> </span>-iex<span class="w"> </span><span class="s2">&quot;set auto-load safe-path /&quot;</span>
+</pre></div>
+</div>
+<p>Connect to OpenOCD and load the binary:</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nv">target</span><span class="w"> </span>extended-remote<span class="w"> </span>localhost:3333
+<span class="nv">monitor</span><span class="w"> </span>reset<span class="w"> </span>halt
+<span class="nb">file</span><span class="w"> </span>build<span class="o">/</span>bin<span class="o">/</span>chimera_unified_<span class="o">&lt;</span>test<span class="o">&gt;</span>.elf
+<span class="nb">load</span>
+<span class="nv">run</span>
+</pre></div>
+</div>
+<p>To re-run without restarting GDB:</p>
+<div class="highlight-tcl notranslate"><div class="highlight"><pre><span></span><span class="nb">load</span>
+<span class="nv">run</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../usage/ci.html" class="btn btn-neutral float-left" title="CI System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api/api.html" class="btn btn-neutral float-right" title="API References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

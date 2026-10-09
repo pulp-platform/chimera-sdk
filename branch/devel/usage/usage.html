@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Multi-Binary Compilation Flow" href="build.html" />
+    <link rel="prev" title="Chimera SDK Documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#building-the-sdk">Building the SDK</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cmake-variables">CMake Variables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docker-recommended">Docker (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#singularity-recommended">Singularity (Recommended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generic-environment-not-recommended">Generic Environment (Not Recommended)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#targets">Targets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="build.html">Multi-Binary Compilation Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial/asic.html">ASIC Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/api.html">API References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/usage/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<section id="building-the-sdk">
+<h2>Building the SDK<a class="headerlink" href="#building-the-sdk" title="Link to this heading"></a></h2>
+<p>The applications are built with RISC-V LLVM 18 or later.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>For LLVM versions less than 15, linker relaxation is not supported and thus disabled.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>Recommended for new users:</strong> use the pre-built container (Docker or Singularity, see
+below).  The container ships with the correct LLVM toolchain, picolibc, and all Python
+dependencies pre-installed — no manual toolchain setup needed.</p>
+</div>
+<section id="cmake-variables">
+<h3>CMake Variables<a class="headerlink" href="#cmake-variables" title="Link to this heading"></a></h3>
+<p>All build methods use the same CMake variables:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">TARGET_PLATFORM</span></code> – hardware target to build for (required; see <a class="reference internal" href="#targets">Targets</a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TOOLCHAIN_DIR</span></code> – path to the LLVM installation root (required if not on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PICOLIBC_DIR</span></code> – path to the prebuilt picolibc installation (required;
+see <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">picolibc-multilib</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HARDWARE_BACKEND</span></code> – simulation back-end: <code class="docutils literal notranslate"><span class="pre">RTL</span></code> (default), <code class="docutils literal notranslate"><span class="pre">GVSOC</span></code> or <code class="docutils literal notranslate"><span class="pre">ASIC</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CHIMERA_UNIFIED_ELF</span></code> – when <code class="docutils literal notranslate"><span class="pre">ON</span></code>, merges device and host ELFs into a single
+mixed-ISA file suitable for simulation (requires <code class="docutils literal notranslate"><span class="pre">lief</span></code>; default <code class="docutils literal notranslate"><span class="pre">OFF</span></code>)</p></li>
+</ul>
+</section>
+<section id="docker-recommended">
+<h3>Docker (Recommended)<a class="headerlink" href="#docker-recommended" title="Link to this heading"></a></h3>
+<p>The pre-built container at <code class="docutils literal notranslate"><span class="pre">ghcr.io/pulp-platform/chimera:devel</span></code> ships with a
+PULP-flavoured RISC-V LLVM toolchain and all required dependencies.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pull the container (one-time)</span>
+docker<span class="w"> </span>pull<span class="w"> </span>ghcr.io/pulp-platform/chimera:devel
+
+<span class="c1"># Start an interactive shell with the repository mounted at /app/chimera</span>
+docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-v<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>:/app/work<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ghcr.io/pulp-platform/chimera:devel<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>zsh
+
+<span class="c1"># Inside the container — configure and build</span>
+<span class="nb">cd</span><span class="w"> </span>/app/work
+cmake<span class="w"> </span>-D<span class="w"> </span><span class="nv">TARGET_PLATFORM</span><span class="o">=</span>chimera-open<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">TOOLCHAIN_DIR</span><span class="o">=</span>/app/install/llvm-18.1.4-pulp<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">PICOLIBC_DIR</span><span class="o">=</span>/app/install/picolibc<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">HARDWARE_BACKEND</span><span class="o">=</span>RTL<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">CHIMERA_UNIFIED_ELF</span><span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-B<span class="w"> </span>build
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+</section>
+<section id="singularity-recommended">
+<h3>Singularity (Recommended)<a class="headerlink" href="#singularity-recommended" title="Link to this heading"></a></h3>
+<p>Singularity (or Apptainer) is available on IIS workstations and HPC clusters where Docker
+is not permitted.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pull the container (creates chimera_devel.sif in the current directory)</span>
+singularity<span class="w"> </span>pull<span class="w"> </span>docker://ghcr.io/pulp-platform/chimera:devel
+
+<span class="c1"># Start a clean shell with environment isolation (-e) inside the container</span>
+singularity<span class="w"> </span>shell<span class="w"> </span>-e<span class="w"> </span>-s<span class="w"> </span>/bin/zsh<span class="w"> </span>chimera_devel.sif
+
+<span class="c1"># Inside the container — configure and build</span>
+<span class="nb">cd</span><span class="w"> </span>/path/to/chimera-sdk
+cmake<span class="w"> </span>-D<span class="w"> </span><span class="nv">TARGET_PLATFORM</span><span class="o">=</span>chimera-open<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">TOOLCHAIN_DIR</span><span class="o">=</span>/app/install/llvm-18.1.4-pulp<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">PICOLIBC_DIR</span><span class="o">=</span>/app/install/picolibc<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">HARDWARE_BACKEND</span><span class="o">=</span>RTL<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">CHIMERA_UNIFIED_ELF</span><span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-B<span class="w"> </span>build
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">-e</span></code> flag to <code class="docutils literal notranslate"><span class="pre">singularity</span> <span class="pre">shell</span></code> cleans the host environment so the container’s
+tool paths take precedence.  Without it, host shell aliases or <code class="docutils literal notranslate"><span class="pre">PATH</span></code> entries can
+shadow the container’s CMake or Python installations.</p>
+</div>
+</section>
+<section id="generic-environment-not-recommended">
+<h3>Generic Environment (Not Recommended)<a class="headerlink" href="#generic-environment-not-recommended" title="Link to this heading"></a></h3>
+<p>If you prefer a native installation, build the toolchain with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">llvm</span></code> and picolibc
+with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">picolibc-multilib</span></code>, then run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span>-D<span class="w"> </span><span class="nv">TARGET_PLATFORM</span><span class="o">=</span>chimera-open<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">TOOLCHAIN_DIR</span><span class="o">=</span>&lt;path-to-llvm&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">PICOLIBC_DIR</span><span class="o">=</span>&lt;path-to-picolibc&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">HARDWARE_BACKEND</span><span class="o">=</span>RTL<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-D<span class="w"> </span><span class="nv">CHIMERA_UNIFIED_ELF</span><span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-B<span class="w"> </span>build
+cmake<span class="w"> </span>--build<span class="w"> </span>build<span class="w"> </span>-j
+</pre></div>
+</div>
+</section>
+</section>
+<section id="targets">
+<h2>Targets<a class="headerlink" href="#targets" title="Link to this heading"></a></h2>
+<p>The SDK supports multiple hardware targets.  Available targets are defined in
+<code class="docutils literal notranslate"><span class="pre">targets/CMakeLists.txt</span></code> under <code class="docutils literal notranslate"><span class="pre">AVAILABLE_TARGETS</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera-convolve</span></code> – target for the CONVOLVE project (RV64IMC host + RV32IMAFD cluster)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera-host</span></code> – host-only target (no cluster devices)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">chimera-open</span></code> – default target with multiple Snitch clusters</p></li>
+</ul>
+</section>
+<section id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Link to this heading"></a></h2>
+<p>You can test functional correctness with the event-based simulator
+<a class="reference external" href="https://github.com/gvsoc/gvsoc">GVSoC</a>.  To install GVSoC:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>gvsoc
+</pre></div>
+</div>
+<p>By default, GVSoC is installed in <code class="docutils literal notranslate"><span class="pre">install/gvsoc</span></code>.  Override with <code class="docutils literal notranslate"><span class="pre">GVSOC_INSTALL_DIR</span></code>.</p>
+<p>Run a test with the unified ELF:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./install/bin/gvsoc<span class="w"> </span>--target<span class="o">=</span>chimera<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--binary<span class="w"> </span>build/bin/chimera_unified_&lt;test&gt;.elf<span class="w"> </span>run
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Chimera SDK Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="build.html" class="btn btn-neutral float-right" title="Multi-Binary Compilation Flow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
