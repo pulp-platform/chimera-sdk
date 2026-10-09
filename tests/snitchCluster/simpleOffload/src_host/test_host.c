@@ -4,8 +4,9 @@
 // Include Standard Libraries
 
 // Include Application Headers
-#include "test_cluster.h"
 #include "test_host.h"
+
+#include "test_snitchCluster_simpleOffload_device_symbols.h"
 
 // Include Target Specific Headers
 #include "soc.h"
@@ -15,6 +16,7 @@
 
 // Include Runtime Headers
 #include "log.h"
+#include "shared.h"
 
 // Import HAL Headers
 
@@ -43,7 +45,7 @@ int main(void) {
     void *stack_cluster_ptr[NUM_CLUSTER_CORES];
     generate_snitchCluster_SPs_uniform(CLUSTER1, (void *)STACK_ADDRESS, 0x2000, stack_cluster_ptr);
 
-    setup_snitchCluster_interruptHandler(clusterInterruptHandler);
+    setup_snitchCluster_interruptHandler(device_clusterInterruptHandler);
 
     set_snitchCluster_clockGating(CLUSTER1, 0);
 
@@ -53,7 +55,8 @@ int main(void) {
 
     printf_log("Waiting for cluster to finish...\n");
 
-    offload_snitchCluster(testReturn, &offloadArgs, stack_cluster_ptr, CLUSTER1);
+    offload_snitchCluster(device_testReturn, device_trampoline, &offloadArgs, stack_cluster_ptr,
+                          CLUSTER1);
     uint32_t retVal = wait_snitchCluster_return(CLUSTER1);
 
     set_snitchCluster_clockGating(CLUSTER1, 1);

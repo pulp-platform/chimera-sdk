@@ -12,6 +12,7 @@ chimera-convolve:
   host/returnZero,
   host/uartSimple,
   host/dutctl,
+  host/hyperbus,
   snitchCluster/matmul,
   snitchCluster/snrt,
   snitchCluster/simpleOffload
@@ -24,9 +25,11 @@ chimera-open:
   host/printf,
   host/returnZero,
   host/uartSimple,
+  host/hyperbus,
   snitchCluster/matmul,
   snitchCluster/snrt,
-  snitchCluster/simpleOffload
+  snitchCluster/simpleOffload,
+  snitchCluster/hyperbus
 ]]
 [[
 chimera-host:
@@ -41,3 +44,4 @@ chimera-host:
 
 # Call the macro
 add_chimera_subdirectories(${TARGET_PLATFORM} "Test" "${TEST_MAPPINGS}")
+

@@ -7,7 +7,7 @@
 #include <string.h>
 
 // Include Application Headers
-#include "test_cluster.h"
+#include "test_snitchCluster_ITA_MatMul_L1_device1_symbols.h"
 #include "test_host.h"
 
 // Include Target Specific Headers
@@ -109,8 +109,9 @@ int main(void) {
         .clusterIds = {4},
         .stack_start = {(void *)STACK_ADDRESS_4},
         .stack_sizes = {stack_size_4},
-        .function_test = (void *)ita_matmul_l1_test,
-        .function_interrupt = (void *)clusterInterruptHandler,
+        .function_test = (void *)device1_ita_matmul_l1_test,
+        .function_trampoline = (void *)device1_trampoline,
+        .function_interrupt = (void *)device1_clusterInterruptHandler,
     };
 
     for (int i = 0; i < _chimera_numClusters; i++) {

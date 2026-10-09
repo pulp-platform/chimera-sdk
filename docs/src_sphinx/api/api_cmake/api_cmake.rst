@@ -6,6 +6,11 @@ CMake API Reference
 
 Below you find a list of CMake Modules included in this project.
 
+Chimera Build System
+^^^^^^^^^^^^^^^^^^^^
+
+.. cmake-module:: ../../../../cmake/Chimera.cmake
+
 Utility Modules
 ^^^^^^^^^^^^^^^
 

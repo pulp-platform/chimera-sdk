@@ -4,7 +4,7 @@
 #pragma once
 
 // #define SNRT_INIT_FP_REGS
-#define SNRT_CRT0_EXIT
+// #define SNRT_CRT0_EXIT
 #define SNRT_CRT0_PARK
 #define SNRT_CRT0_POST_BARRIER
 #define SNRT_CRT0_PRE_BARRIER

@@ -21,11 +21,14 @@
 #include TESTINPUTS_HEADER
 #include TESTOUTPUTS_HEADER
 
+// Include Shared Headers
+#include "macros.h"
+
 // Include Target Specific Headers
 #include "soc.h"
 
 // Include Driver Headers
-#include "trampoline_snitchCluster.h"
+#include "trampoline.h"
 
 // Include Runtime Headers
 #include "snrt.h"
@@ -35,7 +38,7 @@
  *
  * @warning Stack, thread and global pointer might not yet be set up!
  */
-__attribute__((naked)) void clusterInterruptHandler() {
+__attribute__((naked)) KEEP void clusterInterruptHandler() {
     _SET_CLUSTER_BUSY();
     _SETUP_GP();
 
@@ -143,7 +146,7 @@ SNRT_CLUSTER_L1_COPY(static float ops_per_cycle) = 0.0f;
  * @brief Main function of the cluster test.
  *
  */
-int32_t testReturn(void *args) {
+KEEP int32_t testReturn(void *args) {
     argCluster_t *retVal = (argCluster_t *)args;
 
     /*

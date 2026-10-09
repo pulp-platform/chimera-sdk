@@ -13,7 +13,7 @@
 #include "soc.h"
 
 // Include Driver Headers
-#include "trampoline_snitchCluster.h"
+#include "trampoline.h"
 
 // Include Runtime Headers
 #include "snrt.h"
@@ -79,7 +79,7 @@ void clusterDefaultHandler() {
  *
  * @return int Return 0 if the test was successful, -1 otherwise.
  */
-int32_t testReturn(void *args) {
+int32_t testReturn(void *args __attribute__((unused))) {
 
     *reg32((void *)SOC_CTRL_BASE, CHIMERA_SNITCH_INTR_HANDLER_ADDR_REG_OFFSET) =
         (uint32_t)clusterDefaultHandler;

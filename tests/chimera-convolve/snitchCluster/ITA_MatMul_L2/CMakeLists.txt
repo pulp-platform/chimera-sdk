@@ -12,46 +12,58 @@ chimera_select_shape(
   SOURCE_PREFIX   ITA_mem_
 )
 
-######## HOST Code #############################################################
-file(GLOB_RECURSE TEST_HOST_SRCS
-  "src_host/*.c"
-)
-
-add_library(${TEST_NAME}_host OBJECT ${TEST_HOST_SRCS})
-target_include_directories(${TEST_NAME}_host PUBLIC include)
-# The host sources pull in test_cluster.h, so they need the same shape selection
-target_compile_definitions(${TEST_NAME}_host PUBLIC ITA_DIMS_HEADER="ITA_dims_${SELECTED_SHAPE}.h")
-
-# WIESEP: Set the correct ISA and ABI for the host
-target_compile_options(${TEST_NAME}_host
-  PRIVATE
-  -O2
-)
-target_link_libraries(${TEST_NAME}_host PUBLIC hal_host runtime_host picolibc_host trampoline_rv32im)
-
-######## CLUSTER Code ##########################################################
+######## Source files ##########################################################
+file(GLOB_RECURSE TEST_HOST_SRCS "src_host/*.c")
 set(TEST_SNITCH_SRCS
   "src_cluster/test_cluster.c"
   ${SELECTED_SHAPE_SOURCE}
 )
 
-add_library(${TEST_NAME}_cluster OBJECT ${TEST_SNITCH_SRCS})
-target_include_directories(${TEST_NAME}_cluster PUBLIC include)
-target_compile_definitions(${TEST_NAME}_cluster PUBLIC ITA_DIMS_HEADER="ITA_dims_${SELECTED_SHAPE}.h")
-
-# WIESEP: Use -O1 optimization level for the cluster code otherwise the code currently breaks.
-target_compile_options(${TEST_NAME}_cluster
-  PRIVATE
-  -O2
+######## DEVICE Binary #########################################################
+add_device_binary(${TEST_NAME}_device1
+    DEVICE_NAME  device1
+    ISA          ${ISA_CLUSTER_SNITCH}
+    ABI          ${ABI_CLUSTER_SNITCH}
+    COMPILER     ${CROSS_COMPILE_DEVICE_SNITCH_CLUSTER}
+    COMPIERT_RT  ${COMPILERRT_CLUSTER_SNITCH}
+    PICOLIBC     ${PICOLIB_CLUSTER_SNITCH}
+    TARGET_DIR   ${CHIMERA_TARGET_DIR}
+    DEVICE_DIR   ${CHIMERA_TARGET_DIR}/devices/snitch_cluster
+    SOURCES      ${TEST_SNITCH_SRCS}
 )
-
-target_link_libraries(${TEST_NAME}_cluster PUBLIC runtime_cluster_snitch)
-
-######## TEST Executable #######################################################
-add_chimera_test(
-  ${TEST_NAME}
+target_include_directories(${TEST_NAME}_device1.elf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_definitions(${TEST_NAME}_device1.elf
+    PRIVATE
+    ITA_DIMS_HEADER="ITA_dims_${SELECTED_SHAPE}.h"
 )
+target_compile_options(${TEST_NAME}_device1.elf PRIVATE -O2 -ffunction-sections -fdata-sections)
 
-# WIESEP: Link the host and cluster code to the test executable (chimera-sdk is already linked)
-target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_host)
-target_link_libraries(${TEST_NAME} PUBLIC ${TEST_NAME}_cluster)
+######## HOST Binary ###########################################################
+add_host_binary(${TEST_NAME}
+    ISA          ${ISA_HOST}
+    ABI          ${ABI_HOST}
+    COMPILER     ${CROSS_COMPILE_HOST}
+    COMPIERT_RT  ${COMPILERRT_HOST}
+    PICOLIBC     ${PICOLIB_HOST}
+    TARGET_DIR   ${CHIMERA_TARGET_DIR}
+    DEVICE_DIR   ${CHIMERA_TARGET_DIR}/host
+    SOURCES      ${TEST_HOST_SRCS}
+    DEVICE_DEPS    ${TEST_NAME}_device1
+    DEVICE_SYMBOLS ${TEST_NAME}_device1_symbols
+    LAST_DEVICE    ${TEST_NAME}_device1
+)
+target_include_directories(${TEST_NAME}_host.elf PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_definitions(${TEST_NAME}_host.elf
+    PRIVATE
+    ITA_DIMS_HEADER="ITA_dims_${SELECTED_SHAPE}.h"
+)
+target_compile_options(${TEST_NAME}_host.elf PRIVATE -O2 -ffunction-sections -fdata-sections)
+
+######## Simulation ############################################################
+if(TEST_MODE STREQUAL "simulation")
+    add_test(NAME ${TEST_NAME}
+        COMMAND ${SIMULATION_BINARY}
+            +BINARY=${CMAKE_CURRENT_BINARY_DIR}/chimera_unified_${TEST_NAME}.elf
+            +PRELMODE=${PRELOAD_MODE_INT}
+    )
+endif()

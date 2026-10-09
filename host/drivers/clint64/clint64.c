@@ -1,12 +1,16 @@
 // SPDX-FileCopyrightText: 2022 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * \defgroup drivers_clint_64 64-bit CLINT Driver
- * @ingroup drivers
- * @brief 64-bit CLINT driver implementation for Chimera-SDK.
- * @{
+/*
+ * 64-bit CLINT driver implementation.
  *
+ * Reads mtime as a single uint64_t directly from a 64-bit-wide register.
+ * Requires the platform to define PLATFORM_IS_64BIT so that clint.h selects
+ * the uint64_t path for clint_mtime_t.
+ *
+ * The interrupt-API stubs (clint64_init etc.) are no-ops; CLINT interrupt
+ * control is managed via the mie/mip CSRs in the CPU core rather than in
+ * the controller itself.
  */
 
 // Include Standard Libraries
@@ -27,64 +31,34 @@
 // Import HAL Headers
 #include "interrupt_api.h"
 
-// VIVIANEP: Need to skip doxygen generation for these functions
-// to avoid duplicated defintion errors in the generated documentation
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-
 /*---------------------------------------------------------------------------*/
 /* 64‑bit CLINT core routines                                                 */
 /*---------------------------------------------------------------------------*/
 
-/**
- * @brief Retrieves the current CLINT `mtime` value.
- *
- * This function reads the high and low 64-bit registers and combines them into
- * a 64-bit value.
- *
- * @return The current CLINT time as a clint_mtime_t (uint64_t).
- */
+/* Reads mtime by combining the high and low 32-bit registers into a single uint64_t. */
 clint_mtime_t clint_get_mtime(void) {
     return (((clint_mtime_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
            ((clint_mtime_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
 }
 
-/**
- * @brief Compares two CLINT `mtime` values.
- *
- * @param a First CLINT time value.
- * @param b Second CLINT time value.
- * @return 1 if a is smaller than b, 0 otherwise.
- */
+/* Returns 1 if a < b, 0 otherwise. */
 int clint_mtime_less_than(clint_mtime_t a, clint_mtime_t b) {
     return a < b;
 }
 
-/**
- * @brief Spins (busy-waits) until the specified CLINT `mtime` value is reached.
- *
- * @param tgt_mtime Target CLINT time value.
- */
+/* Busy-waits until mtime reaches tgt_mtime. */
 void clint_spin_until(clint_mtime_t tgt_mtime) {
     while (clint_get_mtime() < tgt_mtime);
 }
 
-/**
- * @brief Spins (busy-waits) for a given number of ticks.
- *
- * @param ticks Number of clock cycles to wait.
- */
+/* Busy-waits for the given number of mtime ticks. */
 void clint_spin_ticks(uint32_t ticks) {
     clint_spin_until(clint_get_mtime() + ticks);
 }
 
-/**
- * @brief Estimates the core frequency based on a reference measurement period.
- *
- * This function assumes a stable clock; ref_time_inv is the inverse of the measurement period.
- *
- * @param ref_freq Reference frequency in Hz.
- * @param ref_time_inv Inverse of the measurement period.
- * @return Estimated core frequency in Hz.
+/*
+ * Estimates core frequency by counting mcycle ticks over a reference mtime interval.
+ * Assumes a stable clock; ref_time_inv is the inverse of the measurement period.
  */
 uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
     uint64_t start_mcycle, end_mcycle;
@@ -104,14 +78,7 @@ uint32_t clint_get_core_freq(uint32_t ref_freq, uint32_t ref_time_inv) {
     return ((end_mcycle - start_mcycle) * ref_freq) / (end_time - start_time);
 }
 
-/**
- * @brief Sets the CLINT `mtimecmp` register for a specific timer index.
- *
- * The high register is written first, then the low register.
- *
- * @param timer_idx Timer index to configure.
- * @param value     Target `mtimecmp` value.
- */
+/* Writes the mtimecmp register for the given timer index; high word is written before low. */
 void clint_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
     uint32_t vlo = (uint32_t)(value);
     uint32_t vhi = (uint32_t)(value >> 32);
@@ -120,14 +87,8 @@ void clint_set_mtimecmpx(uint32_t timer_idx, clint_mtime_t value) {
     *reg32(&__base_clint, CLINT_MTIMECMP_LOW0_REG_OFFSET + offs) = vlo;
 }
 
-/**
- * @brief Puts the core into sleep mode until the specified CLINT `mtime` value is reached.
- *
- * This function programs the mtimecmp register, then enables timer and global interrupts.
- *
- * @param timer_idx Timer index.
- * @param tgt_mtime Target CLINT time value.
- */
+/* Programs mtimecmp, enables the timer interrupt, and issues wfi; returns immediately if tgt_mtime
+ * is already past. */
 void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
     if (clint_get_mtime() >= tgt_mtime) return;
     clint_set_mtimecmpx(timer_idx, tgt_mtime);
@@ -137,17 +98,10 @@ void clint_sleep_until(uint32_t timer_idx, clint_mtime_t tgt_mtime) {
     wfi();
 }
 
-/**
- * @brief Puts the core into sleep mode for a specified number of ticks.
- *
- * @param timer_idx Timer index.
- * @param ticks     Number of clock cycles to sleep.
- */
+/* Sleeps for the given number of mtime ticks using wfi. */
 void clint_sleep_ticks(uint32_t timer_idx, uint32_t ticks) {
     clint_sleep_until(timer_idx, clint_get_mtime() + ticks);
 }
-
-/// @endcond
 
 /*---------------------------------------------------------------------------*/
 /* Provide driver‑specific chi_interrupt_api_t for CLINT                      */
@@ -189,9 +143,6 @@ static void clint64_dispatch(const chi_interrupt_t *ctrl) {
     (void)ctrl;
 }
 
-// VIVIANEP: Skip Doxygen generation for these alias functions to avoid duplicate definitions
-/// @cond DOXYGEN_SHOULD_SKIP_THIS
-
 /* Export the CLINT-specific interrupt API */
 const chi_interrupt_api_t default_clint_api = {.init = clint64_init,
                                                .register_handler = clint64_register_handler,
@@ -200,6 +151,3 @@ const chi_interrupt_api_t default_clint_api = {.init = clint64_init,
                                                .set_priority = clint64_set_priority,
                                                .acknowledge = clint64_acknowledge,
                                                .dispatch = clint64_dispatch};
-/// @endcond
-
-/** @} */ // End of drivers_clint_64 group

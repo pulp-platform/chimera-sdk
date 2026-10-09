@@ -1,0 +1,6 @@
+# SPDX-FileCopyrightText: 2026 ETH Zurich and University of Bologna
+# SPDX-License-Identifier: Apache-2.0
+
+set_property(GLOBAL APPEND PROPERTY CHIMERA_HOST_RUNTIME_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/inc)
+
+set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_INCLUDES ${CMAKE_CURRENT_LIST_DIR}/inc)

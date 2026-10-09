@@ -1,6 +1,19 @@
 // SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * FLL (Frequency Locked Loop) low-level driver implementation.
+ *
+ * getFllPtr() maps the FLL index (0=SOC, 1=cluster) to the physical base address
+ * from the SoC address map.
+ *
+ * initFll() writes a fixed reset value (0xC958) to the upper half of CFG1 to
+ * put the FLL into a known configuration before applying new settings.
+ *
+ * setFllFreq() packs the multiplier into bits [25:0] and the divider into bits
+ * [31:26] of CFG1, which the FLL hardware interprets as Fout = Fref * mult / 2^(div-1).
+ */
+
 // Include Standard Libraries
 #include <stdint.h>
 #include <stdbool.h>
@@ -17,14 +30,6 @@
 
 // Import HAL Headers
 // #include "interrupt_api.h"
-
-/**
- * \defgroup drivers_fll FLL Driver
- * @ingroup drivers
- * @brief FLL driver implementation for Chimera-SDK.
- * @{
- *
- */
 
 // Get the Base address of the wanted FLL
 uint32_t *getFllPtr(uint8_t fllIdx) {
@@ -56,5 +61,3 @@ void setFllFreq(volatile uint32_t *fllPtr, uint32_t mult, uint32_t div) {
     div = div << 26;
     *cfgPtr1 = (*cfgPtr1 & 0xC3FF0000) | (mult | div);
 }
-
-/** @} */ // End of drivers_fll group

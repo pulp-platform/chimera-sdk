@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2026 ETH Zurich and University of Bologna
+# SPDX-License-Identifier: Apache-2.0
+
+[project]
+name = "chimera-sdk-multi"
+version = "0.1.0"
+readme = "README.md"
+description = "Build tools for Chimera SDK"
+authors = [
+    { name = "Philip Wiese", email = "wiesep@iis.ee.ethz.ch" },
+]
+requires-python = ">=3.9"
+dependencies = [
+    "lief>=0.14.0",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[dependency-groups]
+dev = [
+    "reuse",
+    "pre-commit",
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "sphinx_design",
+    "myst_parser",
+    "sphinx-autoapi",
+    "breathe",
+    "sphinxcontrib-moderncmakedomain",
+]
+
+[tool.yapf]
+based_on_style = "google"
+column_limit = 120
+split_before_logical_operator = true
+spaces_around_default_or_named_assign = true

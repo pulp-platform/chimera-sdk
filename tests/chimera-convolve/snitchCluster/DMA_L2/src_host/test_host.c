@@ -7,7 +7,7 @@
 #include <string.h>
 
 // Include Application Headers
-#include "test_cluster.h"
+#include "test_snitchCluster_DMA_L2_device1_symbols.h"
 #include "test_host.h"
 
 // Include Target Specific Headers
@@ -112,8 +112,9 @@ int main(void) {
         .stack_start = {(void *)STACK_ADDRESS_0, (void *)STACK_ADDRESS_1, (void *)STACK_ADDRESS_2,
                         (void *)STACK_ADDRESS_3, (void *)STACK_ADDRESS_4},
         .stack_sizes = {stack_size_0, stack_size_1, stack_size_2, stack_size_3, stack_size_4},
-        .function_test = (void *)dma_l2_test,
-        .function_interrupt = (void *)clusterInterruptHandler,
+        .function_test = (void *)device1_dma_l2_test,
+        .function_trampoline = (void *)device1_trampoline,
+        .function_interrupt = (void *)device1_clusterInterruptHandler,
     };
 
     for (int i = 0; i < _chimera_numClusters; i++) {

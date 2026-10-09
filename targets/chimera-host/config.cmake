@@ -6,6 +6,7 @@ set(ABI_HOST ilp32)
 set(ISA_HOST rv32imc)
 set(PICOLIB_HOST rv32im/ilp32)
 set(COMPILERRT_HOST rv32imc)
+set(CROSS_COMPILE_HOST "riscv32-unknown-elf")
 
 set(ABI_CLUSTER_SNITCH None)
 set(ISA_CLUSTER_SNITCH None)

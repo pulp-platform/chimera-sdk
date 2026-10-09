@@ -1,0 +1,105 @@
+/* SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna */
+/* SPDX-License-Identifier: Apache-2.0 */
+
+/*
+ * Host linker script template for chimera-convolve (RV32IMC host).
+ *
+ * cmake/Chimera.cmake calls configure_file() on this template to produce
+ * the actual linker script.  The placeholders below are substituted:
+ *
+ *   @CHIMERA_PLACEMENT_INCLUDE@
+ *       Empty when no devices are present, or
+ *       "INCLUDE <last_device>_placement.ldh" otherwise.
+ *
+ *   @CHIMERA_RESERVED_SECTION@
+ *       Empty when no devices are present, or a NOLOAD .reserved section
+ *       that advances the LC past all device memory regions so host code
+ *       starts immediately after the last device.
+ *
+ * Memory layout in memisl (ORIGIN = 0x48000000, LENGTH = 256K):
+ *
+ *   0x48000000                  ┌─ .common   (host loads, devices NOLOAD)
+ *   0x48000000 + common_size    ├─ [device code/data regions — if any]
+ *   last_device_end or common   ├─ .text / .misc / .bss   ← host code here
+ *   ORIGIN + LENGTH             └─ host stack (grows downward)
+ */
+
+INCLUDE common.ldh
+@CHIMERA_PLACEMENT_INCLUDE@
+
+/* Global pointer sits in the middle of .misc for GP-relative access */
+__global_pointer$ = ADDR(.misc) + SIZEOF(.misc) / 2;
+__stack_pointer$  = ORIGIN(memisl) + LENGTH(memisl);
+
+SECTIONS {
+  /*
+   * Shared communication area – host LOADS this section at 0x48000000.
+   * Device binaries map the same address as NOLOAD.
+   */
+  .common : ALIGN(64) {
+    __common_start = .;
+    KEEP(*(.common))
+    KEEP(*(.common.*))
+    . = ALIGN(64);
+    __common_end = .;
+  } > memisl AT > memisl
+
+@CHIMERA_RESERVED_SECTION@
+
+  .text : ALIGN(0x1000) {
+    *(.text._start)
+    *(.text)
+    *(.text.*)
+  } > memisl
+
+  .misc : ALIGN(32) {
+    *(.rodata)
+    *(.rodata.*)
+    *(.data)
+    *(.data.*)
+    *(.srodata)
+    *(.srodata.*)
+    *(.sdata)
+    *(.sdata.*)
+  } > memisl
+
+  .bss (NOLOAD) : {
+    . = ALIGN(32);
+    __bss_start = .;
+    *(.bss)
+    *(.bss.*)
+    *(.sbss)
+    *(.sbss.*)
+    . = ALIGN(32);
+    __bss_end = .;
+  } > memisl
+
+  /* Thread Local Storage sections */
+  .tdata : {
+    . = ALIGN(32);
+    __tdata_start = .;
+    *(.tdata .tdata.* .gnu.linkonce.td.*)
+    . = ALIGN(32);
+    __tdata_end = .;
+  } > memisl
+
+  .tbss (NOLOAD) : {
+    . = ALIGN(32);
+    __tbss_start = .;
+    *(.tbss .tbss.* .gnu.linkonce.tb.*)
+    *(.tcommon)
+    . = ALIGN(32);
+    __tbss_end = .;
+  } > memisl
+
+  .bulk : ALIGN(32) {
+    *(.bulk)
+    *(.bulk.*)
+  } > memisl
+
+  .l2_heap : ALIGN(32) {
+    __l2_heap_start = .;
+    __l2_heap_end = ORIGIN(memisl) + LENGTH(memisl);
+  } > memisl
+
+}

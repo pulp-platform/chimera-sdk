@@ -14,4 +14,8 @@ The Low-Level (LL) API provides a direct interface to the hardware of the SoC an
    api_ll_drivers_clint
    api_ll_drivers_cluster
    api_ll_drivers_fll
+   api_ll_drivers_hyperbus
    api_ll_runtime_alloc
+   api_ll_runtime_log
+   api_ll_runtime_fll
+   api_ll_shared

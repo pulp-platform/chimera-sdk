@@ -1,6 +1,16 @@
 // SPDX-FileCopyrightText: 2024 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
+/*
+ * HAL interface wrapper implementation.
+ *
+ * Each iface_*() function validates the function pointer chain before
+ * dispatching: if the chi_interface_t pointer, its api pointer, or the
+ * specific function pointer is NULL the call returns -1 without dereferencing.
+ * This guards against partially-initialised interface instances and makes
+ * missing-driver failures predictable rather than undefined.
+ */
+
 #include "interface_api.h"
 
 int iface_open(const chi_interface_t *iface) {

@@ -3,7 +3,10 @@
 
 # Enable verbose output for the linker
 # This passes --verbose to the linker (ld), showing detailed linking information
-add_link_options("-Wl,--verbose")
+add_link_options(
+    "-Wl,--verbose"
+    "-Wl,--print-gc-sections"
+    )
 
 # Enable verbose output for the compiler
 # The -v flag makes the compiler print the commands it executes during compilation

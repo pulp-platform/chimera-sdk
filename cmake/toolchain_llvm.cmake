@@ -15,6 +15,7 @@ set(CMAKE_OBJCOPY ${TOOLCHAIN_DIR}/bin/${LLVM_TAG}-objcopy)
 set(CMAKE_OBJDUMP ${TOOLCHAIN_DIR}/bin/${LLVM_TAG}-objdump)
 set(CMAKE_AR ${TOOLCHAIN_DIR}/bin/${LLVM_TAG}-ar)
 set(CMAKE_STRIP ${TOOLCHAIN_DIR}/bin/${LLVM_TAG}-strip)
+set(CMAKE_NM ${TOOLCHAIN_DIR}/bin/${LLVM_TAG}-nm)
 
 # Disable ABI detection
 set(CMAKE_C_ABI_COMPILED "False")
@@ -41,6 +42,7 @@ string(REGEX MATCH "^[0-9]+" LLVM_VERSION_MAJOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_MINOR ${LLVM_VERSION})
 string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
 
+message(STATUS "[CHIMERA-SDK] Detected LLVM version : ${LLVM_VERSION}")
 if(LLVM_VERSION_MAJOR LESS 16)
     message(STATUS "[CHIMERA-SDK] Disable linker relaxation for LLVM < 16")
     set(CMAKE_ALT_C_OPTIONS "-mno-relax")
@@ -51,18 +53,16 @@ if(LLVM_VERSION_MAJOR LESS 16)
     add_link_options("-Wno-unused-command-line-argument")
 endif()
 
-# Define global flags
-set(CROSS_COMPILE_HOST "riscv32-unknown-elf")
-add_compile_options("--target=${CROSS_COMPILE_HOST}")
-
+# Define global debug flags
 add_compile_options(-ggdb -gdwarf-4 -gstrict-dwarf)
 
-message(STATUS "[CHIMERA-SDK] Linking compiler-rt builtins for RV32HOST")
-# Prefer compiler-rt rather than libgcc
-add_link_options("-rtlib=compiler-rt")
-add_link_options("-nostdlib")
-
-include_directories(${CMAKE_BINARY_DIR}/picolibc-install/include)
-
-# Globally add the real builtins if RV32
-add_link_options("-lclang_rt.builtins-riscv32")
+# Set the global default target triple for the host domain.
+# CROSS_COMPILE_HOST is set by targets/${TARGET_PLATFORM}/config.cmake which is
+# included before project() in the root CMakeLists.txt, so it is available here.
+# This ensures libraries without explicit --target= settings (e.g. hal_host) are
+# compiled for the correct host ISA.  Device binaries override this via the PUBLIC
+# compile options on runtime_cluster_snitch and the explicit options in
+# add_device_binary().
+if(CROSS_COMPILE_HOST)
+    add_compile_options("--target=${CROSS_COMPILE_HOST}")
+endif()

@@ -1,21 +1,24 @@
 // SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
 // SPDX-License-Identifier: Apache-2.0
 
-/**
- * \defgroup drivers_hyperbus HyperBus Driver
- * @ingroup drivers_hyperbus
- * @ingroup drivers
- * @{
- * @brief HyperBus driver implementation for Chimera-SDK.
+/*
+ * HyperBus / HyperRAM driver implementation.
  *
- * This file provides the implementation of HyperBus initialization, read, and write
- * functions for the HyperBus peripheral.
+ * hyperram_cfg_write() applies every field of a hyperram_cfg_t to the peripheral
+ * register map in a single pass: base timing registers first, then the per-chip
+ * address windows.  Returns -1 immediately if either pointer is NULL.
  *
+ * hyperram_cfg_read() performs the reverse: it reads every register and returns a
+ * populated hyperram_cfg_t.  Callers can print or modify the struct and write it back.
+ *
+ * hyperram_cfg_default() sets sensible power-on defaults for a single HyperRAM
+ * device, derived from the HyperRAM IS66WVH8M8ALL datasheet timing requirements.
  */
 
 // Include Standard Libraries
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
 // Include Target Specific Headers
 #include "soc.h"
@@ -129,5 +132,3 @@ void hyperram_cfg_default(hyperram_cfg_t *cfg, uint32_t chip_base, uint32_t chip
         cfg->chip_space[i] = chip_size;
     }
 }
-
-/** @} */ // End of drivers_hyperbus group

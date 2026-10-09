@@ -9,7 +9,8 @@ set -e
 DEFAULT_GVSOC_PATH="/app/install/gvsoc/bin/gvsoc"
 DEFAULT_GDB_PATH="gdb-multiarch"
 DEFAULT_CMAKE="cmake"
-DEFAULT_TOOLCHAIN_DIR="/app/install/llvm"
+DEFAULT_TOOLCHAIN_DIR="/app/install/llvm-18.1.4-pulp"
+DEFAULT_PICOLIBC_DIR="/app/install/picolibc"
 DEFAULT_TARGET="chimera-open"
 DEFAULT_BACKEND="GVSoC"
 
@@ -44,6 +45,7 @@ OPTIONS:
                                Available targets: chimera-open, chimera-host, chimera-convolve
     -c, --cmake PATH           Path to CMake binary (default: $DEFAULT_CMAKE)
     -T, --toolchain-dir PATH   Path to LLVM toolchain directory (default: $DEFAULT_TOOLCHAIN_DIR)
+    -P, --picolibc-dir PATH    Path to picolibc directory (default: $DEFAULT_PICOLIBC_DIR)
     -b, --build-only           Only build tests, don't run them
     -e, --backend BACKEND      Specify the backend to use (default: $DEFAULT_BACKEND)
     -r, --run-only             Only run tests, skip building (requires existing build)
@@ -138,13 +140,16 @@ extract_tests() {
     local backend=$2
     local cmake_cmd=$3
     local toolchain_dir=$4
-    local build_dir=$5
+    local picolibc_dir=$5
+    local build_dir=$6
 
     # Configure build to get CMake targets
     local cmake_args=(
         "-DTARGET_PLATFORM=$target"
         "-DTOOLCHAIN_DIR=$toolchain_dir"
+        "-DPICOLIBC_DIR=$picolibc_dir"
         "-DHARDWARE_BACKEND=$backend"
+        "-DCHIMERA_UNIFIED_ELF=ON"
         "-B" "$build_dir"
     )
 
@@ -154,8 +159,9 @@ extract_tests() {
     fi
 
     # Query CMake for executable targets
+    # Filter out intermediate per-domain targets (_host, _cluster, _device suffixes)
     local targets
-    targets=$($cmake_cmd --build "$build_dir" --target help 2>/dev/null | grep -E "^\.\.\. (test_|.*test)" | sed 's/\.\.\. //' | grep -v -E "_(host|cluster)$" || true)
+    targets=$($cmake_cmd --build "$build_dir" --target help 2>/dev/null | grep -E "^\.\.\. test_" | sed 's/\.\.\. //' | grep -v -E "(\.elf|_runtime|_gen_symbols|_gen_placement|_device.*)$" || true)
 
     # Populate TARGET_TESTS associative array
     TARGET_TESTS["$target"]=""
@@ -193,17 +199,22 @@ build_project() {
     local backend=$2
     local cmake_cmd=$3
     local toolchain_dir=$4
-    local jobs=$5
-    local verbose=$6
-    local build_dir=$7
+    local picolibc_dir=$5
+    local jobs=$6
+    local verbose=$7
+    local build_dir=$8
 
     print_info "Building target: $target"
 
     # Configure build
+    # CHIMERA_UNIFIED_ELF=ON ensures a merged host ELF suitable for simulation
+    # is always produced alongside the individual per-domain binaries.
     local cmake_args=(
         "-DTARGET_PLATFORM=$target"
         "-DTOOLCHAIN_DIR=$toolchain_dir"
+        "-DPICOLIBC_DIR=$picolibc_dir"
         "-DHARDWARE_BACKEND=$backend"
+        "-DCHIMERA_UNIFIED_ELF=ON"
         "-B" "$build_dir"
     )
 
@@ -260,7 +271,7 @@ run_gvsoc_test() {
     local verbose=$4
     local build_dir=$5
 
-    local binary_path="$build_dir/bin/$test_name"
+    local binary_path="$build_dir/bin/${test_name}_unified.elf"
 
     # Check if binary exists
     if [[ ! -f "$binary_path" ]]; then
@@ -503,6 +514,7 @@ GDB_PATH="$DEFAULT_GDB_PATH"
 TARGET="$DEFAULT_TARGET"
 CMAKE_CMD="$DEFAULT_CMAKE"
 TOOLCHAIN_DIR="$DEFAULT_TOOLCHAIN_DIR"
+PICOLIBC_DIR="$DEFAULT_PICOLIBC_DIR"
 BUILD_ONLY="false"
 RUN_ONLY="false"
 LIST_TESTS="false"
@@ -537,6 +549,11 @@ while [[ $# -gt 0 ]]; do
     -T | --toolchain-dir)
         require_value "$1" "$2"
         TOOLCHAIN_DIR="$2"
+        shift 2
+        ;;
+    -P | --picolibc-dir)
+        require_value "$1" "$2"
+        PICOLIBC_DIR="$2"
         shift 2
         ;;
     -b | --build-only)
@@ -614,7 +631,7 @@ BUILD_DIR="${PROJECT_ROOT}/build-${TARGET}"
 
 validate_target "$TARGET"
 
-extract_tests "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR" "$BUILD_DIR"
+extract_tests "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR" "$PICOLIBC_DIR" "$BUILD_DIR"
 
 # Handle list tests
 if [[ $LIST_TESTS == "true" ]]; then
@@ -627,7 +644,7 @@ cd "$PROJECT_ROOT"
 
 # Main execution
 if [[ $RUN_ONLY == "false" ]]; then
-    build_project "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR" "$JOBS" "$VERBOSE" "$BUILD_DIR"
+    build_project "$TARGET" "$BACKEND" "$CMAKE_CMD" "$TOOLCHAIN_DIR" "$PICOLIBC_DIR" "$JOBS" "$VERBOSE" "$BUILD_DIR"
 fi
 
 # WIESEP: Currently only GVSoC and ASIC are supported as backend

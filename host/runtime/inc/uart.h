@@ -157,6 +157,6 @@ int uart_flush(FILE *file);
 }
 #endif
 
-/** @} */ // end defgroup drivers_uart
+/** @} */
 
 #endif // CHIMERA_DRIVER_UART

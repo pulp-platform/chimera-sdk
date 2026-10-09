@@ -13,7 +13,7 @@
 #include "soc.h"
 
 // Include Driver Headers
-#include "trampoline_snitchCluster.h"
+#include "trampoline.h"
 
 // Include Runtime Headers
 #include "snrt.h"
