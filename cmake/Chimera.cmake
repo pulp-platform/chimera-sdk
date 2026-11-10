@@ -237,6 +237,27 @@ function(add_device_binary TARGET_NAME)
         target_link_libraries(${TARGET_NAME}.elf PRIVATE ${TARGET_NAME}_runtime)
     endif()
 
+    # Library sources form an archive, so a binary links only the members it references
+    get_property(_dev_runtime_lib_sources GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_LIBRARY_SOURCES)
+    if(_dev_runtime_lib_sources)
+        add_library(${TARGET_NAME}_runtime_lib STATIC ${_dev_runtime_lib_sources})
+        target_compile_options(${TARGET_NAME}_runtime_lib PRIVATE
+            --target=${ARG_COMPILER}
+            -march=${ARG_ISA}
+            -mabi=${ARG_ABI}
+            -O2
+            -ffunction-sections
+            -fdata-sections
+        )
+        target_include_directories(${TARGET_NAME}_runtime_lib PRIVATE
+            ${_dev_runtime_includes}
+            ${_dev_runtime_priv_inc}
+        )
+        target_compile_definitions(${TARGET_NAME}_runtime_lib PRIVATE ${_dev_runtime_defines})
+        target_link_libraries(${TARGET_NAME}_runtime_lib PRIVATE ${TARGET_NAME}_picolibc)
+        target_link_libraries(${TARGET_NAME}.elf PRIVATE ${TARGET_NAME}_runtime_lib)
+    endif()
+
     # -----------------------------------------------------------------------
     # 4. Debug artifacts: disassembly + section headers + full symbol table
     # -----------------------------------------------------------------------

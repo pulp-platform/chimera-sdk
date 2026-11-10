@@ -150,16 +150,16 @@ void snrt_init() {
                (void *)__cbss_start, (void *)__cbss_end);
 
         printf("L1 Allocator @ %p:\n", snrt_l1_allocator());
-        printf("  base @ %p = %#x\n", &snrt_l1_allocator()->base, snrt_l1_allocator()->base);
-        printf("  end  @ %p = %#x\n", &snrt_l1_allocator()->end, snrt_l1_allocator()->end);
-        printf("  next @ %p = %#x\n", &snrt_l1_allocator()->next, snrt_l1_allocator()->next);
+        printf("  base @ %p = %#llx\n", &snrt_l1_allocator()->base, snrt_l1_allocator()->base);
+        printf("  end  @ %p = %#llx\n", &snrt_l1_allocator()->end, snrt_l1_allocator()->end);
+        printf("  next @ %p = %#llx\n", &snrt_l1_allocator()->next, snrt_l1_allocator()->next);
 
         printf("L3 Allocator @ %p:\n", snrt_l3_allocator());
-        printf("  base @ %p = %#x\n", &snrt_l3_allocator()->base, snrt_l3_allocator()->base);
-        printf("  end  @ %p = %#x\n", &snrt_l3_allocator()->end, snrt_l3_allocator()->end);
-        printf("  next @ %p = %#x\n", &snrt_l3_allocator()->next, snrt_l3_allocator()->next);
+        printf("  base @ %p = %#llx\n", &snrt_l3_allocator()->base, snrt_l3_allocator()->base);
+        printf("  end  @ %p = %#llx\n", &snrt_l3_allocator()->end, snrt_l3_allocator()->end);
+        printf("  next @ %p = %#llx\n", &snrt_l3_allocator()->next, snrt_l3_allocator()->next);
 
-        printf("Cluster Local Storage @ %p = %#x\n", &_cls_ptr, cls());
+        printf("Cluster Local Storage @ %p = %p\n", &_cls_ptr, snrt_cls());
 #endif
     }
 
