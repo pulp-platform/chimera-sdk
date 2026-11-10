@@ -1,0 +1,84 @@
+// Cluster cfg behind shared/inc/{cfg,addr_maps}/snitch_cluster_*.h, see SnitchUtilities.cmake
+    {
+        nr_clusters : 5,
+        cluster : {
+            cluster_base_addr : 0x40000000,
+            cluster_base_offset : 0x200000,
+            cluster_base_hartid : 1,
+            addr_width : 48,
+            data_width : 64,
+            tcdm : {
+                size : 128,
+                banks : 16,
+            },
+            cluster_periph_size : 60,
+            // kB
+            zero_mem_size : 64,
+            // kB
+            alias_region_enable : true,
+            alias_region_base : 0x18000000,
+            dma_data_width : 256,
+            hives : [
+                {
+                    icache : {
+                        size : 1,
+                        ways : 2,
+                        cacheline : 256
+                    },
+                    cores : [
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/compute_core_template"
+                        },
+                        {
+                            $ref : "#/dma_core_template"
+                        },
+                    ]
+                }
+            ]
+        },
+        external_addr_regions : [
+            {
+                name : "dram",
+                address : 0x80000000,
+                length : 0x800000
+            },
+            {
+                name : "clint",
+                address : 0x02040000,
+                length : 0x40000
+            },
+        ],
+        compute_core_template : {
+            isa : "rv32imafd",
+            xssr : false,
+            xfrep : false,
+            xdma : false,
+        },
+        dma_core_template : {
+            isa : "rv32imafd",
+            xssr : false,
+            xfrep : false,
+            xdma : true,
+        }
+    }

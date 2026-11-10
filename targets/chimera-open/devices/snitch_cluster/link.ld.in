@@ -253,4 +253,7 @@ SECTIONS {
 
   /* First free address in memisl (VMA usage and LMA payload usage). */
   __device_end = MAX(__tbss_end, MAX(__cdata_lma_end, __cbss_lma_end));
+
+  /* snitch-sdk's snrt_alloc_init() and snrt_l3_init() start the L3 heap at _edram */
+  PROVIDE(_edram = __l3_heap_start);
 }
