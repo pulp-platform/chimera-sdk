@@ -205,6 +205,9 @@ PICOLIBC_GIT_TAG     := 1.8.11
 PICOLIBC_SRC_DIR     ?= ${INSTALL_DIR}/picolibc-src
 PICOLIBC_INSTALL_DIR := ${INSTALL_DIR}/picolibc
 
+# picolibc defaults to minsize, whose memset and memcpy copy one byte per iteration.
+PICOLIBC_OPTIMIZATION ?= 2
+
 # Clone the official picolibc sources at the pinned tag.
 PICOLIBC_CLONE_STAMP := $(PICOLIBC_SRC_DIR)/.picolibc-cloned
 
@@ -228,7 +231,7 @@ picolibc-clone: $(PICOLIBC_CLONE_STAMP)
 #  6: Meson cpu_family string, e.g. riscv
 define MAKE_PICOLIBC_TARGET
 
-PICOLIBC_STAMP_$(1)      := $(PICOLIBC_INSTALL_DIR)/.picolibc-$(1)-installed
+PICOLIBC_STAMP_$(1)      := $(PICOLIBC_INSTALL_DIR)/.picolibc-$(1)-O$(PICOLIBC_OPTIMIZATION)-installed
 PICOLIBC_BUILD_DIR_$(1)  := $(PICOLIBC_SRC_DIR)/build-$(1)
 PICOLIBC_CROSS_FILE_$(1) := $(PICOLIBC_SRC_DIR)/cross-$(1).txt
 
@@ -257,6 +260,7 @@ $$(PICOLIBC_STAMP_$(1)): $$(PICOLIBC_CROSS_FILE_$(1))
 		$$(PICOLIBC_BUILD_DIR_$(1)) $(PICOLIBC_SRC_DIR) \
 		--cross-file $$(PICOLIBC_CROSS_FILE_$(1)) \
 		-D multilib-list=$(3)/$(4) \
+		-D optimization=$(PICOLIBC_OPTIMIZATION) \
 		--prefix $(PICOLIBC_INSTALL_DIR) \
 		--default-library=static \
 		--wipe
