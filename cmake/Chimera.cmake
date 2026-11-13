@@ -2,6 +2,69 @@
 # SPDX-License-Identifier: Apache-2.0
 
 #[=======================================================================[.rst:
+.. cmake:command:: chimera_add_device_runtime(DEVICE_TYPE)
+
+   Register runtime files for one device type.  Every device binary built
+   with ``add_device_binary(... DEVICE_TYPE <type>)`` compiles them on top of
+   the common ``CHIMERA_DEVICE_RUNTIME_*`` set, which all device types share.
+   Each call appends to the type's set, so a device directory and the
+   target's glue for that device can both register files.
+
+   :param DEVICE_TYPE: Name of the device type (e.g. ``snitch_cluster``).
+   :param SOURCES: *(optional)* Sources compiled into every binary of this type.
+   :param LIBRARY_SOURCES: *(optional)* Sources archived into a static library,
+      so a binary links only the members it references.
+   :param INCLUDES: *(optional)* Include directories, also visible to the
+      binary's own sources.
+   :param PRIVATE_INCLUDES: *(optional)* Include directories for the runtime
+      sources only.
+   :param DEFINES: *(optional)* Compile definitions, also visible to the
+      binary's own sources.
+
+   The files land in the global properties
+   ``CHIMERA_DEVICE_<TYPE>_RUNTIME_{SOURCES,LIBRARY_SOURCES,INCLUDES,PRIVATE_INCLUDES,DEFINES}``
+   (``<TYPE>`` upper-cased), and the type in ``CHIMERA_DEVICE_TYPES``.
+
+   .. code-block:: cmake
+      :caption: Example Usage
+
+      chimera_add_device_runtime(snitch_cluster
+          SOURCES  ${CMAKE_CURRENT_LIST_DIR}/putc.c
+          INCLUDES ${CMAKE_CURRENT_LIST_DIR}
+          DEFINES  CHIMERA_DEVICE_SNITCH_CLUSTER
+      )
+
+#]=======================================================================]
+function(chimera_add_device_runtime DEVICE_TYPE)
+    set(_kinds SOURCES LIBRARY_SOURCES INCLUDES PRIVATE_INCLUDES DEFINES)
+    cmake_parse_arguments(ARG "" "" "${_kinds}" ${ARGN})
+    if(ARG_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR "[CHIMERA] chimera_add_device_runtime(${DEVICE_TYPE}): "
+            "unknown arguments ${ARG_UNPARSED_ARGUMENTS}")
+    endif()
+
+    string(TOUPPER "${DEVICE_TYPE}" _type)
+    foreach(_kind IN LISTS _kinds)
+        if(ARG_${_kind})
+            set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_${_type}_RUNTIME_${_kind} ${ARG_${_kind}})
+        endif()
+    endforeach()
+
+    get_property(_types GLOBAL PROPERTY CHIMERA_DEVICE_TYPES)
+    if(NOT DEVICE_TYPE IN_LIST _types)
+        set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_TYPES ${DEVICE_TYPE})
+    endif()
+endfunction()
+
+# Common runtime files first, then the device type's own
+function(_chimera_device_runtime OUT DEVICE_TYPE KIND)
+    string(TOUPPER "${DEVICE_TYPE}" _type)
+    get_property(_common GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_${KIND})
+    get_property(_own    GLOBAL PROPERTY CHIMERA_DEVICE_${_type}_RUNTIME_${KIND})
+    set(${OUT} ${_common} ${_own} PARENT_SCOPE)
+endfunction()
+
+#[=======================================================================[.rst:
 .. cmake:command:: add_device_binary(TARGET_NAME)
 
    Compile a device binary for one execution domain (e.g. a Snitch cluster)
@@ -40,6 +103,10 @@
       device's placement header so this binary starts immediately after it.
    :param PICOLIBC: *(optional)* Picolibc library variant to link
       (e.g. ``rv32imafd``).
+   :param DEVICE_TYPE: *(optional)* Device type whose runtime this binary
+      compiles, registered with :cmake:command:`chimera_add_device_runtime`.
+      Defaults to ``snitch_cluster``.  The binary also compiles the common
+      ``CHIMERA_DEVICE_RUNTIME_*`` set that every device type shares.
 
    Linker script template placeholders substituted by this function:
 
@@ -75,11 +142,23 @@
 
 #]=======================================================================]
 function(add_device_binary TARGET_NAME)
-    set(oneValueArgs   DEVICE_NAME TARGET_DIR DEVICE_DIR PREV_DEVICE ISA ABI COMPILER COMPIERT_RT PICOLIBC)
+    set(oneValueArgs   DEVICE_NAME TARGET_DIR DEVICE_DIR PREV_DEVICE ISA ABI COMPILER COMPIERT_RT PICOLIBC DEVICE_TYPE)
     set(multiValueArgs SOURCES)
     cmake_parse_arguments(ARG "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+    if(NOT ARG_DEVICE_TYPE)
+        set(ARG_DEVICE_TYPE snitch_cluster)
+    else()
+        get_property(_types GLOBAL PROPERTY CHIMERA_DEVICE_TYPES)
+        if(NOT ARG_DEVICE_TYPE IN_LIST _types)
+            list(JOIN _types ", " _types)
+            message(FATAL_ERROR "[CHIMERA] Device (${TARGET_NAME}): no runtime registered for device type "
+                "'${ARG_DEVICE_TYPE}'. Registered types: ${_types}")
+        endif()
+    endif()
+
     message(STATUS "[CHIMERA] Device (${TARGET_NAME})")
+    message(STATUS "[CHIMERA]    Device type  : ${ARG_DEVICE_TYPE}")
     message(STATUS "[CHIMERA]    ISA / ABI    : ${ARG_ISA} / ${ARG_ABI}")
     message(STATUS "[CHIMERA]    Compiler     : ${ARG_COMPILER}")
     message(STATUS "[CHIMERA]    Compiler-rt  : ${ARG_COMPIERT_RT}")
@@ -210,10 +289,10 @@ function(add_device_binary TARGET_NAME)
     endif()
 
     # Create per-binary device runtime (compiled with this binary's ISA/ABI)
-    get_property(_dev_runtime_sources  GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_SOURCES)
-    get_property(_dev_runtime_includes GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_INCLUDES)
-    get_property(_dev_runtime_priv_inc GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_PRIVATE_INCLUDES)
-    get_property(_dev_runtime_defines  GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_DEFINES)
+    _chimera_device_runtime(_dev_runtime_sources  ${ARG_DEVICE_TYPE} SOURCES)
+    _chimera_device_runtime(_dev_runtime_includes ${ARG_DEVICE_TYPE} INCLUDES)
+    _chimera_device_runtime(_dev_runtime_priv_inc ${ARG_DEVICE_TYPE} PRIVATE_INCLUDES)
+    _chimera_device_runtime(_dev_runtime_defines  ${ARG_DEVICE_TYPE} DEFINES)
     if(_dev_runtime_sources)
         add_library(${TARGET_NAME}_runtime OBJECT ${_dev_runtime_sources})
         target_compile_options(${TARGET_NAME}_runtime PRIVATE
@@ -235,6 +314,27 @@ function(add_device_binary TARGET_NAME)
         endif()
         target_link_libraries(${TARGET_NAME}_runtime PRIVATE ${TARGET_NAME}_picolibc)
         target_link_libraries(${TARGET_NAME}.elf PRIVATE ${TARGET_NAME}_runtime)
+    endif()
+
+    # Library sources form an archive, so a binary links only the members it references
+    _chimera_device_runtime(_dev_runtime_lib_sources ${ARG_DEVICE_TYPE} LIBRARY_SOURCES)
+    if(_dev_runtime_lib_sources)
+        add_library(${TARGET_NAME}_runtime_lib STATIC ${_dev_runtime_lib_sources})
+        target_compile_options(${TARGET_NAME}_runtime_lib PRIVATE
+            --target=${ARG_COMPILER}
+            -march=${ARG_ISA}
+            -mabi=${ARG_ABI}
+            -O2
+            -ffunction-sections
+            -fdata-sections
+        )
+        target_include_directories(${TARGET_NAME}_runtime_lib PRIVATE
+            ${_dev_runtime_includes}
+            ${_dev_runtime_priv_inc}
+        )
+        target_compile_definitions(${TARGET_NAME}_runtime_lib PRIVATE ${_dev_runtime_defines})
+        target_link_libraries(${TARGET_NAME}_runtime_lib PRIVATE ${TARGET_NAME}_picolibc)
+        target_link_libraries(${TARGET_NAME}.elf PRIVATE ${TARGET_NAME}_runtime_lib)
     endif()
 
     # -----------------------------------------------------------------------

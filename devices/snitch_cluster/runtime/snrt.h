@@ -35,23 +35,27 @@ int snrt_printf(const char *fmt, ...);
 #include "config.h"
 #include "util.h"
 
+// Snitch cluster specific
+#include "snitch_cluster_defs.h"
+
 // Forward declarations
 #include "alloc_decls.h"
 #include "cls_decls.h"
+#include "dma_decls.h"
+#include "memory_decls.h"
 #include "riscv_decls.h"
 #include "start_decls.h"
 #include "sync_decls.h"
 #include "team_decls.h"
-
-// Snitch cluster specific
-#include "snitch_cluster_defs.h"
-#include "snitch_cluster_memory.h"
 
 // Implementation
 #include "alloc.h"
 #include "alloc_v2.h"
 #include "cls.h"
 #include "cluster_interrupts.h"
+#ifdef SNRT_SUPPORTS_COPIFT
+#include "copift.h"
+#endif
 #include "dm.h"
 #include "dma.h"
 #include "dump.h"
@@ -61,6 +65,7 @@ int snrt_printf(const char *fmt, ...);
 #include "perf_cnt.h"
 #include "riscv.h"
 #include "snitch_cluster_global_interrupts.h"
+#include "snitch_cluster_memory.h"
 #include "ssr.h"
 #include "sync.h"
 #include "team.h"

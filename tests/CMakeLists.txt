@@ -15,7 +15,8 @@ chimera-convolve:
   host/hyperbus,
   snitchCluster/matmul,
   snitchCluster/snrt,
-  snitchCluster/simpleOffload
+  snitchCluster/simpleOffload,
+  deviceTypes
 ]]
 [[
 chimera-open:
@@ -29,7 +30,8 @@ chimera-open:
   snitchCluster/matmul,
   snitchCluster/snrt,
   snitchCluster/simpleOffload,
-  snitchCluster/hyperbus
+  snitchCluster/hyperbus,
+  deviceTypes
 ]]
 [[
 chimera-host:
