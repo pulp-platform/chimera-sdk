@@ -34,23 +34,31 @@ set_property(GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_DEFINES
 set_property(GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_PRIVATE_INCLUDES "")
 
 ################################################################################
-# Device (Snitch Cluster) Runtime Configuration                                 #
+# Device Runtime Configuration, common to every device type                    #
 ################################################################################
 set_property(GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_SOURCES
-    ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/src/trampoline.c
-    ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/src/symbols.c
-    ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/src/crt0.S
     ${CMAKE_CURRENT_LIST_DIR}/shared/src/cluster_addr_map.c
     ${CMAKE_CURRENT_LIST_DIR}/shared/src/shared.c
 )
 set_property(GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_INCLUDES
-    ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/inc
     ${CMAKE_CURRENT_LIST_DIR}/shared/inc
     ${CMAKE_CURRENT_LIST_DIR}/shared/inc/regs
-    ${CMAKE_CURRENT_LIST_DIR}/shared/inc/cfg
     ${CMAKE_CURRENT_LIST_DIR}/shared/inc/addr_maps
 )
 set_property(GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_DEFINES
     TARGET_PLATFORM_CHIMERA_CONVOLVE
 )
 set_property(GLOBAL PROPERTY CHIMERA_DEVICE_RUNTIME_PRIVATE_INCLUDES "")
+
+################################################################################
+# Snitch Cluster Device Glue                                                   #
+################################################################################
+chimera_add_device_runtime(snitch_cluster
+    SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/src/trampoline.c
+        ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/src/symbols.c
+        ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/src/crt0.S
+    INCLUDES
+        ${CMAKE_CURRENT_LIST_DIR}/devices/snitch_cluster/inc
+        ${CMAKE_CURRENT_LIST_DIR}/shared/inc/cfg
+)

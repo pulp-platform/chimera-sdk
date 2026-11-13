@@ -29,7 +29,8 @@ chimera-open:
   snitchCluster/matmul,
   snitchCluster/snrt,
   snitchCluster/simpleOffload,
-  snitchCluster/hyperbus
+  snitchCluster/hyperbus,
+  deviceTypes
 ]]
 [[
 chimera-host:

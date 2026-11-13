@@ -10,13 +10,13 @@ The SDK is organised into the following main folders:
 
     chimera-sdk/
     ├─ cmake/                           # CMake API and helper scripts
-    │  ├─ Chimera.cmake                 # add_device_binary() + add_host_binary()
+    │  ├─ Chimera.cmake                 # add_device_binary(), add_host_binary(), chimera_add_device_runtime()
     │  ├─ scripts/
     │  │  ├─ ChimeraBuildHelpers.cmake  # symbol extraction + placement generation
     │  │  └─ PrintBuildFooter.cmake     # build summary output
     │  ├─ toolchain_llvm.cmake          # LLVM toolchain configuration
     │  └─ Utils.cmake                   # utility macros
-    ├─ devices/                         # Device-specific runtime code
+    ├─ devices/                         # Device-specific runtime code, one device type per directory
     │  └─ snitch_cluster/
     │     ├─ runtime/                   # Snitch cluster runtime library
     │     └─ third_party/               # snitch-sdk and other external deps
@@ -45,6 +45,7 @@ The SDK is organised into the following main folders:
     │  └─ chimera-host/                 # Host-only target (no cluster devices)
     │     └─ host/
     ├─ tests/                           # Test applications
+    │  ├─ deviceTypes/                  # Two device types in one build
     │  ├─ host/                         # Host-only tests (no cluster)
     │  │  ├─ returnZero/
     │  │  ├─ alloc/

@@ -34,21 +34,19 @@ set(C_SOURCES
     "${SNITCH_ROOT_DIR}/target/common/src/snitch_cluster_memory.c"
 )
 
-# These hold the out-of-line copies of the runtime's inline functions, most of them unused
-set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_LIBRARY_SOURCES ${C_SOURCES})
-set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_SOURCES "${ITA_ROOT_DIR}/src/ITA_utils.c")
-
-set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_INCLUDES
-    ${SN_DEPS_DIR}
-    ${SNITCH_ROOT_DIR}/target/common/inc
-    ${SNITCH_ROOT_DIR}/core/inc
-    ${SNITCH_ROOT_DIR}/omp/inc
-    ${ITA_ROOT_DIR}/inc
-    ${SNITCH_ROOT_DIR}/deps
-    ${SNITCH_ROOT_DIR}/deps/idma
-)
-
-set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_PRIVATE_INCLUDES
-    ${SNITCH_ROOT_DIR}/core/src
-    ${SNITCH_ROOT_DIR}/omp/src
+chimera_add_device_runtime(snitch_cluster
+    # These hold the out-of-line copies of the runtime's inline functions, most of them unused
+    LIBRARY_SOURCES ${C_SOURCES}
+    SOURCES         "${ITA_ROOT_DIR}/src/ITA_utils.c"
+    INCLUDES
+        ${SN_DEPS_DIR}
+        ${SNITCH_ROOT_DIR}/target/common/inc
+        ${SNITCH_ROOT_DIR}/core/inc
+        ${SNITCH_ROOT_DIR}/omp/inc
+        ${ITA_ROOT_DIR}/inc
+        ${SNITCH_ROOT_DIR}/deps
+        ${SNITCH_ROOT_DIR}/deps/idma
+    PRIVATE_INCLUDES
+        ${SNITCH_ROOT_DIR}/core/src
+        ${SNITCH_ROOT_DIR}/omp/src
 )
