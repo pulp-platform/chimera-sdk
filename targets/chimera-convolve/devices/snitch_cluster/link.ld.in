@@ -94,8 +94,19 @@ SECTIONS {
     __bss_end = .;
   } > memisl
 
-  /* Thread Local Storage sections */
-  .tdata : {
+  /* Relro sections must be contiguous with .tdata */
+  .got : {
+    *(.got)
+    *(.got.*)
+  } > memisl
+
+  .data.rel.ro : {
+    *(.data.rel.ro.local*)
+    *(.data.rel.ro*)
+  } > memisl
+
+  /* Thread Local Storage sections; the TLS segment must start at __tdata_start */
+  .tdata : ALIGN(32) {
     . = ALIGN(32);
     __tdata_start = .;
     *(.tdata .tdata.* .gnu.linkonce.td.*)
@@ -241,4 +252,7 @@ SECTIONS {
 
   /* First free address in memisl (VMA usage and LMA payload usage). */
   __device_end = MAX(__tbss_end, MAX(__cdata_lma_end, __cbss_lma_end));
+
+  /* snitch-sdk's snrt_alloc_init() and snrt_l3_init() start the L3 heap at _edram */
+  PROVIDE(_edram = __l3_heap_start);
 }

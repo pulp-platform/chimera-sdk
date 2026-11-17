@@ -13,21 +13,30 @@ set(C_SOURCES
     "${SNITCH_ROOT_DIR}/core/src/alloc.c"
     "${SNITCH_ROOT_DIR}/core/src/alloc_v2.c"
     "${SNITCH_ROOT_DIR}/core/src/cls.c"
+    "${SNITCH_ROOT_DIR}/core/src/cluster_interrupts.c"
     "${SNITCH_ROOT_DIR}/core/src/dm.c"
+    "${SNITCH_ROOT_DIR}/core/src/dma.c"
+    "${SNITCH_ROOT_DIR}/core/src/global_interrupts.c"
+    "${SNITCH_ROOT_DIR}/core/src/perf_cnt.c"
     # WIESEP: We use the picolibc implementation of printf
     # "${SNITCH_ROOT_DIR}/printf.c"
     # "${SNITCH_ROOT_DIR}/snrt_putchar.c"
+    "${SNITCH_ROOT_DIR}/core/src/riscv.c"
     # WIESEP: Start files are included in this runtime library
     # "${SNITCH_ROOT_DIR}/start.S"
     # "${SNITCH_ROOT_DIR}/start.c"
+    "${SNITCH_ROOT_DIR}/core/src/ssr.c"
     "${SNITCH_ROOT_DIR}/core/src/sync.c"
+    "${SNITCH_ROOT_DIR}/core/src/team.c"
     "${SNITCH_ROOT_DIR}/omp/src/eu.c"
     "${SNITCH_ROOT_DIR}/omp/src/kmp.c"
     "${SNITCH_ROOT_DIR}/omp/src/omp.c"
-    "${ITA_ROOT_DIR}/src/ITA_utils.c"
+    "${SNITCH_ROOT_DIR}/target/common/src/snitch_cluster_memory.c"
 )
 
-set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_SOURCES ${C_SOURCES})
+# These hold the out-of-line copies of the runtime's inline functions, most of them unused
+set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_LIBRARY_SOURCES ${C_SOURCES})
+set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_SOURCES "${ITA_ROOT_DIR}/src/ITA_utils.c")
 
 set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_INCLUDES
     ${SN_DEPS_DIR}
@@ -36,6 +45,7 @@ set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_INCLUDES
     ${SNITCH_ROOT_DIR}/omp/inc
     ${ITA_ROOT_DIR}/inc
     ${SNITCH_ROOT_DIR}/deps
+    ${SNITCH_ROOT_DIR}/deps/idma
 )
 
 set_property(GLOBAL APPEND PROPERTY CHIMERA_DEVICE_RUNTIME_PRIVATE_INCLUDES
