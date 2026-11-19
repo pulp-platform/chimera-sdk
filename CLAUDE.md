@@ -53,6 +53,12 @@ via `set_property(GLOBAL PROPERTY CHIMERA_HOST_RUNTIME_SOURCES …)` and
 sources into a private object library per binary using that binary's ISA/ABI.  Changing a
 runtime source file in `targets/<target>/` re-triggers recompilation for every binary.
 
+**Device types.** `CHIMERA_DEVICE_RUNTIME_*` is common to every device binary.  Code for one
+kind of device (the Snitch glue in `targets/<target>/devices/snitch_cluster/`, everything in
+`devices/snitch_cluster/`) registers with `chimera_add_device_runtime(<type> …)` instead, and
+only binaries built with `add_device_binary(... DEVICE_TYPE <type>)` (default
+`snitch_cluster`) compile it.
+
 **Placement chain.** The linker script templates contain `@CHIMERA_PREV_INCLUDE@` and
 `@CHIMERA_RESERVED_SECTION@` placeholders that CMake substitutes at configure time based on
 `PREV_DEVICE` / `LAST_DEVICE` arguments.  If the memory layout looks wrong, check the
