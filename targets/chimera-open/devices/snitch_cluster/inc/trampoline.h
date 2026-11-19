@@ -52,15 +52,31 @@
     "add t1, t1, t3\n"   /* t1 += t3 (cluster_id = 4) */
 
 /**
- * @brief Calculate the cluster ID from mhartid and set the busy flag.
+ * @brief Set the cluster's busy flag from its first hart only, as the Snitch bootrom does.
  *
  * @note This is a naked-friendly macro intended to be used inside an asm volatile block.
  */
 #define _SET_CLUSTER_BUSY() \
-    asm volatile(__CLUSTER_ID_ASM "slli t1, t1, 2\n" /* t1 = cluster_id * 4 */ \
+    asm volatile(__CLUSTER_ID_ASM "xor t2, t0, %5\n" /* t2 = mhartid is a first hart */ \
+                                  "seqz t2, t2\n" \
+                                  "xor t3, t0, %1\n" \
+                                  "seqz t3, t3\n" \
+                                  "or t2, t2, t3\n" \
+                                  "xor t3, t0, %2\n" \
+                                  "seqz t3, t3\n" \
+                                  "or t2, t2, t3\n" \
+                                  "xor t3, t0, %3\n" \
+                                  "seqz t3, t3\n" \
+                                  "or t2, t2, t3\n" \
+                                  "xor t3, t0, %4\n" \
+                                  "seqz t3, t3\n" \
+                                  "or t2, t2, t3\n" \
+                                  "beqz t2, 1f\n" \
+                                  "slli t1, t1, 2\n" /* t1 = cluster_id * 4 */ \
                                   "add t1, %0, t1\n" /* t1 = base + cluster_id*4 */ \
                                   "li t2, 1\n" \
                                   "sw t2, 0(t1)\n" \
+                                  "1:\n" \
                  : /* no outputs */ \
                  : "r"((uintptr_t)(SOC_CTRL_BASE + CHIMERA_CLUSTER_0_BUSY_REG_OFFSET)), \
                    "r"((uintptr_t)(HOST_NUMCORES + CLUSTER_0_NUMCORES)), \
@@ -68,7 +84,8 @@
                    "r"((uintptr_t)(HOST_NUMCORES + CLUSTER_0_NUMCORES + CLUSTER_1_NUMCORES + \
                                    CLUSTER_2_NUMCORES)), \
                    "r"((uintptr_t)(HOST_NUMCORES + CLUSTER_0_NUMCORES + CLUSTER_1_NUMCORES + \
-                                   CLUSTER_2_NUMCORES + CLUSTER_3_NUMCORES)) \
+                                   CLUSTER_2_NUMCORES + CLUSTER_3_NUMCORES)), \
+                   "r"((uintptr_t)(HOST_NUMCORES)) \
                  : "t0", "t1", "t2", "t3", "memory");
 
 /**

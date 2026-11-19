@@ -131,7 +131,7 @@ int snitchCluster_busy(uint8_t clusterId);
  * @brief Blocking wait for the cluster to become idle.
  * The function busy waits until the cluster is ready.
  *
- * @warning The busy flag is set by the offloaded function itself (`_SET_CLUSTER_BUSY()`), not by
+ * @warning The busy flag is set by the cluster's first core (`_SET_CLUSTER_BUSY()`), not by
  * hardware. Hence the busy flag does not reflect the actual status of the cluster right after an
  * offload. A fixed NOP delay after the flag clears is used as a temporary workaround.
  *
@@ -142,8 +142,8 @@ int snitchCluster_busy(uint8_t clusterId);
 void wait_snitchCluster_busy(uint8_t clusterId);
 
 /**
- * @brief Wait for the cluster to return a value. The return value is written
- * by the last core of the cluster.
+ * @brief Wait for the cluster to return a value. The Snitch bootrom writes
+ * the return value of the cluster's first core.
  * The function busy waits until the cluster returns a non-zero value.
  *
  * @warning The return values must be non-zero, otherwise the function will busy wait forever!
