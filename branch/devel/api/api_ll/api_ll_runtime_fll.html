@@ -1,0 +1,235 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FLL Runtime &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Shared Utilities" href="api_ll_shared.html" />
+    <link rel="prev" title="Logging" href="api_ll_runtime_log.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">Multi-Binary Compilation Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/asic.html">ASIC Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api_ll.html">Host Runtime API Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_uart.html">UART</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_clint.html">CLINT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_cluster.html">Snitch Clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_fll.html">FLL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_hyperbus.html">Hyperbus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_alloc.html">Memory Allocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_log.html">Logging</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">FLL Runtime</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv420calculate_fll_params8uint32_t8uint32_tP8uint32_tP8uint32_t"><code class="docutils literal notranslate"><span class="pre">calculate_fll_params()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv413configure_fll8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">configure_fll()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv420restore_default_freq8uint32_t"><code class="docutils literal notranslate"><span class="pre">restore_default_freq()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_shared.html">Shared Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="api_ll.html">Host Runtime API Reference</a></li>
+      <li class="breadcrumb-item active">FLL Runtime</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_ll/api_ll_runtime_fll.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="fll-runtime">
+<h1>FLL Runtime<a class="headerlink" href="#fll-runtime" title="Link to this heading"></a></h1>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__runtime__fll"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">FLL</span> <span class="pre">Runtime</span></span></dt>
+<dd><p>Host-side FLL parameter calculation and frequency switching utilities. </p>
+<p>These functions operate above the low-level FLL driver (<code class="docutils literal notranslate"><span class="pre">drivers_fll</span></code>) and handle the higher-level tasks: computing multiplier/divider values, switching both the SOC and cluster FLLs in concert, and reconfiguring the UART baud rate after a frequency change. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420calculate_fll_params8uint32_t8uint32_tP8uint32_tP8uint32_t">
+<span id="_CPPv320calculate_fll_params8uint32_t8uint32_tP8uint32_tP8uint32_t"></span><span id="_CPPv220calculate_fll_params8uint32_t8uint32_tP8uint32_tP8uint32_t"></span><span id="calculate_fll_params__uint32_t.uint32_t.uint32_tP.uint32_tP"></span><span class="target" id="group__runtime__fll_1ga8740adaff2a6bbc8b52cf99ec1bad993"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">calculate_fll_params</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_freq</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rtc_freq</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mult</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">div</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420calculate_fll_params8uint32_t8uint32_tP8uint32_tP8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Calculate FLL parameters for a target frequency. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_freq</strong> – Target frequency in Hz </p></li>
+<li><p><strong>rtc_freq</strong> – RTC frequency in Hz </p></li>
+<li><p><strong>mult</strong> – Output: FLL multiplier </p></li>
+<li><p><strong>div</strong> – Output: FLL divider (power of 2) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, -1 on error </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv413configure_fll8uint32_t8uint32_t">
+<span id="_CPPv313configure_fll8uint32_t8uint32_t"></span><span id="_CPPv213configure_fll8uint32_t8uint32_t"></span><span id="configure_fll__uint32_t.uint32_t"></span><span class="target" id="group__runtime__fll_1ga0ff640592d9360aa9afe09e027cfab5b"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">configure_fll</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">target_freq</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rtc_freq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv413configure_fll8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Configure FLLs to target frequency and reconfigure UART. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_freq</strong> – Target frequency in Hz </p></li>
+<li><p><strong>rtc_freq</strong> – RTC frequency in Hz </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Actual configured frequency in Hz, or 0 on error </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420restore_default_freq8uint32_t">
+<span id="_CPPv320restore_default_freq8uint32_t"></span><span id="_CPPv220restore_default_freq8uint32_t"></span><span id="restore_default_freq__uint32_t"></span><span class="target" id="group__runtime__fll_1ga9abf5788d142c533a1b4f30fed18de61"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">restore_default_freq</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">rtc_freq</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420restore_default_freq8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Restore the core frequency to its reset value and reconfigure UART. </p>
+<p>Measures the actual reset-domain clock frequency using the CLINT as a reference, then reopens the UART with the measured frequency so that the baud rate remains correct after an FLL is switched off.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rtc_freq</strong> – Reference RTC frequency in Hz (used as timing reference). </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Measured core frequency in Hz, or 0 on error. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_ll_runtime_log.html" class="btn btn-neutral float-left" title="Logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_ll_shared.html" class="btn btn-neutral float-right" title="Shared Utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

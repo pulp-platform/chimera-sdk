@@ -1,0 +1,684 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hyperbus &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Memory Allocation" href="api_ll_runtime_alloc.html" />
+    <link rel="prev" title="FLL" href="api_ll_drivers_fll.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">Multi-Binary Compilation Flow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/test_vectors.html">Test Vectors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial/asic.html">ASIC Tutorial</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../api_hal/api_hal.html">Host High‑Level API Reference (HAL)</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="api_ll.html">Host Runtime API Reference</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_uart.html">UART</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_clint.html">CLINT</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_cluster.html">Snitch Clusters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_drivers_fll.html">FLL</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Hyperbus</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#c.HYPERBUS_NUM_PHYS"><code class="docutils literal notranslate"><span class="pre">HYPERBUS_NUM_PHYS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c.HYPERBUS_NUM_CHIPS"><code class="docutils literal notranslate"><span class="pre">HYPERBUS_NUM_CHIPS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv429hyperbus_set_t_latency_accessPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_t_latency_access()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv429hyperbus_get_t_latency_accessPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_t_latency_access()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv434hyperbus_set_en_latency_additionalPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_en_latency_additional()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv434hyperbus_get_en_latency_additionalPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_en_latency_additional()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv424hyperbus_set_t_burst_maxPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_t_burst_max()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv424hyperbus_get_t_burst_maxPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_t_burst_max()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv434hyperbus_set_t_read_write_recoveryPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_t_read_write_recovery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv434hyperbus_get_t_read_write_recoveryPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_t_read_write_recovery()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv427hyperbus_set_t_rx_clk_delayPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_t_rx_clk_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv427hyperbus_get_t_rx_clk_delayPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_t_rx_clk_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv427hyperbus_set_t_tx_clk_delayPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_t_tx_clk_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv427hyperbus_get_t_tx_clk_delayPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_t_tx_clk_delay()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv429hyperbus_set_address_mask_msbPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_address_mask_msb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv429hyperbus_get_address_mask_msbPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_address_mask_msb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv426hyperbus_set_address_spacePv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_address_space()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv426hyperbus_get_address_spacePv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_address_space()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv424hyperbus_set_phys_in_usePv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_phys_in_use()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv424hyperbus_get_phys_in_usePv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_phys_in_use()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv422hyperbus_set_which_phyPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_which_phy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv422hyperbus_get_which_phyPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_which_phy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv425hyperbus_set_t_csh_cyclesPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_t_csh_cycles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv425hyperbus_get_t_csh_cyclesPv"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_t_csh_cycles()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423hyperbus_set_chip_startPv8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_chip_start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423hyperbus_get_chip_startPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_chip_start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv421hyperbus_set_chip_endPv8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_chip_end()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv421hyperbus_get_chip_endPv8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_get_chip_end()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv423hyperbus_set_chip_rangePv8uint32_t8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperbus_set_chip_range()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv420hyperram_cfg_defaultP14hyperram_cfg_t8uint32_t8uint32_t"><code class="docutils literal notranslate"><span class="pre">hyperram_cfg_default()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv417hyperram_cfg_readPv"><code class="docutils literal notranslate"><span class="pre">hyperram_cfg_read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418hyperram_cfg_writePvPK14hyperram_cfg_t"><code class="docutils literal notranslate"><span class="pre">hyperram_cfg_write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv418hyperram_cfg_printPv"><code class="docutils literal notranslate"><span class="pre">hyperram_cfg_print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv414hyperram_cfg_t"><code class="docutils literal notranslate"><span class="pre">hyperram_cfg_t</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_alloc.html">Memory Allocation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_log.html">Logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_runtime_fll.html">FLL Runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api_ll_shared.html">Shared Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_device/api_device.html">Device API Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+          <li class="breadcrumb-item"><a href="api_ll.html">Host Runtime API Reference</a></li>
+      <li class="breadcrumb-item active">Hyperbus</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_ll/api_ll_drivers_hyperbus.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hyperbus">
+<h1>Hyperbus<a class="headerlink" href="#hyperbus" title="Link to this heading"></a></h1>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group__drivers__hyperbus"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">HyperBus</span> <span class="pre">Driver</span></span></dt>
+<dd><p>HyperBus register definitions for Chimera-SDK. </p>
+<p>This file defines register offsets and fields for an APB-based HyperBus peripheral. It is used in conjunction with the HyperBus driver to configure and interact with the hardware. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.HYPERBUS_NUM_PHYS">
+<span class="target" id="group__drivers__hyperbus_1gac5c7db6c1cc387a819748e2cf586314a"></span><span class="sig-name descname"><span class="n"><span class="pre">HYPERBUS_NUM_PHYS</span></span></span><a class="headerlink" href="#c.HYPERBUS_NUM_PHYS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp macro">
+<dt class="sig sig-object cpp" id="c.HYPERBUS_NUM_CHIPS">
+<span class="target" id="group__drivers__hyperbus_1ga7735f66d5078e61623ba67936ee06ad1"></span><span class="sig-name descname"><span class="n"><span class="pre">HYPERBUS_NUM_CHIPS</span></span></span><a class="headerlink" href="#c.HYPERBUS_NUM_CHIPS" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv429hyperbus_set_t_latency_accessPv8uint32_t">
+<span id="_CPPv329hyperbus_set_t_latency_accessPv8uint32_t"></span><span id="_CPPv229hyperbus_set_t_latency_accessPv8uint32_t"></span><span id="hyperbus_set_t_latency_access__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga8247a52833d76e6a9eab9b4ee925b5d8"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_t_latency_access</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429hyperbus_set_t_latency_accessPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the latency access time for HyperBus transactions. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Latency access time value (4-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv429hyperbus_get_t_latency_accessPv">
+<span id="_CPPv329hyperbus_get_t_latency_accessPv"></span><span id="_CPPv229hyperbus_get_t_latency_accessPv"></span><span id="hyperbus_get_t_latency_access__voidP"></span><span class="target" id="group__drivers__hyperbus_1ga70f1bdbe322c834a3376997dc9d6ff17"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_t_latency_access</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429hyperbus_get_t_latency_accessPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the latency access time for HyperBus transactions. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Latency access time value (4-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434hyperbus_set_en_latency_additionalPv8uint32_t">
+<span id="_CPPv334hyperbus_set_en_latency_additionalPv8uint32_t"></span><span id="_CPPv234hyperbus_set_en_latency_additionalPv8uint32_t"></span><span id="hyperbus_set_en_latency_additional__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga1d639d0784c49ad99598dacf4b2c1b22"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_en_latency_additional</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434hyperbus_set_en_latency_additionalPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Enable or disable additional latency compensation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Enable flag (1-bit field, 0 = disabled, 1 = enabled) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434hyperbus_get_en_latency_additionalPv">
+<span id="_CPPv334hyperbus_get_en_latency_additionalPv"></span><span id="_CPPv234hyperbus_get_en_latency_additionalPv"></span><span id="hyperbus_get_en_latency_additional__voidP"></span><span class="target" id="group__drivers__hyperbus_1ga3bdc594e445d1b9f36b2c080db19de93"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_en_latency_additional</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434hyperbus_get_en_latency_additionalPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the additional latency compensation enable status. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Enable status (1-bit field, 0 = disabled, 1 = enabled) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424hyperbus_set_t_burst_maxPv8uint32_t">
+<span id="_CPPv324hyperbus_set_t_burst_maxPv8uint32_t"></span><span id="_CPPv224hyperbus_set_t_burst_maxPv8uint32_t"></span><span id="hyperbus_set_t_burst_max__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga1193206a646645be0cb61428eb8bac50"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_t_burst_max</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424hyperbus_set_t_burst_maxPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the maximum burst length for HyperBus transfers. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Maximum burst length value (16-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424hyperbus_get_t_burst_maxPv">
+<span id="_CPPv324hyperbus_get_t_burst_maxPv"></span><span id="_CPPv224hyperbus_get_t_burst_maxPv"></span><span id="hyperbus_get_t_burst_max__voidP"></span><span class="target" id="group__drivers__hyperbus_1gab4a7445cddc3ad87e85ae544cba929bc"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_t_burst_max</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424hyperbus_get_t_burst_maxPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the maximum burst length for HyperBus transfers. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Maximum burst length value (16-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434hyperbus_set_t_read_write_recoveryPv8uint32_t">
+<span id="_CPPv334hyperbus_set_t_read_write_recoveryPv8uint32_t"></span><span id="_CPPv234hyperbus_set_t_read_write_recoveryPv8uint32_t"></span><span id="hyperbus_set_t_read_write_recovery__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga51bb106708b96d0bba9f357e2b302126"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_t_read_write_recovery</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434hyperbus_set_t_read_write_recoveryPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the read/write recovery time. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Read/write recovery time value (4-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv434hyperbus_get_t_read_write_recoveryPv">
+<span id="_CPPv334hyperbus_get_t_read_write_recoveryPv"></span><span id="_CPPv234hyperbus_get_t_read_write_recoveryPv"></span><span id="hyperbus_get_t_read_write_recovery__voidP"></span><span class="target" id="group__drivers__hyperbus_1gaf4f78c48e83c174f562e8476475ce4ba"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_t_read_write_recovery</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv434hyperbus_get_t_read_write_recoveryPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the read/write recovery time. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Read/write recovery time value (4-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427hyperbus_set_t_rx_clk_delayPv8uint32_t">
+<span id="_CPPv327hyperbus_set_t_rx_clk_delayPv8uint32_t"></span><span id="_CPPv227hyperbus_set_t_rx_clk_delayPv8uint32_t"></span><span id="hyperbus_set_t_rx_clk_delay__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga5181c6d2e3389c7fcfb7a9cfae5739cb"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_t_rx_clk_delay</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427hyperbus_set_t_rx_clk_delayPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the receive clock delay for HyperBus data. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> RX clock delay value (4-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427hyperbus_get_t_rx_clk_delayPv">
+<span id="_CPPv327hyperbus_get_t_rx_clk_delayPv"></span><span id="_CPPv227hyperbus_get_t_rx_clk_delayPv"></span><span id="hyperbus_get_t_rx_clk_delay__voidP"></span><span class="target" id="group__drivers__hyperbus_1ga84b443c9e6d580edf8a8fd919193ae16"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_t_rx_clk_delay</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427hyperbus_get_t_rx_clk_delayPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the receive clock delay for HyperBus data. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RX clock delay value (4-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427hyperbus_set_t_tx_clk_delayPv8uint32_t">
+<span id="_CPPv327hyperbus_set_t_tx_clk_delayPv8uint32_t"></span><span id="_CPPv227hyperbus_set_t_tx_clk_delayPv8uint32_t"></span><span id="hyperbus_set_t_tx_clk_delay__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga6b5cc2d6fdf1a046535d50193b64c9e0"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_t_tx_clk_delay</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427hyperbus_set_t_tx_clk_delayPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the transmit clock delay for HyperBus data. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> TX clock delay value (4-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv427hyperbus_get_t_tx_clk_delayPv">
+<span id="_CPPv327hyperbus_get_t_tx_clk_delayPv"></span><span id="_CPPv227hyperbus_get_t_tx_clk_delayPv"></span><span id="hyperbus_get_t_tx_clk_delay__voidP"></span><span class="target" id="group__drivers__hyperbus_1ga5ab27ea75466533cc4aa084cf294dc0a"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_t_tx_clk_delay</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv427hyperbus_get_t_tx_clk_delayPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the transmit clock delay for HyperBus data. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>TX clock delay value (4-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv429hyperbus_set_address_mask_msbPv8uint32_t">
+<span id="_CPPv329hyperbus_set_address_mask_msbPv8uint32_t"></span><span id="_CPPv229hyperbus_set_address_mask_msbPv8uint32_t"></span><span id="hyperbus_set_address_mask_msb__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga40943c37bed2c437b3532b29592f0859"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_address_mask_msb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429hyperbus_set_address_mask_msbPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the address mask MSB for address decoding. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Address mask MSB value (5-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv429hyperbus_get_address_mask_msbPv">
+<span id="_CPPv329hyperbus_get_address_mask_msbPv"></span><span id="_CPPv229hyperbus_get_address_mask_msbPv"></span><span id="hyperbus_get_address_mask_msb__voidP"></span><span class="target" id="group__drivers__hyperbus_1ga759aa32d843d8d3c438227ae672cb5d5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_address_mask_msb</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv429hyperbus_get_address_mask_msbPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the address mask MSB for address decoding. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Address mask MSB value (5-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426hyperbus_set_address_spacePv8uint32_t">
+<span id="_CPPv326hyperbus_set_address_spacePv8uint32_t"></span><span id="_CPPv226hyperbus_set_address_spacePv8uint32_t"></span><span id="hyperbus_set_address_space__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1gad59aed8a0baa7f6d0294c4d2b6a750ae"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_address_space</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426hyperbus_set_address_spacePv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the address space configuration. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Address space value (1-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv426hyperbus_get_address_spacePv">
+<span id="_CPPv326hyperbus_get_address_spacePv"></span><span id="_CPPv226hyperbus_get_address_spacePv"></span><span id="hyperbus_get_address_space__voidP"></span><span class="target" id="group__drivers__hyperbus_1gac938f3fdbe5c237f9421c503546cbc39"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_address_space</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv426hyperbus_get_address_spacePv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the address space configuration. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Address space value (1-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424hyperbus_set_phys_in_usePv8uint32_t">
+<span id="_CPPv324hyperbus_set_phys_in_usePv8uint32_t"></span><span id="_CPPv224hyperbus_set_phys_in_usePv8uint32_t"></span><span id="hyperbus_set_phys_in_use__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga054f5b6456e19b1c0dd7130d9c968066"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_phys_in_use</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424hyperbus_set_phys_in_usePv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set which physical interfaces are in use. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Physical interfaces in use bitmask (1-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv424hyperbus_get_phys_in_usePv">
+<span id="_CPPv324hyperbus_get_phys_in_usePv"></span><span id="_CPPv224hyperbus_get_phys_in_usePv"></span><span id="hyperbus_get_phys_in_use__voidP"></span><span class="target" id="group__drivers__hyperbus_1ga3f28793690059d2377145cae74923062"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_phys_in_use</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv424hyperbus_get_phys_in_usePv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get which physical interfaces are in use. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Physical interfaces in use bitmask (1-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422hyperbus_set_which_phyPv8uint32_t">
+<span id="_CPPv322hyperbus_set_which_phyPv8uint32_t"></span><span id="_CPPv222hyperbus_set_which_phyPv8uint32_t"></span><span id="hyperbus_set_which_phy__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga322cb584dfa6c44aab3de135663cf8db"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_which_phy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422hyperbus_set_which_phyPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the active physical interface. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Active PHY index (1-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv422hyperbus_get_which_phyPv">
+<span id="_CPPv322hyperbus_get_which_phyPv"></span><span id="_CPPv222hyperbus_get_which_phyPv"></span><span id="hyperbus_get_which_phy__voidP"></span><span class="target" id="group__drivers__hyperbus_1gabf0e7917e1dd460f5b369539559f2f30"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_which_phy</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv422hyperbus_get_which_phyPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the active physical interface. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Active PHY index (1-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425hyperbus_set_t_csh_cyclesPv8uint32_t">
+<span id="_CPPv325hyperbus_set_t_csh_cyclesPv8uint32_t"></span><span id="_CPPv225hyperbus_set_t_csh_cyclesPv8uint32_t"></span><span id="hyperbus_set_t_csh_cycles__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1gab39cb482c1d9ba7152b2ad6e89bbd73e"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_t_csh_cycles</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425hyperbus_set_t_csh_cyclesPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the chip select hold time in cycles. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>val</strong> – <strong>[in]</strong> Chip select hold time (4-bit field) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv425hyperbus_get_t_csh_cyclesPv">
+<span id="_CPPv325hyperbus_get_t_csh_cyclesPv"></span><span id="_CPPv225hyperbus_get_t_csh_cyclesPv"></span><span id="hyperbus_get_t_csh_cycles__voidP"></span><span class="target" id="group__drivers__hyperbus_1gae894e08293a1f77fe073fc7b4301c749"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_t_csh_cycles</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv425hyperbus_get_t_csh_cyclesPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the chip select hold time in cycles. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Chip select hold time (4-bit field) </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423hyperbus_set_chip_startPv8uint32_t8uint32_t">
+<span id="_CPPv323hyperbus_set_chip_startPv8uint32_t8uint32_t"></span><span id="_CPPv223hyperbus_set_chip_startPv8uint32_t8uint32_t"></span><span id="hyperbus_set_chip_start__voidP.uint32_t.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga47fcc4833535342da8db6f7d9b5f30fa"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_chip_start</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chip</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_addr</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423hyperbus_set_chip_startPv8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the start address for a chip’s address window. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>chip</strong> – <strong>[in]</strong> Chip index (0 to HYPERBUS_NUM_CHIPS - 1) </p></li>
+<li><p><strong>start_addr</strong> – <strong>[in]</strong> Start address of the chip’s memory window </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423hyperbus_get_chip_startPv8uint32_t">
+<span id="_CPPv323hyperbus_get_chip_startPv8uint32_t"></span><span id="_CPPv223hyperbus_get_chip_startPv8uint32_t"></span><span id="hyperbus_get_chip_start__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1gac1796500925c130a81f6ffeea7407c61"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_chip_start</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chip</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423hyperbus_get_chip_startPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the start address for a chip’s address window. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Chip index (0 to HYPERBUS_NUM_CHIPS - 1) </p></li>
+<li><p><strong>chip</strong> – <strong>[in]</strong> Chip index </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Start address of the chip’s memory window </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421hyperbus_set_chip_endPv8uint32_t8uint32_t">
+<span id="_CPPv321hyperbus_set_chip_endPv8uint32_t8uint32_t"></span><span id="_CPPv221hyperbus_set_chip_endPv8uint32_t8uint32_t"></span><span id="hyperbus_set_chip_end__voidP.uint32_t.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1gafe1aba568517db91a461ed10c34b5016"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_chip_end</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chip</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_addr_noninclusive</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421hyperbus_set_chip_endPv8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the end address for a chip’s address window. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>chip</strong> – <strong>[in]</strong> Chip index (0 to HYPERBUS_NUM_CHIPS - 1) </p></li>
+<li><p><strong>end_addr_noninclusive</strong> – <strong>[in]</strong> End address (non-inclusive) of the chip’s memory window </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv421hyperbus_get_chip_endPv8uint32_t">
+<span id="_CPPv321hyperbus_get_chip_endPv8uint32_t"></span><span id="_CPPv221hyperbus_get_chip_endPv8uint32_t"></span><span id="hyperbus_get_chip_end__voidP.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga7f008ddb72e9ab68bd7e1a01fd594f14"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_get_chip_end</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chip</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv421hyperbus_get_chip_endPv8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the end address for a chip’s address window. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>chip</strong> – <strong>[in]</strong> Chip index (0 to HYPERBUS_NUM_CHIPS - 1) </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>End address (non-inclusive) of the chip’s memory window </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv423hyperbus_set_chip_rangePv8uint32_t8uint32_t8uint32_t">
+<span id="_CPPv323hyperbus_set_chip_rangePv8uint32_t8uint32_t8uint32_t"></span><span id="_CPPv223hyperbus_set_chip_rangePv8uint32_t8uint32_t8uint32_t"></span><span id="hyperbus_set_chip_range__voidP.uint32_t.uint32_t.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga256b3f8bcf216c1e6423f99d354c6370"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperbus_set_chip_range</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chip</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">start_addr</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">end_addr_noninclusive</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv423hyperbus_set_chip_rangePv8uint32_t8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Set both start and end addresses for a chip’s address window. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>chip</strong> – <strong>[in]</strong> Chip index (0 to HYPERBUS_NUM_CHIPS - 1) </p></li>
+<li><p><strong>start_addr</strong> – <strong>[in]</strong> Start address of the chip’s memory window </p></li>
+<li><p><strong>end_addr_noninclusive</strong> – <strong>[in]</strong> End address (non-inclusive) of the chip’s memory window </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv420hyperram_cfg_defaultP14hyperram_cfg_t8uint32_t8uint32_t">
+<span id="_CPPv320hyperram_cfg_defaultP14hyperram_cfg_t8uint32_t8uint32_t"></span><span id="_CPPv220hyperram_cfg_defaultP14hyperram_cfg_t8uint32_t8uint32_t"></span><span id="hyperram_cfg_default__hyperram_cfg_tP.uint32_t.uint32_t"></span><span class="target" id="group__drivers__hyperbus_1ga2df01aaba6b349cdffba9eb03fd41d9d"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperram_cfg_default</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv414hyperram_cfg_t" title="hyperram_cfg_t"><span class="n"><span class="pre">hyperram_cfg_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cfg</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chip_base</span></span>, <span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">chip_size</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv420hyperram_cfg_defaultP14hyperram_cfg_t8uint32_t8uint32_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Initialize HyperRAM configuration with default values. </p>
+<p>Sets up sensible defaults for a HyperRAM device with the specified base address and size.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cfg</strong> – <strong>[out]</strong> Pointer to the configuration structure to initialize </p></li>
+<li><p><strong>chip_base</strong> – <strong>[in]</strong> Physical base address of the chip </p></li>
+<li><p><strong>chip_size</strong> – <strong>[in]</strong> Size of the chip’s address space in bytes </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv417hyperram_cfg_readPv">
+<span id="_CPPv317hyperram_cfg_readPv"></span><span id="_CPPv217hyperram_cfg_readPv"></span><span id="hyperram_cfg_read__voidP"></span><span class="target" id="group__drivers__hyperbus_1gaad20607c2fac72ad1dda5884227707c3"></span><a class="reference internal" href="#_CPPv414hyperram_cfg_t" title="hyperram_cfg_t"><span class="n"><span class="pre">hyperram_cfg_t</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperram_cfg_read</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv417hyperram_cfg_readPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Read the current HyperRAM configuration from hardware. </p>
+<p>Reads all configuration registers from the HyperBus peripheral and returns a populated configuration structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configuration structure containing the hardware settings </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418hyperram_cfg_writePvPK14hyperram_cfg_t">
+<span id="_CPPv318hyperram_cfg_writePvPK14hyperram_cfg_t"></span><span id="_CPPv218hyperram_cfg_writePvPK14hyperram_cfg_t"></span><span id="hyperram_cfg_write__voidP.hyperram_cfg_tCP"></span><span class="target" id="group__drivers__hyperbus_1gaaba0de8ffda2203f07fe0aa036f0cb2c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperram_cfg_write</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv414hyperram_cfg_t" title="hyperram_cfg_t"><span class="n"><span class="pre">hyperram_cfg_t</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cfg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418hyperram_cfg_writePvPK14hyperram_cfg_t" title="Link to this definition"></a><br /></dt>
+<dd><p>Write a HyperRAM configuration to hardware. </p>
+<p>Applies a complete configuration to the HyperBus peripheral by writing all configuration registers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p></li>
+<li><p><strong>cfg</strong> – <strong>[in]</strong> Pointer to the configuration structure to apply </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>0 on success, non-zero error code on failure </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv418hyperram_cfg_printPv">
+<span id="_CPPv318hyperram_cfg_printPv"></span><span id="_CPPv218hyperram_cfg_printPv"></span><span id="hyperram_cfg_print__voidP"></span><span class="target" id="group__drivers__hyperbus_1ga11edbafec875eff7774dada311874327"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperram_cfg_print</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">base</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv418hyperram_cfg_printPv" title="Link to this definition"></a><br /></dt>
+<dd><p>Print the current HyperRAM configuration to output. </p>
+<p>Reads the hardware configuration and displays all registers and settings in a human-readable format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base</strong> – <strong>[in]</strong> Base address of the HyperBus peripheral </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv414hyperram_cfg_t">
+<span id="_CPPv314hyperram_cfg_t"></span><span id="_CPPv214hyperram_cfg_t"></span><span id="hyperram_cfg_t"></span><span class="target" id="structhyperram__cfg__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hyperram_cfg_t</span></span></span><a class="headerlink" href="#_CPPv414hyperram_cfg_t" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;hyperbus.h&gt;</em></div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api_ll_drivers_fll.html" class="btn btn-neutral float-left" title="FLL" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_ll_runtime_alloc.html" class="btn btn-neutral float-right" title="Memory Allocation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <!--
+ SPDX-FileCopyrightText: 2025 ETH Zurich and University of Bologna
+ SPDX-License-Identifier: CC-BY-ND-4.0
+ -->
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: devel
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
