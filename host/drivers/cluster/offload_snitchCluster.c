@@ -30,12 +30,12 @@
  * 32 bits of the host's RV64 pointer are discarded, which is safe because all shared
  * memory lies within the 32-bit physical address space.
  *
- * offload_snitchCluster() iterates over all cores in the cluster, calls
- * _setup_trampoline() for each, then releases the cluster from reset.
- * offload_snitchCluster_core() targets a single core.
+ * offload_snitchCluster() calls _setup_trampoline() for every core in the cluster, writes the
+ * boot address, wakes the cores, and returns once every core has set its
+ * shared_data.trampoline_ack. offload_snitchCluster_core() does the same for a single core.
  *
- * wait_snitchCluster_busy() polls the SOC_CTRL busy register.  The register is set
- * by the device-side trampoline and cleared when the cluster calls snrt_exit().
+ * wait_snitchCluster_busy() polls the SOC_CTRL busy register.  The cluster's first core sets
+ * it when it wakes up, and the Snitch bootrom clears it once that core has returned.
  */
 
 /* Writes the function pointer, argument pointer, and stack pointer into the shared trampoline
@@ -50,6 +50,31 @@ static void _setup_trampoline(uint32_t hartID, void (*function)(void *), void *a
         (uint32_t)((uint64_t)args & 0xFFFFFFFF); // Ensure LSB is 0 for RV32 pointer
     shared_data.trampoline_stack[trampoline_idx] =
         (uint32_t)((uint64_t)stack & 0xFFFFFFFF); // Ensure LSB is 0 for RV32 pointer
+    shared_data.trampoline_ack[trampoline_idx] = 0;
+}
+
+/* Waits until the given hart's trampoline has read its entries. */
+static void _wait_trampoline_ack(uint32_t hartID) {
+    while (shared_data.trampoline_ack[hartID - CLUSTER_HART_BASE] == 0);
+}
+
+/* Writes the address every woken Snitch core jumps to. */
+static void _set_boot_addr(void *trampoline) {
+    *(volatile uint32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_BOOT_ADDR_REG_OFFSET) =
+        (uint32_t)((uint64_t)trampoline & 0xFFFFFFFF);
+}
+
+/* Sends a software interrupt to the given hart. */
+static void _wake_hart(uint32_t hartID) {
+    volatile uint32_t *interruptTarget = ((uint32_t *)CLINT_CTRL_BASE) + hartID;
+    *interruptTarget = 1;
+}
+
+/* Gives the cores time to reach the bootrom's first wfi: a wake-up before that is lost or traps. */
+static void _wait_snitchCluster_boot(void) {
+    for (int i = 0; i < 5000; i++) {
+        asm volatile("addi x0, x0, 0\n" :::);
+    }
 }
 
 /* Returns the global hart ID for the given cluster and core index. */
@@ -103,33 +128,27 @@ void *generate_snitchCluster_SPs_uniform(uint8_t clusterId, void *sp, uint32_t s
     return sp;
 }
 
-/* Sets up the trampoline for a single core, programs the boot address, and sends a software
- * interrupt. */
+/* Sets up the trampoline for a single core, wakes it, and waits until it has taken the offload. */
 void offload_snitchCluster_core(void *function, void *trampoline, void *args, void *stack_ptr,
                                 uint8_t clusterId, uint32_t core_id) {
-    volatile void **snitchBootAddr =
-        (volatile void **)(SOC_CTRL_BASE + CHIMERA_SNITCH_BOOT_ADDR_REG_OFFSET);
-
     uint32_t hartId = _get_hart_id(clusterId, core_id);
 
     printf("Offloading to core %d in cluster %d with hartid %d\n", core_id, clusterId, hartId);
 
-    _setup_trampoline(hartId, function, args, stack_ptr);
-
-    *snitchBootAddr = trampoline;
-
     // Check if the cluster is busy
     wait_snitchCluster_busy(clusterId);
-    volatile uint32_t *interruptTarget = ((uint32_t *)CLINT_CTRL_BASE) + hartId;
-    *interruptTarget = 1;
+
+    _setup_trampoline(hartId, function, args, stack_ptr);
+    _set_boot_addr(trampoline);
+    fence();
+    _wake_hart(hartId);
+    _wait_trampoline_ack(hartId);
 }
 
-/* Sets up trampolines for all cores in a cluster and sends a software interrupt to each. */
+/* Sets up the trampolines of all cores in a cluster, wakes them, and waits until each core has
+ * taken the offload. */
 void offload_snitchCluster(void *function, void *trampoline, void *args, void **stack_ptr,
                            uint8_t clusterId) {
-    volatile uint32_t *snitchBootAddr =
-        (uint32_t *)(SOC_CTRL_BASE + CHIMERA_SNITCH_BOOT_ADDR_REG_OFFSET);
-
     uint32_t hartId = _get_hart_id(clusterId, 0);
 
 #ifdef TRACE
@@ -142,11 +161,11 @@ void offload_snitchCluster(void *function, void *trampoline, void *args, void **
 
     for (uint32_t i = 0; i < _chimera_numCores[clusterId]; i++) {
         _setup_trampoline(hartId + i, function, args, stack_ptr[i]);
-        *snitchBootAddr = (uint32_t)((uint64_t)trampoline & 0xFFFFFFFF);
-        fence();
-        // Send interrupt to the core
-        volatile uint32_t *interruptTarget = ((uint32_t *)CLINT_CTRL_BASE) + hartId + i;
-        *interruptTarget = 1;
+    }
+    _set_boot_addr(trampoline);
+    fence();
+    for (uint32_t i = 0; i < _chimera_numCores[clusterId]; i++) {
+        _wake_hart(hartId + i);
     }
 
 #ifdef TRACE
@@ -162,8 +181,10 @@ void offload_snitchCluster(void *function, void *trampoline, void *args, void **
     }
 #endif
 
-    // Prevent race contidtion by waiting for all cores to set the busy flag
-    for (volatile int i = 0; i < 10; i++);
+    // The boot address and the trampoline entries may change once every core has read them
+    for (uint32_t i = 0; i < _chimera_numCores[clusterId]; i++) {
+        _wait_trampoline_ack(hartId + i);
+    }
 }
 
 /* Returns 1 if the cluster is busy, 0 if idle, -1 if clusterId is out of range. */
@@ -193,19 +214,9 @@ int snitchCluster_busy(uint8_t clusterId) {
     return *busy_ptr;
 }
 
-/*
- * Busy-waits until the cluster is idle, then inserts a short NOP delay to avoid a race condition
- * where cores have not yet set the busy flag after being released.
- */
+/* Busy-waits until the cluster's first core has returned. */
 void wait_snitchCluster_busy(uint8_t clusterId) {
     while (snitchCluster_busy(clusterId) == 1);
-    // TODO: temporary race condition fix
-    for (int i = 0; i < 5000; i++) {
-        // NOP
-        asm volatile("addi x0, x0, 0\n" :::);
-    }
-
-    return;
 }
 
 /*
@@ -300,6 +311,9 @@ void set_snitchCluster_reset(uint8_t clusterId, bool enable) {
     default:
         break;
     }
+    if (!enable) {
+        _wait_snitchCluster_boot();
+    }
 }
 
 /* Asserts or de-asserts soft reset for all clusters. */
@@ -309,6 +323,9 @@ void setAll_snitchCluster_reset(bool enable) {
     *(volatile uint8_t *)(SOC_CTRL_BASE + CHIMERA_RESET_CLUSTER_2_REG_OFFSET) = enable;
     *(volatile uint8_t *)(SOC_CTRL_BASE + CHIMERA_RESET_CLUSTER_3_REG_OFFSET) = enable;
     *(volatile uint8_t *)(SOC_CTRL_BASE + CHIMERA_RESET_CLUSTER_4_REG_OFFSET) = enable;
+    if (!enable) {
+        _wait_snitchCluster_boot();
+    }
 }
 
 static int snitchcluster_open(chi_device_t *dev) {

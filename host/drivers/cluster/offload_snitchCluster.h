@@ -63,8 +63,9 @@ void *generate_snitchCluster_SPs_uniform(uint8_t clusterId, void *sp, uint32_t s
 // Function Offloading
 /**
  * @brief Offload a void function pointer to a cluster.
- * The function will be executed on all cores of the cluster. Waits for the cluster to become
- * idle before offloading.
+ * The function will be executed on all cores of the cluster, with interrupts disabled
+ * (`mstatus.MIE` = 0). Waits for the cluster to become idle before offloading, and returns once
+ * every core has read its trampoline entries, so the next offload can follow right away.
  *
  * @param function Function pointer to offload
  * @param trampoline Address of the trampoline in the device binary. The trampoline loads the
@@ -79,7 +80,9 @@ void offload_snitchCluster(void *function, void *trampoline, void *args, void **
 
 /**
  * @brief Offload a void function pointer to a cluster's core.
- * The function will be executed on the specified core of the cluster.
+ * The function will be executed on the specified core of the cluster, with interrupts disabled
+ * (`mstatus.MIE` = 0). Waits for the cluster to become idle before offloading, and returns once
+ * the core has read its trampoline entries.
  *
  * @param function Function pointer to offload
  * @param trampoline Address of the trampoline in the device binary. The trampoline loads the
@@ -94,6 +97,8 @@ void offload_snitchCluster_core(void *function, void *trampoline, void *args, vo
 
 /**
  * @brief Set Soft Reset on specified cluster
+ * Releasing the reset waits a fixed time for the cores to reach the bootrom's first `wfi`, so
+ * the cluster's clock must be on.
  * @param clusterId ID of the cluster to set soft reset for
  * @param enable true to enable soft reset, false to disable
  */
@@ -101,6 +106,8 @@ void set_snitchCluster_reset(uint8_t clusterId, bool enable);
 
 /**
  * @brief Set Soft Reset on all clusters
+ * Releasing the reset waits a fixed time for the cores to reach the bootrom's first `wfi`, so
+ * the clusters' clocks must be on.
  * @param enable true to enable soft reset, false to disable
  */
 void setAll_snitchCluster_reset(bool enable);
@@ -131,11 +138,8 @@ int snitchCluster_busy(uint8_t clusterId);
  * @brief Blocking wait for the cluster to become idle.
  * The function busy waits until the cluster is ready.
  *
- * @warning The busy flag is set by the cluster's first core (`_SET_CLUSTER_BUSY()`), not by
- * hardware. Hence the busy flag does not reflect the actual status of the cluster right after an
- * offload. A fixed NOP delay after the flag clears is used as a temporary workaround.
- *
- * @todo Replace the delay after adding synchronization primitives for the Snitch cores.
+ * @note The busy flag is set by the cluster's first core when it wakes up, and cleared by the
+ * Snitch bootrom once that core has returned. The other cores may still be running.
  *
  * @param clusterId ID of the cluster to wait for.
  */
