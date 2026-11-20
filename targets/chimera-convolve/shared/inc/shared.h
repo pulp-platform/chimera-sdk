@@ -45,6 +45,9 @@ typedef struct __attribute__((packed)) {
     /** @brief Per-core stack pointer written by the host before releasing a core. */
     volatile uint32_t trampoline_stack[NUM_CLUSTER_CORES];
 
+    /** @brief Per-core flag the trampoline sets once it has read the three entries above. */
+    volatile uint32_t trampoline_ack[NUM_CLUSTER_CORES];
+
 } chimera_shared_data_t;
 
 /** @brief Singleton instance of the shared communication region, placed in @c .common. */
