@@ -81,14 +81,17 @@ void clusterDefaultHandler() {
  */
 int32_t testReturn(void *args __attribute__((unused))) {
 
-    *reg32((void *)SOC_CTRL_BASE, CHIMERA_SNITCH_INTR_HANDLER_ADDR_REG_OFFSET) =
-        (uint32_t)clusterDefaultHandler;
-
     extern char __tbss_start[], __tbss_end[], __tdata_start[], __tdata_end[];
     extern char __cbss_start[], __cbss_end[], __cdata_start[], __cdata_end[];
     extern char __cdata_lma_start[], __cdata_lma_end[];
 
     snrt_init();
+
+    // Only after snrt_init()'s barrier: a core still waking up would take this handler and hang
+    if (snrt_cluster_core_idx() == 0) {
+        *reg32((void *)SOC_CTRL_BASE, CHIMERA_SNITCH_INTR_HANDLER_ADDR_REG_OFFSET) =
+            (uint32_t)clusterDefaultHandler;
+    }
 
     if (snrt_is_dm_core()) {
         printf("Cluster Local Data 1 @ %p = %#x\n", &cluster_local_var1, cluster_local_var1);
