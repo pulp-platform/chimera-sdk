@@ -10,7 +10,8 @@
  * ALL CORES — Thread-Local Storage (TLS):
  *   Copy .tdata from the binary LMA into each core's thread pointer region,
  *   then zero .tbss.  Each core's tp register already points to its private
- *   TLS block (set up by crt0.S from the per-core stack allocation).
+ *   TLS block (set up by crt0.S from the per-core stack allocation).  Then set
+ *   the thread-local pointer to the cluster local storage (snrt_cls()).
  *
  * DMA CORE ONLY — Cluster memory:
  *   1. DMA-copy per-cluster L1 data (.l1 sections) from the LMA in memisl to
@@ -73,9 +74,13 @@ void snrt_init() {
     memset((void *)(tls_ptr + tbss_off), 0, size_tbss);
 
     /********** Cluster Initialization **********/
-    if (snrt_is_dm_core()) {
-        uint32_t cluster_idx = snrt_cluster_idx();
+    uint32_t cluster_idx = snrt_cluster_idx();
+    uintptr_t l1_heap_base = _chimera_clusterHeapStart[cluster_idx];
 
+    // The pointer is thread-local, so every core sets its own
+    _cls_ptr = (cls_t *)l1_heap_base;
+
+    if (snrt_is_dm_core()) {
         // Preload l1 data from LMA to VMA
         uintptr_t __l1_lma_start = _chimera_clusterL1LmaStart[cluster_idx];
         uintptr_t __l1_lma_end = _chimera_clusterL1LmaEnd[cluster_idx];
@@ -110,10 +115,6 @@ void snrt_init() {
             snrt_dma_start_1d((void *)__cbss_local_start, (void *)snrt_zero_memory_ptr(),
                               size_cbss);
         }
-
-        // Initialize the cluster local storage pointer
-        uintptr_t l1_heap_base = _chimera_clusterHeapStart[cluster_idx];
-        _cls_ptr = (cls_t *)l1_heap_base;
 
         // Initialize the L1 allocator
         snrt_l1_allocator()->base = ALIGN_UP(l1_heap_base + sizeof(cls_t), MIN_CHUNK_SIZE);
