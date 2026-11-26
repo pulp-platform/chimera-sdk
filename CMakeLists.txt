@@ -56,8 +56,9 @@ set(error_messages "")
 ################################################################################
 
 # Bootstrap uv Python environment for post-build tools (optional)
+# PATHS, unlike HINTS, come after PATH, so a stale uv in ~/.local/bin cannot shadow the user's
 find_program(CHIMERA_UV uv
-    HINTS $ENV{HOME}/.local/bin /usr/local/bin
+    PATHS $ENV{HOME}/.local/bin /usr/local/bin
     DOC "uv Python package manager")
 if(CHIMERA_UV)
     execute_process(
