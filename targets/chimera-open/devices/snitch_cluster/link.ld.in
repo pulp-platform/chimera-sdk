@@ -83,6 +83,17 @@ SECTIONS {
     *(.sdata.*)
   } > memisl
 
+  .bss (NOLOAD) : ALIGN(32) {
+    . = ALIGN(32);
+    __bss_start = .;
+    *(.bss)
+    *(.bss.*)
+    *(.sbss)
+    *(.sbss.*)
+    . = ALIGN(32);
+    __bss_end = .;
+  } > memisl
+
   .got : ALIGN(32) {
     *(.got)
     *(.got.*)
@@ -93,24 +104,13 @@ SECTIONS {
     *(.data.rel.ro*)
   } > memisl
 
-  /* Thread Local Storage sections */
+  /* Thread Local Storage sections; the TLS segment must start at __tdata_start */
   .tdata : ALIGN(32) {
     . = ALIGN(32);
     __tdata_start = .;
     *(.tdata .tdata.* .gnu.linkonce.td.*)
     . = ALIGN(32);
     __tdata_end = .;
-  } > memisl
-
-  .bss (NOLOAD) : ALIGN(32) {
-    . = ALIGN(32);
-    __bss_start = .;
-    *(.bss)
-    *(.bss.*)
-    *(.sbss)
-    *(.sbss.*)
-    . = ALIGN(32);
-    __bss_end = .;
   } > memisl
 
   .tbss (NOLOAD) : ALIGN(32) {
