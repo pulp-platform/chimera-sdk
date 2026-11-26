@@ -24,6 +24,7 @@
  *   [prev device end]       ├─ .init / .text / .rodata / .data
  *                           ├─ .bss       (NOLOAD)
  *                           ├─ .tdata / .tbss
+ *                           ├─ load images of .cdata and .l1_c0 to .l1_c4
  *   __device_end            └─ 4 KiB-aligned end → ${TARGET}_placement.ldh
  *
  * The host sets __stack_pointer$ and __global_pointer$ in the cluster control
@@ -251,8 +252,9 @@ SECTIONS {
   PROVIDE(__l1_c4_lma_start = 0);
   PROVIDE(__l1_c4_lma_end = 0);
 
-  /* First free address in memisl (VMA usage and LMA payload usage). */
-  __device_end = MAX(__tbss_end, MAX(__cdata_lma_end, __cbss_lma_end));
+  /* First free address in memisl (VMA usage and LMA payload usage, including the L1 images). */
+  __device_end = MAX(MAX(MAX(__tbss_end, __cdata_lma_end), MAX(__cbss_lma_end, __l1_c0_lma_end)),
+                     MAX(MAX(__l1_c1_lma_end, __l1_c2_lma_end), MAX(__l1_c3_lma_end, __l1_c4_lma_end)));
 
   /* snitch-sdk's snrt_alloc_init() and snrt_l3_init() start the L3 heap at _edram */
   PROVIDE(_edram = __l3_heap_start);
