@@ -11,6 +11,7 @@
 
 // Include Target Specific Headers
 #include "soc.h"
+#include "symbols.h"
 
 // Include Driver Headers
 #include "trampoline.h"
@@ -20,6 +21,7 @@
 
 SNRT_CLUSTER_L1_COPY(static volatile int8_t cluster_local_var1) = 1;
 SNRT_CLUSTER_L1_ZERO(static volatile int cluster_local_var2[64]);
+SNRT_CLUSTER_L1_ZERO(static volatile int wrong_cls[16]);
 
 static __thread int32_t thread_local_var1 = 1;
 static __thread int32_t thread_local_var2[64];
@@ -77,7 +79,7 @@ void clusterDefaultHandler() {
 /**
  * @brief Main function of the cluster test.
  *
- * @return int Return 0 if the test was successful, -1 otherwise.
+ * @return int Twice the number of cores whose cluster local storage pointer is wrong.
  */
 int32_t testReturn(void *args __attribute__((unused))) {
 
@@ -92,6 +94,9 @@ int32_t testReturn(void *args __attribute__((unused))) {
         *reg32((void *)SOC_CTRL_BASE, CHIMERA_SNITCH_INTR_HANDLER_ADDR_REG_OFFSET) =
             (uint32_t)clusterDefaultHandler;
     }
+
+    wrong_cls[snrt_cluster_core_idx()] =
+        snrt_cls() != (cls_t *)_chimera_clusterHeapStart[snrt_cluster_idx()];
 
     if (snrt_is_dm_core()) {
         printf("Cluster Local Data 1 @ %p = %#x\n", &cluster_local_var1, cluster_local_var1);
@@ -153,5 +158,9 @@ int32_t testReturn(void *args __attribute__((unused))) {
            thread_local_var2[0]);
 
     snrt_cluster_hw_barrier();
-    return 0;
+
+    // The number of cores without the cluster local storage pointer, above the bootrom's bit 0
+    int errors = 0;
+    for (uint32_t i = 0; i < snrt_cluster_core_num(); i++) errors += wrong_cls[i];
+    return errors << 1;
 }
