@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>High Level API Reference (HAL) &mdash; Chimera SDK 2024 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=6fefd858"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Low Level API Reference (Runtime)" href="../api_ll/api_ll.html" />
+    <link rel="prev" title="API References" href="../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Chimera SDK
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/structure.html">Folder Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/build.html">CMake Build System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage/ci.html">CI System</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API References</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">High Level API Reference (HAL)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#device-api">Device API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv419chi_device_callback"><code class="docutils literal notranslate"><span class="pre">chi_device_callback</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv416chi_device_api_t"><code class="docutils literal notranslate"><span class="pre">chi_device_api_t</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv412chi_device_t"><code class="docutils literal notranslate"><span class="pre">chi_device_t</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../api_ll/api_ll.html">Low Level API Reference (Runtime)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_cmake/api_cmake.html">CMake API Reference</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Chimera SDK</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API References</a></li>
+      <li class="breadcrumb-item active">High Level API Reference (HAL)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/api_hal/api_hal.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="high-level-api-reference-hal">
+<h1>High Level API Reference (HAL)<a class="headerlink" href="#high-level-api-reference-hal" title="Link to this heading"></a></h1>
+<section id="device-api">
+<h2>Device API<a class="headerlink" href="#device-api" title="Link to this heading"></a></h2>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv419chi_device_callback">
+<span id="_CPPv319chi_device_callback"></span><span id="_CPPv219chi_device_callback"></span><span id="chi_device_callback"></span><span class="target" id="group__device_1gad4666df143845fe987edd0940847255b"></span><span class="k"><span class="pre">typedef</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">chi_device_callback</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">chi_device</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv419chi_device_callback" title="Link to this definition"></a><br /></dt>
+<dd><p>Callback function for asynchronous device operations. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv416chi_device_api_t">
+<span id="_CPPv316chi_device_api_t"></span><span id="_CPPv216chi_device_api_t"></span><span id="chi_device_api_t"></span><span class="target" id="structchi__device__api__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chi_device_api_t</span></span></span><a class="headerlink" href="#_CPPv416chi_device_api_t" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;device_api.h&gt;</em></div>
+<p>Device API structure. </p>
+<p>This structure defines the API for a device. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16chi_device_api_t4openE">
+<span id="_CPPv3N16chi_device_api_t4openE"></span><span id="_CPPv2N16chi_device_api_t4openE"></span><span class="target" id="structchi__device__api__t_1a3857ca496c3babdf3ae3aa446c68f3e4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">open</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">chi_device</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N16chi_device_api_t4openE" title="Link to this definition"></a><br /></dt>
+<dd><p>Open the device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param device<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Device to open. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>int 0 on success, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16chi_device_api_t5closeE">
+<span id="_CPPv3N16chi_device_api_t5closeE"></span><span id="_CPPv2N16chi_device_api_t5closeE"></span><span class="target" id="structchi__device__api__t_1a4cc629e642dc8d0c8d2dd992eff857c5"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">close</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">chi_device</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N16chi_device_api_t5closeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Close the device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param device<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Device to close. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>int 0 on success, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16chi_device_api_t10read_asyncE">
+<span id="_CPPv3N16chi_device_api_t10read_asyncE"></span><span id="_CPPv2N16chi_device_api_t10read_asyncE"></span><span class="target" id="structchi__device__api__t_1a19bfb0709f1528c7c110d3f8d98de674"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">read_async</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">chi_device</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv419chi_device_callback" title="chi_device_callback"><span class="n"><span class="pre">chi_device_callback</span></span></a><span class="w"> </span><span class="n"><span class="pre">cb</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N16chi_device_api_t10read_asyncE" title="Link to this definition"></a><br /></dt>
+<dd><p>Read from the device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param device<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Device to read from. </p>
+</dd>
+<dt class="field-even">Param buffer<span class="colon">:</span></dt>
+<dd class="field-even"><p>Buffer to read into. </p>
+</dd>
+<dt class="field-odd">Param size<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Size of the buffer. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>ssize_t Number of bytes read, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16chi_device_api_t11write_asyncE">
+<span id="_CPPv3N16chi_device_api_t11write_asyncE"></span><span id="_CPPv2N16chi_device_api_t11write_asyncE"></span><span class="target" id="structchi__device__api__t_1a37ef6cb37e96856667a85f43b73310bc"></span><span class="n"><span class="pre">ssize_t</span></span><span class="w"> </span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">write_async</span></span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">(</span></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">chi_device</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n"><span class="pre">buffer</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv419chi_device_callback" title="chi_device_callback"><span class="n"><span class="pre">chi_device_callback</span></span></a><span class="w"> </span><span class="n"><span class="pre">cb</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4N16chi_device_api_t11write_asyncE" title="Link to this definition"></a><br /></dt>
+<dd><p>Write to the device.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param device<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Device to write to. </p>
+</dd>
+<dt class="field-even">Param buffer<span class="colon">:</span></dt>
+<dd class="field-even"><p>Buffer to write from. </p>
+</dd>
+<dt class="field-odd">Param size<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Size of the buffer. </p>
+</dd>
+<dt class="field-even">Return<span class="colon">:</span></dt>
+<dd class="field-even"><p>ssize_t Number of bytes written, negative on failure. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv412chi_device_t">
+<span id="_CPPv312chi_device_t"></span><span id="_CPPv212chi_device_t"></span><span id="chi_device_t"></span><span class="target" id="structchi__device__t"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">chi_device_t</span></span></span><a class="headerlink" href="#_CPPv412chi_device_t" title="Link to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;device_api.h&gt;</em></div>
+<p>Device structure. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12chi_device_t3apiE">
+<span id="_CPPv3N12chi_device_t3apiE"></span><span id="_CPPv2N12chi_device_t3apiE"></span><span id="chi_device_t::api__chi_device_apiP"></span><span class="target" id="structchi__device__t_1a7e9657f9806db7615d061381ee4323f7"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="n"><span class="pre">chi_device_api</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">api</span></span></span><a class="headerlink" href="#_CPPv4N12chi_device_t3apiE" title="Link to this definition"></a><br /></dt>
+<dd><p>Device API. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12chi_device_t11device_addrE">
+<span id="_CPPv3N12chi_device_t11device_addrE"></span><span id="_CPPv2N12chi_device_t11device_addrE"></span><span id="chi_device_t::device_addr__uint32_tP"></span><span class="target" id="structchi__device__t_1a751cd0901885a36ba8fef95edc01adc2"></span><span class="n"><span class="pre">uint32_t</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">device_addr</span></span></span><a class="headerlink" href="#_CPPv4N12chi_device_t11device_addrE" title="Link to this definition"></a><br /></dt>
+<dd><p>Device address. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12chi_device_t3cfgE">
+<span id="_CPPv3N12chi_device_t3cfgE"></span><span id="_CPPv2N12chi_device_t3cfgE"></span><span id="chi_device_t::cfg__voidP"></span><span class="target" id="structchi__device__t_1a5db20be58d83738e1d7c4eae6fb37d61"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">cfg</span></span></span><a class="headerlink" href="#_CPPv4N12chi_device_t3cfgE" title="Link to this definition"></a><br /></dt>
+<dd><p>Device configuration. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../api.html" class="btn btn-neutral float-left" title="API References" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api_ll/api_ll.html" class="btn btn-neutral float-right" title="Low Level API Reference (Runtime)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Philip Wiese, Moritz Scherer, Viviane Potocnik.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    Version: smazzola/dev-pulp
+    <span class="fa fa-caret-down"></span>
+  </span>
+  <div class="rst-other-versions">
+    
+    
+    <dl>
+      <dt>Versions</dt>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk//index.html">master</a></dd>
+      
+      <dd><a href="https://pulp-platform.github.io/chimera-sdk/branch/devel//index.html">devel</a></dd>
+      
+    </dl>
+    
+    <br>
+    </dl>
+  </div>
+</div><script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
