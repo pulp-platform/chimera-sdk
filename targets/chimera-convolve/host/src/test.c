@@ -238,8 +238,8 @@ int test_cluster(test_cluster_cfg_t *test_cfg) {
                     printf_log("Unknown syscall: %u\n", syscall_mem[0]);
                 }
 
-                // Notify cluster that syscall is done
-                shared_data.device_to_host = syscall_addr;
+                // Notify cluster that syscall is done; the device's putc waits on host_to_device
+                shared_data.host_to_device = syscall_addr;
             }
             // Enter low-power mode until next interrupt
             clint_sleep_ticks(0, 10);
