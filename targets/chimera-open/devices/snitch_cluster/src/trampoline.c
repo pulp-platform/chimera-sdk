@@ -28,8 +28,17 @@ __attribute__((naked)) KEEP void trampoline() {
     _SETUP_GP();
 
     asm volatile(
+        // Turn interrupts off, so later wake-ups leave the bootrom's wfi without a trap
+        "csrci mstatus, 8\n"
+
         // Get hart ID (hardware thread ID)
         "csrr t0, mhartid\n"
+
+        // Clear this core's software interrupt
+        "la t1, __base_clint\n"
+        "slli t2, t0, 2\n"
+        "add t1, t1, t2\n"
+        "sw zero, 0(t1)\n"
 
         // ---- Load stack pointer from shared_data.trampoline_stack[hartId] ----
         "la a0, shared_data\n"
@@ -69,13 +78,26 @@ __attribute__((naked)) KEEP void trampoline() {
         "add a0, a0, t0\n"           // a0 = &trampoline_args[hartId]
         "lw a0, 0(a0)\n"             // a0 = trampoline_args[hartId]
 
+        // ---- Set trampoline_ack[hartId]; t2 = 1 depends on all three loads, so no fence ----
+        "la t1, shared_data\n"
+        "addi t1, t1, %[off_ack]\n"
+        "add t1, t1, t0\n"
+        "xor t2, a0, a0\n"
+        "xor t3, a1, a1\n"
+        "or t2, t2, t3\n"
+        "xor t3, sp, sp\n"
+        "or t2, t2, t3\n"
+        "addi t2, t2, 1\n"
+        "sw t2, 0(t1)\n"
+
         // Call the offloaded function
         "jr a1\n"
         : /* No outputs */
         : [hartOffset] "i"(CLUSTER_HART_BASE),
           [off_stack] "i"(offsetof(chimera_shared_data_t, trampoline_stack)),
           [off_func] "i"(offsetof(chimera_shared_data_t, trampoline_function)),
-          [off_args] "i"(offsetof(chimera_shared_data_t, trampoline_args)));
+          [off_args] "i"(offsetof(chimera_shared_data_t, trampoline_args)),
+          [off_ack] "i"(offsetof(chimera_shared_data_t, trampoline_ack)));
 }
 
 /** @}*/

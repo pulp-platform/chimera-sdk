@@ -107,6 +107,7 @@ The layout is defined by a single C struct compiled into every binary:
         volatile uint32_t trampoline_function[NUM_CLUSTER_CORES];
         volatile uint32_t trampoline_args[NUM_CLUSTER_CORES];
         volatile uint32_t trampoline_stack[NUM_CLUSTER_CORES];
+        volatile uint32_t trampoline_ack[NUM_CLUSTER_CORES];
     } chimera_shared_data_t;
 
     extern chimera_shared_data_t shared_data;
@@ -343,6 +344,27 @@ GP-relative addressing:
     }
 
 The trampoline lives in the **device** binary only and is never linked into the host.
+
+Offload Handshake
+-----------------
+
+``offload_snitchCluster()`` writes each core's ``trampoline_function``, ``trampoline_args`` and
+``trampoline_stack``, clears its ``trampoline_ack``, writes the trampoline's address to the
+``SNITCH_BOOT_ADDR`` register and wakes the cores with a software interrupt. Each core then runs
+through the Snitch bootrom into the trampoline, which:
+
+1. turns interrupts off (``mstatus.MIE``),
+2. clears its software interrupt,
+3. reads its three entries and sets its ``trampoline_ack``.
+
+``offload_snitchCluster()`` returns once every core has set its ``trampoline_ack``. All clusters
+share ``SNITCH_BOOT_ADDR``, so this is what lets the next offload, to any cluster and with any
+binary, follow right away. With interrupts off, the next wake-up ends the bootrom's ``wfi``
+without a trap, so it is not lost when it arrives before the core is back in the ``wfi``.
+
+Only the first wake-up after a reset goes through the bootrom's trap handler and the handler set
+with ``setup_snitchCluster_interruptHandler()``. The bootrom enables interrupts before it sets
+``mtvec``, so ``set_snitchCluster_reset()`` waits a fixed time after releasing the reset.
 
 Key Design Decisions
 --------------------
