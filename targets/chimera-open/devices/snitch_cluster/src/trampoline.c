@@ -78,12 +78,16 @@ __attribute__((naked)) KEEP void trampoline() {
         "add a0, a0, t0\n"           // a0 = &trampoline_args[hartId]
         "lw a0, 0(a0)\n"             // a0 = trampoline_args[hartId]
 
-        // ---- Set shared_data.trampoline_ack[hartId] once the loads above are done ----
+        // ---- Set trampoline_ack[hartId]; t2 = 1 depends on all three loads, so no fence ----
         "la t1, shared_data\n"
         "addi t1, t1, %[off_ack]\n"
         "add t1, t1, t0\n"
-        "li t2, 1\n"
-        "fence\n"
+        "xor t2, a0, a0\n"
+        "xor t3, a1, a1\n"
+        "or t2, t2, t3\n"
+        "xor t3, sp, sp\n"
+        "or t2, t2, t3\n"
+        "addi t2, t2, 1\n"
         "sw t2, 0(t1)\n"
 
         // Call the offloaded function

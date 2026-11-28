@@ -55,7 +55,10 @@ static void _setup_trampoline(uint32_t hartID, void (*function)(void *), void *a
 
 /* Waits until the given hart's trampoline has read its entries. */
 static void _wait_trampoline_ack(uint32_t hartID) {
-    while (shared_data.trampoline_ack[hartID - CLUSTER_HART_BASE] == 0);
+    // One word load per poll: shared_data is packed, so a plain access reads byte by byte
+    volatile uint32_t *ack =
+        (volatile uint32_t *)(uintptr_t)&shared_data.trampoline_ack[hartID - CLUSTER_HART_BASE];
+    while (*ack == 0);
 }
 
 /* Writes the address every woken Snitch core jumps to. */
