@@ -211,6 +211,36 @@ Key arguments:
   ``link.ld.in`` linker script template respectively.
 - ``PREV_DEVICE`` – optional; name of the preceding device in memisl order.  When set, this
   device is placed immediately after it via the placement chain.
+- ``DEVICE_TYPE`` – optional; the device type whose runtime this binary compiles (see
+  below).  Defaults to ``snitch_cluster``.
+
+Device runtimes and device types
+---------------------------------
+
+Every device binary compiles its runtime with its own ISA and ABI, from two sets of global
+properties:
+
+- ``CHIMERA_DEVICE_RUNTIME_{SOURCES,LIBRARY_SOURCES,INCLUDES,PRIVATE_INCLUDES,DEFINES}`` –
+  common to every device type: the target's shared code and headers.  The target's
+  ``CMakeLists.txt`` sets them.
+- ``CHIMERA_DEVICE_<TYPE>_RUNTIME_*`` – one set per device type, filled with
+  ``chimera_add_device_runtime()``.  For ``snitch_cluster``, the target registers its glue
+  (``crt0.S``, ``trampoline.c``, ``symbols.c``) and ``devices/snitch_cluster`` the cluster
+  runtime and the snitch-sdk.
+
+.. code-block:: cmake
+
+    chimera_add_device_runtime(snitch_cluster
+        SOURCES  ${CMAKE_CURRENT_LIST_DIR}/putc.c
+        INCLUDES ${CMAKE_CURRENT_LIST_DIR}
+        DEFINES  CHIMERA_DEVICE_SNITCH_CLUSTER
+    )
+
+A target with several kinds of device lists each device directory in ``DEVICE_MAPPINGS``
+(``devices/CMakeLists.txt``, e.g. ``my-target:snitch_cluster,my_cluster``), keeps each
+type's linker template and glue in ``targets/<target>/devices/<type>/``, and builds each
+binary with ``DEVICE_TYPE`` and the matching ``DEVICE_DIR``.  A binary never sees another
+type's runtime; ``tests/deviceTypes`` checks this.
 
 ``add_host_binary()``
 ----------------------
